@@ -1,0 +1,10 @@
+﻿Found API key in .env.local
+Testing with API Key: AIzaSyAp...
+
+=== Testing v1 API ===
+v1 Response status: 404
+v1 Error: models/gemini-1.5-flash is not found for API version v1, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+
+=== Testing v1beta API ===
+v1beta Response status: 404
+v1beta Error: models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.

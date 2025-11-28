@@ -1,0 +1,90 @@
+╔══════════════════════════════════════════════════════════════╗
+║         WELLVEST BACKEND DEPLOYMENT CHECKLIST                ║
+╚══════════════════════════════════════════════════════════════╝
+
+📋 PRE-DEPLOYMENT CHECKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  [ ] npm run build - succeeds
+  [ ] npm run dev - app loads
+  [ ] Can login/signup to app
+  [ ] .env.local has VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+  [ ] Have Gemini API key from https://makersuite.google.com/app/apikey
+
+
+🚀 DEPLOYMENT STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: SETTINGS COLUMN (1 minute)
+  [ ] Open Supabase Dashboard
+  [ ] Go to: SQL Editor
+  [ ] Run: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS settings JSONB DEFAULT '{}'::jsonb;
+  [ ] See: Success message
+
+
+STEP 2: EDGE FUNCTION (2 minutes)
+  [ ] Terminal: npx supabase login
+  [ ] Terminal: npx supabase link --project-ref YOUR_REF
+  [ ] Terminal: npx supabase functions deploy gemini-chat
+  [ ] Terminal: npx supabase secrets set GEMINI_API_KEY=your_key
+  [ ] Verify: npx supabase functions list (shows gemini-chat)
+
+
+STEP 3: RECURRING TRANSACTIONS (1 minute)
+  [ ] Open file: supabase/recurring_logic.sql
+  [ ] Copy all content
+  [ ] Supabase Dashboard → SQL Editor → New Query
+  [ ] Paste and Run
+  [ ] See: Success message
+
+
+🧪 TESTING CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RUN VERIFICATION SCRIPT:
+  [ ] Terminal: node scripts/verify-backend.js
+  [ ] All 4 checks show ✅
+
+
+TEST 1: SETTINGS SYNC
+  [ ] App → Login
+  [ ] Go to Profile
+  [ ] Toggle Dark Mode ON
+  [ ] Supabase Dashboard → Table Editor → profiles
+  [ ] Find your user row
+  [ ] Check settings column shows: {"darkMode": true, ...}
+  ✅ PASS: Settings sync to Supabase
+
+
+TEST 2: GEMINI EDGE FUNCTION
+  [ ] App → Wellness → Mental Health Chat
+  [ ] Type: "Hello, are you working?"
+  [ ] Send message and receive AI response
+  [ ] Browser DevTools → Network tab
+  [ ] Verify call to: gemini-chat function
+  ✅ PASS: API calls secured
+
+
+TEST 3: RECURRING TRANSACTIONS
+  [ ] Supabase → SQL Editor
+  [ ] Run process_recurring_transactions()
+  [ ] Verify function exists and runs
+  ✅ PASS: Recurring logic works
+
+
+TEST 4: NOTIFICATIONS
+  [ ] App → Profile → Toggle Notifications
+  [ ] Browser shows permission prompt
+  [ ] Console shows: "Service Worker registered"
+  ✅ PASS: Notifications ready
+
+
+✅ COMPLETION CRITERIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  [ ] All 4 tests pass
+  [ ] verify-backend.js shows 4/4
+  [ ] No errors in console
+
+
+🎉 SUCCESS! All backend features deployed!
+
+ESTIMATED TIME: 10-15 minutes total

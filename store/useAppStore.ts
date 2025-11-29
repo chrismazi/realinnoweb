@@ -535,9 +535,14 @@ const useAppStore = create<AppState>()(
               darkMode: loadedSettings.darkMode ?? false,
               notifications: loadedSettings.notifications ?? true,
               biometrics: loadedSettings.biometrics ?? false,
-              language: loadedSettings.language || 'en',
-              currency: loadedSettings.currency || 'USD'
+              // Force Kinyarwanda for all users (migration)
+              language: 'rw',
+              currency: loadedSettings.currency === 'USD' ? 'RWF' : loadedSettings.currency
             };
+          } else {
+            // New users - ensure Kinyarwanda is set
+            state.settings.language = 'rw';
+            state.settings.currency = 'RWF';
           }
 
           // Apply settings

@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
+import { useTranslation } from '../hooks/useTranslation';
 import { SavingsGoal, Tab, Transaction } from '../types';
 import useAppStore, { useBalance, useSavingsGoals, useTransactions, useUser } from '../store/useAppStore';
 import { CardSkeleton, ChartSkeleton, EmptyState } from './ui/LoadingStates';
@@ -35,6 +36,7 @@ const getGoalIcon = (iconName: string) => {
 
 const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   // Get real data from store
+  const { t } = useTranslation();
   const user = useUser();
   const balance = useBalance();
   const savingsGoals = useSavingsGoals();
@@ -120,9 +122,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       {/* Header */}
       <div className="pt-14 px-6 pb-6 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl sticky top-0 z-30 flex justify-between items-center transition-all duration-300">
         <div className="animate-fade-in">
-          <h2 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest mb-0.5">{getGreeting()}</h2>
+          <h2 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest mb-0.5">{t('dashboard.welcome')}</h2>
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            {user.name || 'Welcome'}
+            {user.name || t('auth.welcomeBack')}
           </h1>
         </div>
         <div onClick={() => onNavigate(Tab.PROFILE)} className="relative group cursor-pointer animate-scale-in">
@@ -170,7 +172,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div className="flex justify-between items-start mb-8">
               <div>
                 <p className="text-slate-400 text-sm font-medium mb-1 flex items-center gap-2">
-                  Total Balance
+                  {t('dashboard.totalBalance')}
                   {/* Orange Pulse */}
                   <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse"></span>
                 </p>
@@ -178,7 +180,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   ${Math.abs(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </h2>
                 {balance < 0 && (
-                  <span className="text-xs text-red-400 font-bold mt-1">Overdraft</span>
+                  <span className="text-xs text-red-400 font-bold mt-1">{t('common.overdraft')}</span>
                 )}
               </div>
               <button className="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10 hover:bg-white/20 transition-all cursor-pointer active:scale-90 shadow-lg group">
@@ -192,7 +194,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   <div className="w-5 h-5 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 group-hover/item:scale-110 transition-transform">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" transform="rotate(180 12 12)" /></svg>
                   </div>
-                  <p className="text-[10px] text-slate-300 font-bold uppercase tracking-wider">Income</p>
+                  <p className="text-[10px] text-slate-300 font-bold uppercase tracking-wider">{t('dashboard.income')}</p>
                 </div>
                 <p className="font-bold text-lg tracking-wide pl-1">
                   +${monthlyIncome.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
@@ -203,7 +205,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   <div className="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-brand group-hover/item:scale-110 transition-transform">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                   </div>
-                  <p className="text-[10px] text-slate-300 font-bold uppercase tracking-wider">Expense</p>
+                  <p className="text-[10px] text-slate-300 font-bold uppercase tracking-wider">{t('dashboard.expenses')}</p>
                 </div>
                 <p className="font-bold text-lg tracking-wide pl-1">
                   -${monthlyExpenses.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
@@ -216,8 +218,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         {/* Daily Pulse - Horizontal Scroll Widgets */}
         <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex justify-between items-center mb-5 px-1">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Daily Pulse</h3>
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">Today</span>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('dashboard.dailyPulse')}</h3>
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">{t('common.today')}</span>
           </div>
           <div className="flex gap-4 overflow-x-auto no-scrollbar pb-6 -mx-6 px-6 snap-x snap-mandatory">
             {/* Budget Widget - Using Brand Color */}
@@ -226,7 +228,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <Icons.Wallet className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Daily Spend</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">{t('dashboard.dailySpend')}</p>
                 <div className="flex items-end gap-1 mb-3">
                   <span className="text-2xl font-black text-slate-900 dark:text-white leading-none">$42</span>
                   <span className="text-xs text-slate-400 mb-0.5 font-medium">/ $60</span>
@@ -243,7 +245,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <Icons.Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-3">Mood Check</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-3">{t('dashboard.checkMood')}</p>
                 <div className="flex justify-between items-center px-0.5">
                   <button className="text-2xl hover:scale-125 transition-transform grayscale hover:grayscale-0 active:scale-90">😊</button>
                   <button className="text-2xl hover:scale-125 transition-transform grayscale hover:grayscale-0 active:scale-90">😐</button>
@@ -258,7 +260,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <Icons.Bell className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Up Next</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">{t('dashboard.upNext')}</p>
                 <p className="font-bold text-slate-900 dark:text-white text-sm truncate leading-snug">Netflix Sub</p>
                 <div className="flex items-center gap-1.5 mt-1.5 bg-blue-50 dark:bg-blue-900/20 w-fit px-2 py-1 rounded-md">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
@@ -271,14 +273,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
         {/* Quick Actions - Updated to use Brand Orange for the 'Add' button */}
         <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-5 px-1">Quick Actions</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-5 px-1">{t('dashboard.quickActions')}</h3>
           <div className="grid grid-cols-4 gap-4">
             {[
               // Made 'Add' action prominently Orange (Brand)
-              { label: 'Add', icon: <Icons.Plus className="w-6 h-6" />, color: 'bg-brand/10 text-brand', hover: 'hover:bg-brand/20' },
-              { label: 'Send', icon: <Icons.Send className="w-5 h-5 translate-x-0.5 -translate-y-0.5" />, color: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400', hover: 'hover:bg-indigo-100 dark:hover:bg-indigo-500/20' },
-              { label: 'Scan', icon: <Icons.Scan className="w-5 h-5" />, color: 'bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400', hover: 'hover:bg-teal-100 dark:hover:bg-teal-500/20' },
-              { label: 'More', icon: <Icons.Dots className="w-6 h-6" />, color: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400', hover: 'hover:bg-slate-100 dark:hover:bg-slate-700' }
+              { label: t('dashboard.add'), icon: <Icons.Plus className="w-6 h-6" />, color: 'bg-brand/10 text-brand', hover: 'hover:bg-brand/20' },
+              { label: t('dashboard.send'), icon: <Icons.Send className="w-5 h-5 translate-x-0.5 -translate-y-0.5" />, color: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400', hover: 'hover:bg-indigo-100 dark:hover:bg-indigo-500/20' },
+              { label: t('dashboard.scan'), icon: <Icons.Scan className="w-5 h-5" />, color: 'bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400', hover: 'hover:bg-teal-100 dark:hover:bg-teal-500/20' },
+              { label: t('dashboard.more'), icon: <Icons.Dots className="w-6 h-6" />, color: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400', hover: 'hover:bg-slate-100 dark:hover:bg-slate-700' }
             ].map((action, i) => (
               <button key={i} className="flex flex-col items-center gap-3 group active:scale-95 transition-transform duration-200">
                 <div className={`w-16 h-16 rounded-[1.2rem] ${action.color} flex items-center justify-center shadow-sm dark:shadow-none group-hover:shadow-md transition-all duration-300 ${action.hover}`}>
@@ -293,8 +295,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         {/* Savings Goals */}
         <div className="animate-slide-up pb-6" style={{ animationDelay: '0.3s' }}>
           <div className="flex justify-between items-center mb-5 px-1">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Savings Goals</h3>
-            <button className="text-brand text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full hover:bg-brand/10 transition-colors">View All</button>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('dashboard.savingsGoals')}</h3>
+            <button className="text-brand text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full hover:bg-brand/10 transition-colors">{t('dashboard.viewAll')}</button>
           </div>
           <div className="space-y-4">
             {savingsGoals.map((goal) => (

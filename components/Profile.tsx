@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import useAppStore from '../store/useAppStore';
+import { useTranslation } from '../hooks/useTranslation';
 import exportService from '../services/exportService';
 import { notificationService } from '../services/notificationService';
 
@@ -21,6 +22,12 @@ interface UserProfile {
 const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
     const { settings, updateSettings, toggleDarkMode: toggleTheme } = useAppStore();
     const { notifications, biometrics: faceId, darkMode } = settings;
+    const { t, language } = useTranslation();
+
+    const handleToggleLanguage = () => {
+        const newLang = language === 'en' ? 'rw' : 'en';
+        updateSettings({ language: newLang });
+    };
 
     // Modal State
     const [activeModal, setActiveModal] = useState<ModalType>('NONE');
@@ -126,15 +133,16 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
 
     const menuItems = [
         {
-            section: 'Account Settings', items: [
-                { id: 'personal', label: 'Personal Information', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>, action: openEditModal },
+            section: t('profile.account'), items: [
+                { id: 'personal', label: t('auth.name'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>, action: openEditModal },
             ]
         },
         {
-            section: 'App Preferences', items: [
-                { id: 'notifications', label: 'Push Notifications', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>, type: 'toggle', value: notifications, toggle: handleToggleNotifications },
+            section: t('profile.preferences'), items: [
+                { id: 'language', label: t('profile.language'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>, type: 'value', value: language === 'en' ? 'English' : 'Kinyarwanda', action: handleToggleLanguage },
+                { id: 'notifications', label: t('profile.notifications'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>, type: 'toggle', value: notifications, toggle: handleToggleNotifications },
                 { id: 'faceid', label: 'Face ID Security', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.858.571-4.189" /></svg>, type: 'toggle', value: faceId, toggle: handleToggleFaceId },
-                { id: 'darkmode', label: 'Dark Mode', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>, type: 'toggle', value: darkMode, toggle: toggleTheme },
+                { id: 'darkmode', label: t('profile.darkMode'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>, type: 'toggle', value: darkMode, toggle: toggleTheme },
             ]
         },
         {
@@ -423,6 +431,11 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                                             <div className={`w-12 h-7 rounded-full p-1 transition-colors duration-300 ${item.value ? 'bg-brand shadow-lg shadow-brand/30' : 'bg-gray-200 dark:bg-slate-700'}`}>
                                                 <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${item.value ? 'translate-x-5' : 'translate-x-0'}`}></div>
                                             </div>
+                                        ) : item.type === 'value' ? (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{item.value}</span>
+                                                <svg className="w-5 h-5 text-gray-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                                            </div>
                                         ) : (
                                             <svg className="w-5 h-5 text-gray-300 dark:text-slate-600 group-hover:text-slate-400 dark:group-hover:text-slate-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                                         )}
@@ -441,7 +454,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     <div className="w-6 h-6 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center group-hover:bg-red-100 dark:group-hover:bg-red-900/40 transition-colors">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                     </div>
-                    Log Out
+                    {t('profile.logout')}
                 </button>
 
                 <p className="text-center text-[10px] text-gray-400 dark:text-slate-600 font-bold tracking-widest uppercase mb-4 opacity-50">WellVest v2.4.0 • Built with ❤️</p>

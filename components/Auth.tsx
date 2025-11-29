@@ -1,13 +1,14 @@
-
 import React, { useState } from 'react';
 import { AuthState } from '../types';
 import supabaseAuthService from '../services/supabaseAuth';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface AuthProps {
   onLogin: (userData?: { name: string; email: string; id: string }) => void;
 }
 
 const Auth: React.FC<AuthProps> = ({ onLogin }) => {
+  const { t } = useTranslation();
   const [view, setView] = useState<AuthState>(AuthState.LOGIN);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -194,14 +195,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           </div>
 
           <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            {view === AuthState.LOGIN && 'Welcome Back'}
-            {view === AuthState.SIGNUP && 'Join WellVest'}
-            {view === AuthState.FORGOT_PASSWORD && 'Recovery'}
+            {view === AuthState.LOGIN && t('auth.welcomeBack')}
+            {view === AuthState.SIGNUP && t('auth.join')}
+            {view === AuthState.FORGOT_PASSWORD && t('auth.recovery')}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-3 font-medium leading-relaxed">
-            {view === AuthState.LOGIN && 'Your holistic wealth and health journey continues here.'}
-            {view === AuthState.SIGNUP && 'Create an account to start tracking your wealth and wellness.'}
-            {view === AuthState.FORGOT_PASSWORD && 'Don’t worry, we’ll help you get back in.'}
+            {view === AuthState.LOGIN && t('auth.subtitleLogin')}
+            {view === AuthState.SIGNUP && t('auth.subtitleSignup')}
+            {view === AuthState.FORGOT_PASSWORD && t('auth.subtitleRecovery')}
           </p>
         </div>
 
@@ -230,23 +231,23 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         )}
 
         <form onSubmit={handleAuthAction} className="space-y-5">
-          {view === AuthState.SIGNUP && renderInput('text', 'Full Name', <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>, name, setName)}
-          {renderInput('email', 'Email Address', <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>, email, setEmail)}
-          {view !== AuthState.FORGOT_PASSWORD && renderInput('password', 'Password', <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>, password, setPassword)}
+          {view === AuthState.SIGNUP && renderInput('text', t('auth.name'), <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>, name, setName)}
+          {renderInput('email', t('auth.email'), <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>, email, setEmail)}
+          {view !== AuthState.FORGOT_PASSWORD && renderInput('password', t('auth.password'), <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>, password, setPassword)}
 
           {view === AuthState.LOGIN && (
-            <div className="flex justify-end"><button type="button" onClick={() => setView(AuthState.FORGOT_PASSWORD)} className="text-xs text-brand font-bold hover:text-orange-700 dark:hover:text-orange-300 transition-colors">Forgot Password?</button></div>
+            <div className="flex justify-end"><button type="button" onClick={() => setView(AuthState.FORGOT_PASSWORD)} className="text-xs text-brand font-bold hover:text-orange-700 dark:hover:text-orange-300 transition-colors">{t('auth.forgotPassword')}</button></div>
           )}
 
           <button type="submit" disabled={isLoading} className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold text-sm shadow-xl shadow-slate-200 dark:shadow-black/20 active:scale-[0.98] transition-all flex items-center justify-center hover:bg-slate-800 dark:hover:bg-slate-200">
-            {isLoading ? <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> : <>{view === AuthState.LOGIN && 'Sign In'}{view === AuthState.SIGNUP && 'Create Account'}{view === AuthState.FORGOT_PASSWORD && 'Send Reset Link'}</>}
+            {isLoading ? <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> : <>{view === AuthState.LOGIN && t('auth.loginButton')}{view === AuthState.SIGNUP && t('auth.signupButton')}{view === AuthState.FORGOT_PASSWORD && t('auth.sendReset')}</>}
           </button>
         </form>
 
         <div className="mt-8 text-center">
           <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
-            {view === AuthState.LOGIN ? "New here? " : view === AuthState.SIGNUP ? "Already a member? " : "Remembered? "}
-            <button onClick={() => setView(view === AuthState.LOGIN ? AuthState.SIGNUP : AuthState.LOGIN)} className="text-brand font-bold hover:underline transition-all ml-1">{view === AuthState.LOGIN ? 'Create Account' : 'Log In'}</button>
+            {view === AuthState.LOGIN ? t('auth.noAccount') + " " : view === AuthState.SIGNUP ? t('auth.haveAccount') + " " : t('auth.remembered') + " "}
+            <button onClick={() => setView(view === AuthState.LOGIN ? AuthState.SIGNUP : AuthState.LOGIN)} className="text-brand font-bold hover:underline transition-all ml-1">{view === AuthState.LOGIN ? t('auth.signupButton') : t('auth.loginButton')}</button>
           </p>
         </div>
       </div>

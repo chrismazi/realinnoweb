@@ -124,8 +124,8 @@ const useAppStore = create<AppState>()(
           darkMode: false,
           notifications: true,
           biometrics: false,
-          language: 'en',
-          currency: 'USD'
+          language: 'rw',
+          currency: 'RWF'
         },
 
         isLoading: false,

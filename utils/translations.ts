@@ -158,7 +158,7 @@ export const translations = {
             haveAccount: "Ufite konti?",
             noAccount: "Nta konti ufite?",
             loginButton: "Injira",
-            signupButton: "Fungura Konti",
+            signupButton: "Iyandikishe",
             join: "Iyandikishe kuri WellVest",
             recovery: "Kugarura Konti",
             subtitleLogin: "Urugendo rwawe rw'ubukire n'ubuzima rurakomeje.",

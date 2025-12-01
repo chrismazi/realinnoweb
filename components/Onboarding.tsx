@@ -1,5 +1,7 @@
-
 import React, { useState } from 'react';
+import real1 from './real1.jpg';
+import real2 from './real2.jpg';
+import real3 from './real3.jpg';
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -8,24 +10,21 @@ interface OnboardingProps {
 const slides = [
   {
     id: 1,
-    title: "Master Your Money",
-    desc: "Track expenses, visualize your budget, and achieve your financial dreams with ease.",
-    image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=800&q=80",
-    color: "bg-teal-50"
+    title: "Genzura Amafaranga Yawe",
+    desc: "Kurikirana uko utunze, wubake ingengo y'imari, kandi ugenze neza ukoresheje WellVest.",
+    image: real1,
   },
   {
     id: 2,
-    title: "Wellness Companion",
-    desc: "A safe space to chat, reflect, and find mental clarity with our AI support.",
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
-    color: "bg-indigo-50"
+    title: "Inshuti y'Ubuzima",
+    desc: "Ahantu hizewe ho kuganira, kwibuka, no kubona amahoro mu mutwe hamwe n'ubufasha bwa AI.",
+    image: real2,
   },
   {
     id: 3,
-    title: "Health First",
-    desc: "Empowering you with trusted knowledge about your reproductive health.",
-    image: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=800&q=80",
-    color: "bg-pink-50"
+    title: "Ubuzima Ni Bwo Bwa Mbere",
+    desc: "Kukugezaho ubumenyi bwizewe ku buzima bw'imyororokere no kwita ku mubiri.",
+    image: real3,
   }
 ];
 
@@ -40,55 +39,68 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     }
   };
 
+  const handleSkip = () => onComplete();
+
   return (
-    <div className="flex flex-col h-full bg-white relative overflow-hidden">
-      {/* Image Section */}
-      <div className="flex-1 relative">
-         {slides.map((slide, index) => (
-            <div 
-                key={slide.id}
-                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
-            >
-                <img
-                    src={slide.image}
-                    alt="Onboarding"
-                    className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white"></div>
-            </div>
-         ))}
+    <div className="relative h-full bg-[#f4f2ee] overflow-hidden">
+      {/* Background imagery */}
+      <div className="absolute inset-0 overflow-hidden">
+        {slides.map((slide, index) => (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="w-full h-full object-cover"
+            />
+            {/* Deep gradient base for text readability */}
+            <div className="absolute inset-x-0 bottom-0 h-[45vh] bg-gradient-to-t from-white via-white/60 to-transparent" />
+          </div>
+        ))}
       </div>
 
-      {/* Content Section */}
-      <div className="h-[45%] flex flex-col items-center justify-between p-8 pb-12 bg-white rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.05)] relative -mt-12 z-10">
-        <div className="text-center mt-6">
-          <h2 className="text-3xl font-extrabold mb-4 text-gray-900 tracking-tight">
+      {/* Top bar with Skip */}
+      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 pt-8">
+        <div className="flex-1" />
+        <button onClick={handleSkip} className="text-white text-sm font-semibold tracking-wide drop-shadow-lg">
+          Skip
+        </button>
+      </div>
+
+      {/* Bottom content (title + subtitle + button + indicators) */}
+      <div className="absolute inset-x-0 bottom-0 z-20 px-6 pb-10">
+        {/* Soft white glow hill effect */}
+        <div className="absolute inset-x-0 -bottom-20 h-80 bg-white rounded-[100%] blur-2xl opacity-75 scale-150 pointer-events-none" />
+
+        <div className="relative text-center mb-8 z-10">
+          <h2 className="text-[26px] leading-tight font-bold text-slate-900">
             {slides[currentSlide].title}
           </h2>
-          <p className="text-gray-500 leading-relaxed px-2 text-lg">
+          <p className="mt-3 text-sm text-slate-600 leading-relaxed max-w-xs mx-auto">
             {slides[currentSlide].desc}
           </p>
         </div>
 
-        <div className="w-full flex flex-col items-center gap-8">
-            {/* Indicators */}
-            <div className="flex space-x-2">
-                {slides.map((_, idx) => (
-                <div
-                    key={idx}
-                    className={`h-2 rounded-full transition-all duration-500 ${
-                    idx === currentSlide ? 'w-8 bg-gray-900' : 'w-2 bg-gray-200'
-                    }`}
-                />
-                ))}
-            </div>
+        <div className="relative z-10">
+          <button
+            onClick={nextSlide}
+            className="w-full py-4 rounded-full bg-slate-900 text-white font-semibold text-lg shadow-[0_8px_25px_rgba(15,23,42,0.4)] hover:shadow-[0_12px_35px_rgba(15,23,42,0.45)] active:scale-[0.98] transition-all duration-200"
+          >
+            {currentSlide === slides.length - 1 ? 'Tangira' : 'Komeza'}
+          </button>
 
-            <button
-                onClick={nextSlide}
-                className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold text-lg shadow-xl shadow-gray-200 active:scale-[0.98] transition-all"
-            >
-                {currentSlide === slides.length - 1 ? "Get Started" : "Continue"}
-            </button>
+          <div className="mt-10 flex justify-center gap-2.5">
+            {slides.map((_, idx) => (
+              <span
+                key={idx}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  idx === currentSlide ? 'w-8 bg-slate-900' : 'w-3 bg-slate-300'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

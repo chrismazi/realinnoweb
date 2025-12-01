@@ -958,10 +958,10 @@ const SexualHealth: React.FC = () => {
               onClick={() => { setWomensTab(tab); if (tab !== 'RESOURCES') setWomensResource('NONE'); }}
               className={`px-6 py-3 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-sm border ${womensTab === tab ? 'bg-slate-900 text-white shadow-slate-300 dark:shadow-slate-900/50 scale-105 border-slate-900' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
-              {tab === 'CYCLE' && 'Cycle & Calendar'}
-              {tab === 'INSIGHTS' && 'Daily Insights'}
-              {tab === 'LOG' && 'Symptom Log'}
-              {tab === 'RESOURCES' && 'Wellness Library'}
+              {tab === 'CYCLE' && 'Imihango & Kalendari'}
+              {tab === 'INSIGHTS' && "Amakuru y'Umunsi"}
+              {tab === 'LOG' && 'Ibimenyetso'}
+              {tab === 'RESOURCES' && "Isomero ry'Ubuzima"}
             </button>
           ))}
         </div>
@@ -989,7 +989,7 @@ const SexualHealth: React.FC = () => {
 
             <div className="bg-gradient-to-br from-rose-50 via-white to-rose-100 dark:from-rose-900/20 dark:via-slate-900 dark:to-rose-900/10 rounded-[2.5rem] p-8 text-center shadow-lg shadow-rose-100/50 dark:shadow-none relative overflow-hidden border border-rose-100/50 dark:border-rose-900/20">
               <div className="relative z-10 flex flex-col items-center">
-                <span className="text-rose-500 font-extrabold tracking-widest uppercase text-[10px] mb-6 bg-white dark:bg-slate-900 px-3 py-1 rounded-full shadow-sm">Follicular Phase</span>
+                <span className="text-rose-500 font-extrabold tracking-widest uppercase text-[10px] mb-6 bg-white dark:bg-slate-900 px-3 py-1 rounded-full shadow-sm">Igihe cya Follicular</span>
                 <div className="w-48 h-48 relative flex items-center justify-center mb-6">
                   <svg className="absolute w-full h-full transform -rotate-90">
                     <circle cx="96" cy="96" r="88" stroke="#ffe4e6" strokeWidth="12" fill="transparent" className="dark:stroke-rose-900/20" />
@@ -997,11 +997,11 @@ const SexualHealth: React.FC = () => {
                   </svg>
                   <div className="text-center">
                     <span className="block text-6xl font-black text-slate-900 dark:text-white leading-none">9</span>
-                    <span className="text-sm text-slate-400 font-bold">Day of 28</span>
+                    <span className="text-sm text-slate-400 font-bold">Umunsi wa 28</span>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Energy Rising</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-0">Estrogen levels are climbing.</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Imbaraga Ziyongera</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-0">Urugero rwa Estrogen ruriyongera.</p>
               </div>
             </div>
           </div>
@@ -1012,26 +1012,26 @@ const SexualHealth: React.FC = () => {
             {womensResource !== 'NONE' && (
               <button onClick={() => setWomensResource('NONE')} className="mb-6 flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors bg-white dark:bg-slate-900 px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:border-slate-800 w-fit">
                 <Icons.Back className="w-4 h-4" />
-                Back to Library
+                Subira mu Isomero
               </button>
             )}
 
             {womensResource === 'PREGNANCY' && (
               <div className="space-y-6">
                 <div className="bg-amber-50 dark:bg-amber-900/20 rounded-[2rem] p-6 border border-amber-100 dark:border-amber-900/30">
-                  <h2 className="text-2xl font-bold text-amber-900 dark:text-amber-300 mb-2">Pregnancy Tracker</h2>
-                  <p className="text-sm text-amber-700 dark:text-amber-400 font-medium mb-6">Track your baby's growth week by week.</p>
+                  <h2 className="text-2xl font-bold text-amber-900 dark:text-amber-300 mb-2">Gukurikirana Inda</h2>
+                  <p className="text-sm text-amber-700 dark:text-amber-400 font-medium mb-6">Kurikirana imikurire y'umwana icyumweru ku kindi.</p>
 
-                  <label className="text-xs font-bold text-amber-800 dark:text-amber-500 uppercase tracking-wider block mb-2">Due Date</label>
+                  <label className="text-xs font-bold text-amber-800 dark:text-amber-500 uppercase tracking-wider block mb-2">Itariki y'Ukwibaruka</label>
                   <input type="date" value={dueDate} onChange={(e) => handleDueDateChange(e.target.value)} className="w-full p-4 rounded-xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-100 font-bold outline-none focus:ring-2 focus:ring-amber-400" />
                 </div>
 
                 {pregnancyWeek !== null && (
                   <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm text-center">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Current Progress</p>
-                    <h3 className="text-6xl font-black text-slate-900 dark:text-white mb-2">{pregnancyWeek} <span className="text-xl text-slate-400 font-bold">Weeks</span></h3>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Aho Ugeze</p>
+                    <h3 className="text-6xl font-black text-slate-900 dark:text-white mb-2">{pregnancyWeek} <span className="text-xl text-slate-400 font-bold">Ibyumweru</span></h3>
                     <div className="inline-block bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-4 py-2 rounded-full font-bold text-sm mb-8">
-                      Baby is the size of a {getBabySize(pregnancyWeek)}
+                      Umwana afite ingano ya {getBabySize(pregnancyWeek)}
                     </div>
                     <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div className="h-full bg-amber-500 rounded-full" style={{ width: `${(pregnancyWeek / 40) * 100}%` }}></div>
@@ -1040,7 +1040,7 @@ const SexualHealth: React.FC = () => {
                 )}
 
                 <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-gray-100 dark:border-slate-800 shadow-sm">
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-4">Local Superfoods</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-4">Ibiribwa Byiza by'Aho</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {[{ name: 'Amaranth (Dodo)', ben: 'Folic Acid' }, { name: 'Millet', ben: 'Iron & Calcium' }, { name: 'Avocado', ben: 'Healthy Fats' }, { name: 'Sweet Potato', ben: 'Vitamin A' }, { name: 'Small Fish', ben: 'Calcium/Protein' }].map((food, i) => (
                       <div key={i} className="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
@@ -1062,10 +1062,10 @@ const SexualHealth: React.FC = () => {
             {womensResource === 'NONE' && (
               <div className="grid grid-cols-1 gap-4">
                 {[
-                  { id: 'PREGNANCY', title: 'Pregnancy & Fertility', desc: 'Nutrition, first trimester guide & safety.', color: 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400', icon: <Icons.UserPlus className="w-6 h-6" /> },
-                  { id: 'HORMONAL', title: 'Hormonal Balance', desc: 'PCOS, Endometriosis & symptom check.', color: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400', icon: <Icons.Sparkles className="w-6 h-6" /> },
-                  { id: 'MENOPAUSE', title: 'Menopause Care', desc: 'Hot flash tracking & HRT guidance.', color: 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400', icon: <Icons.Fire className="w-6 h-6" /> },
-                  { id: 'PELVIC', title: 'Pelvic Health', desc: 'Kegel trainer & postpartum recovery.', color: 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400', icon: <Icons.Chip className="w-6 h-6" /> },
+                  { id: 'PREGNANCY', title: 'Inda & Uburumbuke', desc: 'Imirire, amabwiriza y\'amezi atatu ya mbere & umutekano.', color: 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400', icon: <Icons.UserPlus className="w-6 h-6" /> },
+                  { id: 'HORMONAL', title: 'Imiterere y\'Hormoni', desc: 'PCOS, Endometriosis & gusuzuma ibimenyetso.', color: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400', icon: <Icons.Sparkles className="w-6 h-6" /> },
+                  { id: 'MENOPAUSE', title: 'Ubuvuzi bwa Menopause', desc: 'Gukurikirana ubushyuhe & ubuyobozi bwa HRT.', color: 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400', icon: <Icons.Fire className="w-6 h-6" /> },
+                  { id: 'PELVIC', title: 'Ubuzima bw\'Inda', desc: 'Imyitozo ya Kegel & gukira nyuma yo kubyara.', color: 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400', icon: <Icons.Chip className="w-6 h-6" /> },
                 ].map((res) => (
                   <button
                     key={res.id}

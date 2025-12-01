@@ -53,12 +53,12 @@ export const sendMessageToGemini = async (
   try {
     // Check rate limiting
     if (!checkRateLimit(userId)) {
-      return "You're sending messages too quickly. Please wait a moment before trying again.";
+      return "Wohereje ubutumwa bwinshi vuba cyane. Nyamuneka tegereza akanya gato ugerageze nanone.";
     }
 
     // Validate and sanitize input
     if (!validate.required(newMessage)) {
-      return "Please enter a message.";
+      return "Nyamuneka andika ubutumwa.";
     }
 
     const sanitizedMessage = sanitizeMessage(newMessage);
@@ -85,16 +85,16 @@ export const sendMessageToGemini = async (
   } catch (error: any) {
     console.error('Gemini API Error:', error);
 
-    // Handle specific error types
+    // Handle specific error types - messages in Kinyarwanda
     if (error.message?.includes('quota')) {
-      return "I've reached my conversation limit for now. Please try again later.";
+      return "Nageze ku mupaka w'ikiganiro. Nyamuneka gerageza nyuma y'akanya.";
     }
 
     if (error.message?.includes('safety')) {
-      return "I cannot respond to that type of message. Please keep our conversation appropriate and constructive.";
+      return "Sinshobora gusubiza ubwo butumwa. Nyamuneka dukomeze ikiganiro cyacu mu buryo bwiza.";
     }
 
-    return `I'm having trouble connecting right now. Please try again later.`;
+    return "Mfite ikibazo cyo guhuza ubu. Nyamuneka gerageza nyuma y'akanya.";
   }
 };
 

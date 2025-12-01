@@ -1,7 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChatMessage } from '../types';
 import { sendMessageToGemini } from '../services/geminiService';
-import useAppStore, { useChatHistory } from '../store/useAppStore';
+import useAppStore, { useChatHistory, useSettings } from '../store/useAppStore';
+
+// Rwanda emergency numbers (Kinyarwanda)
+const RWANDA_EMERGENCY = {
+    crisis: { name: 'Telefoni y\'ubuzima bwo mu mutwe', number: '114', desc: 'Ubuntu • 24/7' },
+    emergency: { name: 'Polisi/Ihutirwa', number: '112' }
+};
+
+// Typing indicator animation variants
+const TYPING_ANIMATIONS = [
+    { type: 'dots', label: 'Ndatekereza...' },
+    { type: 'wave', label: 'Ndandika...' },
+    { type: 'pulse', label: 'Ndategura...' }
+];
 
 const BreathingExercise = ({ onClose }: { onClose: () => void }) => {
     const [phase, setPhase] = useState<'Inhale' | 'Hold' | 'Exhale'>('Inhale');
@@ -20,9 +33,9 @@ const BreathingExercise = ({ onClose }: { onClose: () => void }) => {
 
     const getText = () => {
         switch (phase) {
-            case 'Inhale': return 'Breathe In...';
-            case 'Hold': return 'Hold...';
-            case 'Exhale': return 'Breathe Out...';
+            case 'Inhale': return 'Humeka...';
+            case 'Hold': return 'Komeza...';
+            case 'Exhale': return 'Sohora...';
         }
     };
 
@@ -52,7 +65,7 @@ const BreathingExercise = ({ onClose }: { onClose: () => void }) => {
                     <div className={`rounded-full bg-gradient-to-tr from-teal-200 to-white shadow-[0_0_50px_rgba(45,212,191,0.4)] transition-all duration-[4000ms] ease-in-out ${phase === 'Inhale' ? 'w-40 h-40 scale-100' : phase === 'Hold' ? 'w-40 h-40 scale-105' : 'w-40 h-40 scale-50'}`}></div>
                 </div>
 
-                <p className="text-teal-200/50 mt-20 text-xs font-medium tracking-[0.3em] uppercase animate-pulse">Sync your breathing</p>
+                <p className="text-teal-200/50 mt-20 text-xs font-medium tracking-[0.3em] uppercase animate-pulse">Huza guhumeka kwawe</p>
             </div>
         </div>
     )
@@ -67,24 +80,27 @@ const SOSModal = ({ onClose }: { onClose: () => void }) => (
                     <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                 </div>
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Crisis Support</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">You are not alone. Help is available.</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Ubufasha bw'Ihutirwa</h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">Nturi wenyine. Ubufasha burahari.</p>
                 </div>
             </div>
             <div className="space-y-4">
-                <a href="tel:988" className="flex items-center justify-between w-full p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-red-100 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all group shadow-sm">
+                <a href="tel:114" className="flex items-center justify-between w-full p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-red-100 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all group shadow-sm">
                     <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors">Suicide & Crisis Lifeline</span>
-                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Confidential • 24/7</span>
+                        <span className="font-bold text-slate-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors">{RWANDA_EMERGENCY.crisis.name}</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">{RWANDA_EMERGENCY.crisis.desc}</span>
                     </div>
-                    <span className="font-bold text-slate-900 dark:text-white text-xl group-hover:text-red-700 dark:group-hover:text-red-400">988</span>
+                    <span className="font-bold text-slate-900 dark:text-white text-xl group-hover:text-red-700 dark:group-hover:text-red-400">{RWANDA_EMERGENCY.crisis.number}</span>
                 </a>
-                <a href="tel:911" className="flex items-center justify-between w-full p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all shadow-sm">
-                    <span className="font-bold text-slate-700 dark:text-slate-300">Emergency Services</span>
-                    <span className="font-bold text-slate-700 dark:text-slate-300 text-xl">911</span>
+                <a href="tel:112" className="flex items-center justify-between w-full p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all shadow-sm">
+                    <span className="font-bold text-slate-700 dark:text-slate-300">{RWANDA_EMERGENCY.emergency.name}</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300 text-xl">{RWANDA_EMERGENCY.emergency.number}</span>
                 </a>
             </div>
-            <button onClick={onClose} className="mt-8 w-full py-4 text-slate-400 dark:text-slate-500 font-bold text-sm hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-slate-50 dark:bg-slate-900/50 rounded-2xl">Dismiss</button>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-4">
+                Numero z'ihutirwa mu Rwanda. Mu gihe cy'ihutirwa, hamagara serivisi z'aho uherereye.
+            </p>
+            <button onClick={onClose} className="mt-4 w-full py-4 text-slate-400 dark:text-slate-500 font-bold text-sm hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-slate-50 dark:bg-slate-900/50 rounded-2xl">Funga</button>
         </div>
     </div>
 );
@@ -95,15 +111,56 @@ interface MentalHealthChatProps {
 
 const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
     const messages = useChatHistory();
-    const { addChatMessage } = useAppStore();
+    const { addChatMessage, clearChatHistory } = useAppStore();
+    const settings = useSettings();
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showBreathing, setShowBreathing] = useState(false);
     const [showSOS, setShowSOS] = useState(false);
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
+    const [typingAnimation, setTypingAnimation] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
+    useEffect(() => {
+        if (isLoading) {
+            const interval = setInterval(() => {
+                setTypingAnimation(prev => (prev + 1) % TYPING_ANIMATIONS.length);
+            }, 2000);
+            return () => clearInterval(interval);
+        }
+    }, [isLoading]);
+
     useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, isLoading]);
+
+    const messagesWithDates = useMemo(() => {
+        const result: { type: 'date' | 'message'; date?: string; message?: ChatMessage }[] = [];
+        let lastDate = '';
+        messages.forEach((msg) => {
+            const msgDate = new Date(msg.timestamp).toDateString();
+            if (msgDate !== lastDate) {
+                result.push({ type: 'date', date: msgDate });
+                lastDate = msgDate;
+            }
+            result.push({ type: 'message', message: msg });
+        });
+        return result;
+    }, [messages]);
+
+    const formatDateSeparator = (dateStr: string) => {
+        const date = new Date(dateStr);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (date.toDateString() === today.toDateString()) return 'Uyu munsi';
+        if (date.toDateString() === yesterday.toDateString()) return 'Ejo';
+        return date.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+    };
+
+    const handleClearChat = async () => {
+        await clearChatHistory();
+        setShowClearConfirm(false);
+    };
 
     const handleSend = async (textOverride?: string) => {
         const textToSend = textOverride || input;
@@ -121,12 +178,7 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
         setIsLoading(true);
 
         try {
-            // Use current messages for history
-            // 'messages' here is from the render scope, so it doesn't have userMsg yet.
-            // But sendMessageToGemini takes (history, newMessage), so this is correct.
             const history = messages;
-
-            // Try to get AI response with retries
             let responseText: string;
             let attempts = 0;
             const maxAttempts = 3;
@@ -134,8 +186,6 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
             while (attempts < maxAttempts) {
                 try {
                     responseText = await sendMessageToGemini(history, userMsg.text);
-
-                    // Check if response is valid
                     if (responseText && responseText.trim().length > 0) {
                         const botMsg: ChatMessage = {
                             id: (Date.now() + 1).toString(),
@@ -150,52 +200,25 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                     break;
                 } catch (apiError: any) {
                     attempts++;
-                    console.warn(`AI API attempt ${attempts} failed:`, apiError);
-
-                    if (attempts >= maxAttempts) {
-                        throw apiError;
-                    }
-
-                    // Wait before retry (exponential backoff)
+                    if (attempts >= maxAttempts) throw apiError;
                     await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
                 }
             }
-
-            // If we get here, all attempts failed or empty response
             throw new Error('Unable to get a valid response from AI');
-
         } catch (error: any) {
-            console.error('Chat error:', error);
-
-            // Provide helpful fallback response based on error type
-            let fallbackText = "I'm having trouble connecting right now. ";
-
-            if (error.message?.includes('API_KEY_INVALID') || error.message?.includes('API key')) {
-                fallbackText += "It seems there's a configuration issue. Please contact support or try again later.";
-            } else if (error.message?.includes('quota') || error.message?.includes('limit')) {
-                fallbackText += "We've reached our daily limit. Please try again tomorrow or contact support.";
-            } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
-                fallbackText += "Please check your internet connection and try again.";
+            let fallbackText = "Mfite ikibazo cyo guhuza ubu. ";
+            if (error.message?.includes('API_KEY_INVALID')) {
+                fallbackText += "Nyamuneka vugana n'abafasha cyangwa ugerageze nyuma.";
             } else {
-                fallbackText += "Sometimes taking a deep breath helps. Would you like to try the breathing exercise?";
+                fallbackText += "Ushaka kugerageza guhumeka?";
             }
-
             const errorMsg: ChatMessage = {
                 id: (Date.now() + 1).toString(),
                 role: 'model',
                 text: fallbackText,
                 timestamp: new Date()
             };
-
             addChatMessage(errorMsg);
-
-            // Show error toast
-            const toast = document.createElement('div');
-            toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] animate-slide-up';
-            toast.textContent = 'AI temporarily unavailable. Showing fallback response.';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-
         } finally {
             setIsLoading(false);
         }
@@ -203,12 +226,36 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
 
     const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    const handleStartNewConversation = () => {
+        if (messages.length === 0) return;
+        setShowClearConfirm(true);
+    };
+
     return (
         <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative font-sans text-slate-800 dark:text-slate-200 transition-colors duration-500">
             {showBreathing && <BreathingExercise onClose={() => setShowBreathing(false)} />}
             {showSOS && <SOSModal onClose={() => setShowSOS(false)} />}
-
-            {/* Professional Header */}
+            
+            {showClearConfirm && (
+                <div className="absolute inset-0 z-[60] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={() => setShowClearConfirm(false)}>
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-slide-up" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Tangira ikiganiro gishya?</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Ibi bizasiba amateka y'ikiganiro cyawe.</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-3 mt-6">
+                            <button onClick={() => setShowClearConfirm(false)} className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-sm">Hagarika</button>
+                            <button onClick={handleClearChat} className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold text-sm">Tangira Bishya</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
             <div className="pt-14 px-6 pb-4 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-30 sticky top-0 flex justify-between items-end transition-colors duration-300">
                 <div className="flex items-center gap-3">
                     {onBack && (
@@ -217,39 +264,52 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                         </button>
                     )}
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Vestie</h1>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">Wellness Companion</span>
+                        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Vestie</h1>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">Umufasha w'Ubuzima</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleStartNewConversation}
+                        disabled={messages.length === 0}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 active:scale-95 border transition-colors ${messages.length === 0 ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border-slate-200 dark:border-slate-800 cursor-not-allowed opacity-60' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                        title="Start new conversation"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                        Ikiganiro Gishya
+                    </button>
+                    {messages.length > 0 && (
+                        <button onClick={() => setShowClearConfirm(true)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors active:scale-95" title="Clear chat">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    )}
                     <button onClick={() => setShowBreathing(true)} className="px-4 py-2 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-xl text-xs font-bold hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors flex items-center gap-2 active:scale-95 border border-teal-100 dark:border-teal-900/30">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                        Breathe
+                        Humeka
                     </button>
                     <button onClick={() => setShowSOS(true)} className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-bold hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-2 group active:scale-95 border border-slate-200 dark:border-slate-700">
                         <svg className="w-4 h-4 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        Support
+                        Ubufasha
                     </button>
                 </div>
             </div>
 
-            {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto px-6 pt-6 no-scrollbar space-y-6 pb-48" style={{ scrollBehavior: 'smooth' }}>
+            <div className="flex-1 overflow-y-auto px-6 pt-6 no-scrollbar space-y-6 pb-32" style={{ scrollBehavior: 'smooth' }}>
                 {messages.length === 0 && (
                     <div className="flex flex-col items-center justify-center min-h-[50vh] animate-fade-in text-center pt-10">
                         <div className="w-24 h-24 bg-gradient-to-tr from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-600 mb-8 shadow-sm border border-slate-100 dark:border-slate-800">
                             <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                         </div>
-                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">How are you feeling?</h2>
+                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">Wiyumva ute?</h2>
                         <p className="text-slate-400 dark:text-slate-500 text-sm max-w-xs mb-10 leading-relaxed mx-auto">
-                            This is a safe, private space. Select a topic below or type whatever is on your mind.
+                            Aha ni ahantu hizewe kandi h'ibanga. Hitamo ingingo hepfo cyangwa wandike icyo utekereza.
                         </p>
                         <div className="grid grid-cols-2 gap-4 w-full max-w-sm mx-auto">
                             {[
-                                { label: 'Anxiety', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>, prompt: "I'm feeling anxious" },
-                                { label: 'Stress', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>, prompt: "I'm really stressed out" },
-                                { label: 'Sleep', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>, prompt: "I'm having trouble sleeping" },
-                                { label: 'Vent', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>, prompt: "I just need to vent" }
+                                { label: 'Ubwoba', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>, prompt: "Mfite ubwoba" },
+                                { label: 'Stress', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>, prompt: "Mfite stress nyinshi" },
+                                { label: 'Ibitotsi', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>, prompt: "Mfite ikibazo cyo gusinzira" },
+                                { label: 'Kuvuga', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>, prompt: "Nshaka kuvuga ibyanjye" }
                             ].map((item) => (
                                 <button key={item.label} onClick={() => handleSend(item.prompt)} className="p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-teal-100 dark:hover:border-teal-900/50 transition-all active:scale-[0.98] group">
                                     <div className="text-slate-400 dark:text-slate-600 group-hover:text-teal-500 dark:group-hover:text-teal-400 mb-3 transition-colors">{item.icon}</div>
@@ -259,9 +319,25 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                         </div>
                     </div>
                 )}
-                {messages.map((msg, index) => {
+                
+                {messagesWithDates.map((item) => {
+                    if (item.type === 'date') {
+                        return (
+                            <div key={`date-${item.date}`} className="flex items-center justify-center my-6">
+                                <div className="px-4 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
+                                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                        {formatDateSeparator(item.date!)}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    }
+                    
+                    const msg = item.message!;
+                    const msgIndex = messages.findIndex(m => m.id === msg.id);
                     const isUser = msg.role === 'user';
-                    const isSequence = index > 0 && messages[index - 1].role === msg.role;
+                    const isSequence = msgIndex > 0 && messages[msgIndex - 1].role === msg.role;
+                    
                     return (
                         <div key={msg.id} className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} ${!isSequence ? 'mt-6' : 'mt-2'} animate-slide-up`}>
                             {!isUser && !isSequence && (
@@ -271,31 +347,46 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                             )}
                             {!isUser && isSequence && <div className="w-[52px]"></div>}
                             <div className="flex flex-col max-w-[85%]">
-                                <div className={`px-6 py-4 text-[15px] leading-relaxed shadow-sm ${isUser ? `bg-slate-900 dark:bg-teal-600 text-white ${isSequence ? 'rounded-[2rem] rounded-tr-md' : 'rounded-[2rem] rounded-br-md'}` : `bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-800 ${isSequence ? 'rounded-[2rem] rounded-tl-md' : 'rounded-[2rem] rounded-bl-md'}`}`}>{msg.text}</div>
-                                {(!messages[index + 1] || messages[index + 1].role !== msg.role) && <p className={`text-[10px] text-slate-300 dark:text-slate-600 mt-2 px-2 font-bold uppercase tracking-wide ${isUser ? 'text-right' : 'text-left'}`}>{formatTime(msg.timestamp)}</p>}
+                                <div className={`px-6 py-4 text-[15px] leading-relaxed shadow-sm ${isUser ? 'bg-slate-900 dark:bg-teal-600 text-white rounded-[2rem] rounded-br-md' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-800 rounded-[2rem] rounded-bl-md'}`}>{msg.text}</div>
+                                {(!messages[msgIndex + 1] || messages[msgIndex + 1].role !== msg.role) && <p className={`text-[10px] text-slate-300 dark:text-slate-600 mt-2 px-2 font-bold uppercase tracking-wide ${isUser ? 'text-right' : 'text-left'}`}>{formatTime(msg.timestamp)}</p>}
                             </div>
                         </div>
                     );
                 })}
+                
                 {isLoading && (
                     <div className="flex justify-start mt-6 animate-fade-in ml-14">
-                        <div className="bg-white dark:bg-slate-900 px-5 py-4 rounded-[2rem] rounded-bl-md shadow-sm border border-slate-100 dark:border-slate-800 flex space-x-2 items-center">
-                            <div className="w-2 h-2 bg-slate-400 dark:bg-slate-600 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-slate-400 dark:bg-slate-600 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
-                            <div className="w-2 h-2 bg-slate-400 dark:bg-slate-600 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
+                        <div className="bg-white dark:bg-slate-900 px-5 py-4 rounded-[2rem] rounded-bl-md shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                            <div className="flex space-x-1.5">
+                                <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce"></div>
+                                <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
+                                <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
+                            </div>
+                            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                                {TYPING_ANIMATIONS[typingAnimation].label}
+                            </span>
                         </div>
                     </div>
                 )}
-                <div ref={messagesEndRef} className="h-6" />
+                <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="absolute bottom-32 left-0 w-full px-6 z-40 pointer-events-none">
-                <div className="pointer-events-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-2 rounded-[2.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-black/50 border border-slate-100 dark:border-slate-800 flex items-end gap-2 max-w-2xl mx-auto transition-colors duration-300">
-                    <div className="flex-1 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] px-6 py-2 border border-transparent focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:border-slate-200 dark:focus-within:border-slate-700 focus-within:ring-2 focus-within:ring-teal-100 dark:focus-within:ring-teal-900/20 transition-all">
-                        <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }} placeholder="Type your message..." rows={1} className="w-full bg-transparent py-3 outline-none text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-base resize-none max-h-32" style={{ minHeight: '48px' }} />
-                    </div>
-                    <button onClick={() => handleSend()} disabled={!input.trim() || isLoading} className={`p-4 rounded-full mb-1 transition-all duration-300 shrink-0 ${!input.trim() ? 'bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600' : 'bg-slate-900 dark:bg-teal-600 text-white shadow-lg shadow-slate-200 dark:shadow-teal-900/40 active:scale-90 hover:scale-105'}`}>
+            <div className="absolute left-0 right-0 p-6 pb-10 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent dark:from-slate-950 dark:via-slate-950 z-20" style={{ bottom: '5.5rem' }}>
+                <div className="flex items-end gap-3 max-w-2xl mx-auto">
+                    <textarea
+                        ref={inputRef}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                        placeholder="Andika ubutumwa bwawe..."
+                        className="flex-1 bg-white dark:bg-slate-900 rounded-[1.5rem] px-6 py-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none resize-none max-h-32 shadow-sm border border-slate-200 dark:border-slate-800 focus:border-teal-300 dark:focus:border-teal-700 transition-colors"
+                        rows={1}
+                    />
+                    <button
+                        onClick={() => handleSend()}
+                        disabled={!input.trim() || isLoading}
+                        className="w-14 h-14 bg-slate-900 dark:bg-teal-600 text-white rounded-2xl flex items-center justify-center shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all hover:bg-slate-800 dark:hover:bg-teal-500"
+                    >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                     </button>
                 </div>

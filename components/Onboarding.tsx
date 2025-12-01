@@ -53,7 +53,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center scale-105"
             />
             {/* Deep gradient base for text readability */}
             <div className="absolute inset-x-0 bottom-0 h-[45vh] bg-gradient-to-t from-white via-white/60 to-transparent" />

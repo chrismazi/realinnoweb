@@ -55,7 +55,7 @@ const Icons = {
   Drop: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>,
   Search: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>,
   Calendar: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>,
-  Moon: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>,
+  Moon: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0112 21a9.003 9.003 0 018.354-5.646z" /></svg>,
   Zap: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
   UserPlus: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>,
   Sparkles: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>,
@@ -78,6 +78,13 @@ const Icons = {
   Male: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="10" cy="14" r="4" strokeWidth={1.8} /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13.5 10.5l7-7M20.5 3.5h-5M20.5 3.5v5" /></svg>,
   Female: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="9.5" r="4.5" strokeWidth={1.8} /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 14v6M9 19h6" /></svg>,
 };
+
+const formatRWF = (value: number) =>
+  new Intl.NumberFormat('rw-RW', {
+    style: 'currency',
+    currency: 'RWF',
+    maximumFractionDigits: 0,
+  }).format(value);
 
 const KegelTimer = () => {
   const [isActive, setIsActive] = useState(false);
@@ -171,12 +178,12 @@ const SexualHealth: React.FC = () => {
   const [familyPhase, setFamilyPhase] = useState<string>('PREP');
   const [checklist, setChecklist] = useState<string[]>([]);
   const [budgetItems, setBudgetItems] = useState([
-    { name: 'Diapers/Wipes', cost: 80, type: 'monthly', category: 'Essentials' },
-    { name: 'Formula/Feeding', cost: 150, type: 'monthly', category: 'Essentials' },
-    { name: 'Nursery Setup', cost: 800, type: 'one-time', category: 'Nursery' },
-    { name: 'Stroller & Car Seat', cost: 600, type: 'one-time', category: 'Gear' },
-    { name: 'Medical Visits', cost: 200, type: 'monthly', category: 'Medical' },
-    { name: 'Clothing', cost: 300, type: 'one-time', category: 'Essentials' }
+    { name: 'Impapuro z’abana n’isuku', cost: 0, type: 'monthly', category: 'Ibikoresho by’ingenzi' },
+    { name: 'Ifunguro ry’umwana', cost: 0, type: 'monthly', category: 'Ibikoresho by’ingenzi' },
+    { name: 'Gutunganya icyumba cy’umwana', cost: 0, type: 'one-time', category: 'Icyumba cy’umwana' },
+    { name: 'Imodoka y’umwana n’intebe', cost: 0, type: 'one-time', category: 'Ibikoresho' },
+    { name: 'Gusura muganga', cost: 0, type: 'monthly', category: 'Ubuvuzi' },
+    { name: 'Imyenda y’umwana', cost: 0, type: 'one-time', category: 'Ibikoresho by’ingenzi' }
   ]);
 
   // Mental Health State
@@ -678,7 +685,9 @@ const SexualHealth: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-green-100 rounded-full blur-2xl -mr-6 -mt-6"></div>
+              <div className="absolute top-0 right-0 p-4 opacity-5">
+                <Icons.Activity className="w-32 h-32 text-slate-900" />
+              </div>
               <h4 className="font-bold text-slate-900 mb-1 relative z-10">Zinc</h4>
               <p className="text-xs text-slate-500 mb-4 relative z-10">Immunity & Testosterone</p>
               <div className="space-y-2 relative z-10">
@@ -695,7 +704,9 @@ const SexualHealth: React.FC = () => {
               </div>
             </div>
             <div className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-amber-100 rounded-full blur-2xl -mr-6 -mt-6"></div>
+              <div className="absolute top-0 right-0 p-4 opacity-5">
+                <Icons.Activity className="w-32 h-32 text-slate-900" />
+              </div>
               <h4 className="font-bold text-slate-900 mb-1 relative z-10">Magnesium</h4>
               <p className="text-xs text-slate-500 mb-4 relative z-10">Recovery & Sleep</p>
               <div className="space-y-2 relative z-10">
@@ -1170,6 +1181,14 @@ const SexualHealth: React.FC = () => {
       }
     ];
 
+    const annualTotal = budgetItems.reduce((acc, item) => acc + (item.type === 'monthly' ? item.cost * 12 : item.cost), 0);
+    const monthlyTotal = budgetItems.filter(item => item.type === 'monthly').reduce((acc, item) => acc + item.cost, 0);
+    const oneTimeTotal = budgetItems.filter(item => item.type === 'one-time').reduce((acc, item) => acc + item.cost, 0);
+    const typeLabels: Record<'monthly' | 'one-time', string> = {
+      monthly: 'Buri kwezi',
+      'one-time': 'Rimwe',
+    };
+
     return (
       <div className="animate-slide-in-right pb-44">
         {/* Sticky Tabs */}
@@ -1294,16 +1313,16 @@ const SexualHealth: React.FC = () => {
                 <div className="relative z-10">
                   <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Igiciro cy'Umwaka wa 1</p>
                   <h2 className="text-5xl font-black mb-8 tracking-tight">
-                    ${(budgetItems.reduce((acc, item) => acc + (item.type === 'monthly' ? item.cost * 12 : item.cost), 0)).toLocaleString()}
+                    {formatRWF(annualTotal)}
                   </h2>
                   <div className="flex gap-4">
                     <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md flex-1 border border-white/5 hover:bg-white/15 transition-colors">
                       <p className="text-[10px] text-teal-300 uppercase font-bold mb-1">Buri kwezi</p>
-                      <p className="font-bold text-xl">${budgetItems.filter(i => i.type === 'monthly').reduce((a, b) => a + b.cost, 0)}</p>
+                      <p className="font-bold text-xl">{formatRWF(monthlyTotal)}</p>
                     </div>
                     <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md flex-1 border border-white/5 hover:bg-white/15 transition-colors">
                       <p className="text-[10px] text-orange-300 uppercase font-bold mb-1">Rimwe</p>
-                      <p className="font-bold text-xl">${budgetItems.filter(i => i.type === 'one-time').reduce((a, b) => a + b.cost, 0)}</p>
+                      <p className="font-bold text-xl">{formatRWF(oneTimeTotal)}</p>
                     </div>
                   </div>
                 </div>
@@ -1317,22 +1336,23 @@ const SexualHealth: React.FC = () => {
                       <div className="flex justify-between items-end mb-3">
                         <div>
                           <p className="font-bold text-slate-900 dark:text-white text-sm">{item.name}</p>
-                          <span className="text-[10px] text-slate-400 font-bold uppercase">{item.category} • {item.type}</span>
+                          <span className="text-[10px] text-slate-400 font-bold uppercase">{item.category} • {typeLabels[item.type]}</span>
                         </div>
-                        <p className="font-bold text-teal-600 dark:text-teal-400">${item.cost}</p>
+                        <p className="font-bold text-teal-600 dark:text-teal-400">{formatRWF(item.cost)}</p>
                       </div>
                       <input
-                        type="range"
+                        type="number"
                         min="0"
-                        max={item.type === 'one-time' ? 2000 : 500}
-                        step="10"
+                        step="1000"
                         value={item.cost}
                         onChange={(e) => {
                           const newItems = [...budgetItems];
-                          newItems[i].cost = parseInt(e.target.value);
+                          const nextValue = Number(e.target.value);
+                          newItems[i].cost = Number.isNaN(nextValue) ? 0 : Math.max(0, nextValue);
                           setBudgetItems(newItems);
                         }}
-                        className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-slate-900 dark:accent-teal-500"
+                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        placeholder="Injiza amafaranga (RWF)"
                       />
                     </div>
                   ))}

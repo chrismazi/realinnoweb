@@ -7,6 +7,14 @@ type MensTab = 'VITALITY' | 'EXAM' | 'RISKS';
 type WomensTab = 'CYCLE' | 'INSIGHTS' | 'LOG' | 'RESOURCES';
 type WomensResourceView = 'NONE' | 'PREGNANCY' | 'HORMONAL' | 'MENOPAUSE' | 'PELVIC';
 type MentalTab = 'DASHBOARD' | 'JOURNAL' | 'LIBRARY' | 'TOOLS' | 'SUPPORT' | 'CHAT';
+type BudgetItemType = 'monthly' | 'one-time';
+
+interface BudgetItem {
+  name: string;
+  cost: number;
+  type: BudgetItemType;
+  category: string;
+}
 
 interface JournalEntry {
   id: number;
@@ -177,7 +185,7 @@ const SexualHealth: React.FC = () => {
   // Family Planning State
   const [familyPhase, setFamilyPhase] = useState<string>('PREP');
   const [checklist, setChecklist] = useState<string[]>([]);
-  const [budgetItems, setBudgetItems] = useState([
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
     { name: 'Impapuro z’abana n’isuku', cost: 0, type: 'monthly', category: 'Ibikoresho by’ingenzi' },
     { name: 'Ifunguro ry’umwana', cost: 0, type: 'monthly', category: 'Ibikoresho by’ingenzi' },
     { name: 'Gutunganya icyumba cy’umwana', cost: 0, type: 'one-time', category: 'Icyumba cy’umwana' },
@@ -185,6 +193,13 @@ const SexualHealth: React.FC = () => {
     { name: 'Gusura muganga', cost: 0, type: 'monthly', category: 'Ubuvuzi' },
     { name: 'Imyenda y’umwana', cost: 0, type: 'one-time', category: 'Ibikoresho by’ingenzi' }
   ]);
+  const initialBudgetItem: BudgetItem = {
+    name: '',
+    cost: 0,
+    type: 'monthly',
+    category: '',
+  };
+  const [newBudgetItem, setNewBudgetItem] = useState<BudgetItem>(initialBudgetItem);
 
   // Mental Health State
   const [mood, setMood] = useState<string | null>(null);
@@ -752,7 +767,7 @@ const SexualHealth: React.FC = () => {
                     <span className={`text-xs font-medium transition-colors ${mensChecklist.includes(item.id) ? 'text-gray-400' : 'text-gray-500'}`}>{item.desc}</span>
                   </div>
                 </div>
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all ${mensChecklist.includes(item.id) ? 'bg-green-500 border-green-500 scale-110' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
+                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${mensChecklist.includes(item.id) ? 'bg-green-500 border-green-500 scale-110' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
                   {mensChecklist.includes(item.id) && <Icons.Check className="w-3.5 h-3.5 text-white" />}
                 </div>
               </button>
@@ -1189,6 +1204,29 @@ const SexualHealth: React.FC = () => {
       'one-time': 'Rimwe',
     };
 
+    const handleNewBudgetChange = (field: keyof BudgetItem, value: string | number) => {
+      setNewBudgetItem(prev => ({
+        ...prev,
+        [field]: field === 'cost' ? (Number.isNaN(Number(value)) ? 0 : Number(value)) : value,
+      }));
+    };
+
+    const handleAddBudgetItem = () => {
+      if (!newBudgetItem.name.trim()) return;
+      const sanitized: BudgetItem = {
+        name: newBudgetItem.name.trim(),
+        category: newBudgetItem.category.trim() || 'Ibikoresho by’ingenzi',
+        type: newBudgetItem.type,
+        cost: Math.max(0, Math.floor(newBudgetItem.cost)),
+      };
+      setBudgetItems(prev => [...prev, sanitized]);
+      setNewBudgetItem(initialBudgetItem);
+    };
+
+    const handleRemoveBudgetItem = (index: number) => {
+      setBudgetItems(prev => prev.filter((_, i) => i !== index));
+    };
+
     return (
       <div className="animate-slide-in-right pb-44">
         {/* Sticky Tabs */}
@@ -1238,16 +1276,15 @@ const SexualHealth: React.FC = () => {
               <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm animate-scale-in transition-colors">
                 {journeyPhases.map(phase => familyPhase === phase.id && (
                   <div key={phase.id}>
-                    <div className={`inline-block px-3 py-1 rounded-lg text-[10px] font-bold uppercase mb-4 ${phase.color}`}>
+                    <div className={`inline-block px-3 py-1 rounded-lg text-[10px] font-bold ${phase.color}`}>
                       {phase.timeline}
                     </div>
                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Icyiciro cya {phase.title}</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-8 font-medium">{phase.description}</p>
 
                     <div className="space-y-4">
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Inama z'Impuguke</h4>
                       {phase.tips.map((tip, i) => (
-                        <div key={i} className="flex gap-4 items-start p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl group hover:bg-white dark:hover:bg-slate-700 transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-600 shadow-sm hover:shadow-md">
+                        <div key={i} className="flex gap-4 items-start p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl group hover:bg-white dark:hover:bg-slate-700 transition-colors border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md">
                           <div className="w-2 h-2 rounded-full bg-slate-900 dark:bg-white mt-1.5 shrink-0 group-hover:scale-125 transition-transform"></div>
                           <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">{tip}</p>
                         </div>
@@ -1330,15 +1367,78 @@ const SexualHealth: React.FC = () => {
 
               <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
                 <h3 className="font-bold text-slate-900 dark:text-white mb-6">Igikoresho cyo Kubara</h3>
-                <div className="space-y-8">
+                
+                {/* Add new item form */}
+                <div className="mb-8 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Ongeraho igikorwa gishya</p>
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <input
+                      type="text"
+                      value={newBudgetItem.name}
+                      onChange={(e) => setNewBudgetItem({...newBudgetItem, name: e.target.value})}
+                      className="col-span-2 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="Izina ry'igikorwa"
+                    />
+                    <input
+                      type="text"
+                      value={newBudgetItem.category}
+                      onChange={(e) => setNewBudgetItem({...newBudgetItem, category: e.target.value})}
+                      className="px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="Icyiciro"
+                    />
+                    <input
+                      type="number"
+                      min="0"
+                      step="1000"
+                      value={newBudgetItem.cost || ''}
+                      onChange={(e) => setNewBudgetItem({...newBudgetItem, cost: Number(e.target.value) || 0})}
+                      className="px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="Amafaranga (RWF)"
+                    />
+                    <select
+                      value={newBudgetItem.type}
+                      onChange={(e) => setNewBudgetItem({...newBudgetItem, type: e.target.value as BudgetItemType})}
+                      className="col-span-2 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    >
+                      <option value="monthly">Buri kwezi</option>
+                      <option value="one-time">Rimwe</option>
+                    </select>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (!newBudgetItem.name.trim()) return;
+                      setBudgetItems([...budgetItems, {
+                        name: newBudgetItem.name.trim(),
+                        category: newBudgetItem.category.trim() || 'Ibindi',
+                        cost: Math.max(0, newBudgetItem.cost),
+                        type: newBudgetItem.type
+                      }]);
+                      setNewBudgetItem(initialBudgetItem);
+                    }}
+                    className="w-full py-3 rounded-xl font-bold text-sm bg-teal-600 text-white hover:bg-teal-700 transition-colors active:scale-95"
+                  >
+                    + Ongeraho
+                  </button>
+                </div>
+
+                <div className="space-y-6">
                   {budgetItems.map((item, i) => (
-                    <div key={i}>
-                      <div className="flex justify-between items-end mb-3">
+                    <div key={i} className="p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-700">
+                      <div className="flex justify-between items-start mb-3">
                         <div>
                           <p className="font-bold text-slate-900 dark:text-white text-sm">{item.name}</p>
                           <span className="text-[10px] text-slate-400 font-bold uppercase">{item.category} • {typeLabels[item.type]}</span>
                         </div>
-                        <p className="font-bold text-teal-600 dark:text-teal-400">{formatRWF(item.cost)}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-teal-600 dark:text-teal-400">{formatRWF(item.cost)}</p>
+                          <button
+                            onClick={() => setBudgetItems(budgetItems.filter((_, idx) => idx !== i))}
+                            className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 transition-colors"
+                            title="Kuraho"
+                          >
+                            <Icons.Close className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                       <input
                         type="number"
@@ -1351,7 +1451,7 @@ const SexualHealth: React.FC = () => {
                           newItems[i].cost = Number.isNaN(nextValue) ? 0 : Math.max(0, nextValue);
                           setBudgetItems(newItems);
                         }}
-                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-teal-500"
                         placeholder="Injiza amafaranga (RWF)"
                       />
                     </div>

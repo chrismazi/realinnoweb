@@ -28,7 +28,7 @@ serve(async (req) => {
             parts: [{ text: msg.text }]
         }));
 
-        const systemInstruction = `Uri Vestie, umujyanama w'ubuzima bwo mu mutwe mu kigo cya WellVest.
+        const systemInstruction = `Uri Vestie, umujyanama w'ubuzima bwo mu mutwe mu kigo cya RealWorks.
 
 AMATEGEKO AKOMEYE - NTUSHOBORA KUYICA:
 1. ANDIKA MU KINYARWANDA GUSA - Ntukoreshe icyongereza, igifaransa, cyangwa indi ndimi na gato. Buri jambo rigomba kuba mu Kinyarwanda.

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# WellVest Backend Deployment Script
+# RealWorks Backend Deployment Script
 # This script helps you deploy all backend features
 
-echo "🚀 WellVest Backend Deployment Helper"
+echo "🚀 RealWorks Backend Deployment Helper"
 echo "======================================"
 echo ""
 

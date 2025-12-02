@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# WellVest Production Deployment Script
+# RealWorks Production Deployment Script
 # This script deploys your app to Vercel
 
-echo "🚀 WellVest Production Deployment"
+echo "🚀 RealWorks Production Deployment"
 echo "=================================="
 echo ""
 

@@ -1,7 +1,7 @@
 {
-  "name": "wellvest-api",
+  "name": "realworks-api",
   "version": "1.0.0",
-  "description": "WellVest Backend API with Express, PostgreSQL, and JWT",
+  "description": "RealWorks Backend API with Express, PostgreSQL, and JWT",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

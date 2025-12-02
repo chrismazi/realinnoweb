@@ -1,11 +1,11 @@
 {
-  "name": "wellvest",
+  "name": "realworks",
   "version": "2.0.0",
   "description": "Financial wellness app for women",
-  "homepage": "https://wellvest.app",
+  "homepage": "https://realworks.app",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/wellvest.git"
+    "url": "https://github.com/yourusername/realworks.git"
   },
   "scripts": {
     "dev": "vite",

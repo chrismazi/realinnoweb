@@ -46,6 +46,15 @@ const getIcon = (name: string, className: string = "w-5 h-5") => {
     }
 };
 
+const formatCurrency = (value: number, options?: Intl.NumberFormatOptions) =>
+    new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'RWF',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+        ...options,
+    }).format(value);
+
 const CATEGORY_LABELS: Record<string, string> = {
     housing: 'Icumbi',
     food: 'Ibiryo',
@@ -320,14 +329,14 @@ const BudgetPlanner = memo(() => {
             items.push({
                 id: 'available',
                 title: 'Room to save',
-                message: `You can still set aside $${availableToSave.toFixed(0)} this month.`,
+                message: `You can still set aside ${formatCurrency(availableToSave, { maximumFractionDigits: 0 })} this month.`,
                 tone: 'positive'
             });
         } else {
             items.push({
                 id: 'overspend',
                 title: 'Spending ahead',
-                message: `Expenses exceeded income by $${Math.abs(availableToSave).toFixed(0)} this month.`,
+                message: `Expenses exceeded income by ${formatCurrency(Math.abs(availableToSave), { maximumFractionDigits: 0 })} this month.`,
                 tone: 'warning'
             });
         }
@@ -336,7 +345,7 @@ const BudgetPlanner = memo(() => {
             items.push({
                 id: 'over-category',
                 title: 'Over budget category',
-                message: `${overspentCategories[0].name} is $${(overspentCategories[0].spent - overspentCategories[0].limit).toFixed(0)} above limit.`,
+                message: `${overspentCategories[0].name} is ${formatCurrency(overspentCategories[0].spent - overspentCategories[0].limit, { maximumFractionDigits: 0 })} above limit.`,
                 tone: 'warning'
             });
         }
@@ -400,7 +409,7 @@ const BudgetPlanner = memo(() => {
         }
         const highSpends = transactions.filter(t => t.amount > 100 && t.type === 'expense' && new Date(t.date).getTime() > Date.now() - 86400000 * 7);
         if (highSpends.length > 0) {
-            msgs.push({ type: 'warning', title: 'High Spending', text: `You spent $${highSpends[0].amount} at ${highSpends[0].title} recently.` });
+            msgs.push({ type: 'warning', title: 'High Spending', text: `You spent ${formatCurrency(highSpends[0].amount)} at ${highSpends[0].title} recently.` });
         }
         return { msgs };
     }, [transactions]);
@@ -552,9 +561,9 @@ const BudgetPlanner = memo(() => {
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <p className="text-slate-500 text-[10px] font-extrabold uppercase tracking-widest mb-1">Amafaranga Yose</p>
-                        <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                            ${Math.abs(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            {balance < 0 && <span className="text-lg text-red-500 ml-2">(Umwenda)</span>}
+                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                            {formatCurrency(Math.abs(balance), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {balance < 0 && <span className="text-base text-red-500 ml-2">(Umwenda)</span>}
                         </h1>
                     </div>
                     <button
@@ -592,7 +601,7 @@ const BudgetPlanner = memo(() => {
                         )}
                         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors">
                             <div className="flex justify-between items-center mb-6">
-                                <div><h3 className="font-bold text-slate-900 dark:text-white">Imikoreshereze y'Amafaranga</h3><p className="text-xs text-slate-400">Iminsi 7 ishize</p></div>
+                                <div><h3 className="font-semibold text-slate-900 dark:text-white">Imikoreshereze y'Amafaranga</h3><p className="text-xs text-slate-400">Iminsi 7 ishize</p></div>
                             </div>
                             <div className="h-48 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -625,7 +634,7 @@ const BudgetPlanner = memo(() => {
                                 )}
                                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                                     <p className="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Igiteranyo</p>
-                                    <p className="text-xl font-bold text-slate-900 dark:text-white">${totalSpent.toLocaleString()}</p>
+                                    <p className="text-xl font-bold text-slate-900 dark:text-white">{formatCurrency(totalSpent)}</p>
                                 </div>
                             </div>
                         </div>
@@ -647,7 +656,7 @@ const BudgetPlanner = memo(() => {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <span className={`font-bold ${isOverBudget ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>${cat.spent.toFixed(0)} <span className="text-slate-300 dark:text-slate-600 font-normal">/ ${cat.limit}</span></span>
+                                                <span className={`font-bold ${isOverBudget ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>{formatCurrency(cat.spent)} <span className="text-slate-300 dark:text-slate-600 font-normal">/ {formatCurrency(cat.limit)}</span></span>
                                                 <p className="text-[10px] text-teal-500 opacity-0 group-hover:opacity-100 transition-opacity font-bold">Hindura</p>
                                             </div>
                                         </div>
@@ -695,7 +704,7 @@ const BudgetPlanner = memo(() => {
                                             </div>
                                             <div><h4 className="font-bold text-slate-900 dark:text-white text-base mb-0.5">{tx.title}</h4><div className="flex items-center gap-2"><p className="text-xs text-slate-400 font-medium">{tx.category}</p><span className="text-[10px] text-slate-300">•</span><p className="text-xs text-slate-400 font-medium">{new Date(tx.date).toLocaleDateString()}</p></div></div>
                                         </div>
-                                        <div className="flex flex-col items-end"><span className={`font-black text-lg ${tx.type === 'income' ? 'text-teal-600 dark:text-teal-400' : 'text-slate-900 dark:text-white'}`}>{tx.type === 'income' ? '+' : '-'}${tx.amount.toFixed(2)}</span><span className="text-[10px] text-teal-600 opacity-0 group-hover:opacity-100 transition-opacity font-bold mt-1">Hindura</span></div>
+                                        <div className="flex flex-col items-end"><span className={`font-black text-lg ${tx.type === 'income' ? 'text-teal-600 dark:text-teal-400' : 'text-slate-900 dark:text-white'}`}>{tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}</span><span className="text-[10px] text-teal-600 opacity-0 group-hover:opacity-100 transition-opacity font-bold mt-1">Hindura</span></div>
                                     </div>
                                 ))
                             ) : (
@@ -710,12 +719,20 @@ const BudgetPlanner = memo(() => {
 
                 {activeSection === 'SAVINGS' && (
                     <div className="animate-slide-up space-y-6 pb-10">
-                        <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-[80px] -mr-16 -mt-16 pointer-events-none group-hover:opacity-10 transition-opacity"></div>
+                        <div className="rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden border border-slate-800 bg-slate-900">
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0f172a] to-slate-900" />
+                            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light" />
+                            <div className="absolute -top-24 -right-24 w-60 h-60 bg-brand/25 rounded-full blur-[90px]" />
+                            <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-purple-900/40 rounded-full blur-[90px]" />
                             <div className="relative z-10">
-                                <p className="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-2">Byose Byazigamwe</p>
-                                <h2 className="text-5xl font-black mb-8 tracking-tight">${savings.reduce((acc, curr) => acc + curr.current, 0).toLocaleString()}</h2>
-                                <button onClick={() => setShowSavingsModal(true)} className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition-transform flex items-center gap-2 hover:bg-white/20">
+                                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                                    Byose Byazigamwe
+                                    <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
+                                </p>
+                                <h2 className="text-4xl md:text-5xl font-black mb-8 tracking-tight">
+                                    {formatCurrency(savings.reduce((acc, curr) => acc + curr.current, 0), { minimumFractionDigits: 0 })}
+                                </h2>
+                                <button onClick={() => setShowSavingsModal(true)} className="bg-white/10 backdrop-blur-md border border-white/10 text-white px-6 py-3.5 rounded-2xl font-bold text-sm shadow-lg active:scale-95 transition-all flex items-center gap-2 hover:bg-white/20">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                     Intego Nshya
                                 </button>
@@ -737,7 +754,7 @@ const BudgetPlanner = memo(() => {
                                                     {goal.deadline && <p className="text-xs text-slate-400 font-medium">Intego: {new Date(goal.deadline).toLocaleDateString()}</p>}
                                                 </div>
                                             </div>
-                                            <span className="font-black text-slate-900 dark:text-white text-lg">${goal.current.toLocaleString()} <span className="text-xs text-slate-400 font-normal">/ ${goal.target.toLocaleString()}</span></span>
+                                            <span className="font-black text-slate-900 dark:text-white text-lg">{formatCurrency(goal.current)} <span className="text-xs text-slate-400 font-normal">/ {formatCurrency(goal.target)}</span></span>
                                         </div>
 
                                         <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-5">

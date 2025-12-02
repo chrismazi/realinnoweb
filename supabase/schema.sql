@@ -1,5 +1,5 @@
 -- ============================================
--- WellVest Database Schema - Supabase
+-- RealWorks Database Schema - Supabase
 -- Professional-grade schema with security
 -- ============================================
 

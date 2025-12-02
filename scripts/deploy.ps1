@@ -1,7 +1,7 @@
-# WellVest Production Deployment Script (PowerShell)
+# RealWorks Production Deployment Script (PowerShell)
 # Run this script to deploy your app to Vercel
 
-Write-Host "🚀 WellVest Production Deployment" -ForegroundColor Cyan
+Write-Host "🚀 RealWorks Production Deployment" -ForegroundColor Cyan
 Write-Host "==================================" -ForegroundColor Cyan
 Write-Host ""
 

@@ -13,12 +13,12 @@ async function main() {
 
   // Create demo user
   const hashedPassword = await bcrypt.hash('demo123', 12);
-  
+
   const user = await prisma.user.upsert({
-    where: { email: 'demo@wellvest.app' },
+    where: { email: 'demo@realworks.app' },
     update: {},
     create: {
-      email: 'demo@wellvest.app',
+      email: 'demo@realworks.app',
       password: hashedPassword,
       name: 'Alex Demo',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
@@ -122,7 +122,7 @@ async function main() {
 
   console.log('\n🎉 Seeding completed!\n');
   console.log('Demo credentials:');
-  console.log('  Email: demo@wellvest.app');
+  console.log('  Email: demo@realworks.app');
   console.log('  Password: demo123\n');
 }
 

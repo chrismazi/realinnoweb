@@ -1,4 +1,4 @@
-// Prisma Schema for WellVest App
+// Prisma Schema for RealWorks App
 // PostgreSQL Database
 
 generator client {

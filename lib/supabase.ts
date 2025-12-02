@@ -24,12 +24,12 @@ export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKe
         persistSession: true,
         detectSessionInUrl: true,
         storage: window.localStorage,
-        storageKey: 'wellvest-auth',
+        storageKey: 'realworks-auth',
         flowType: 'pkce', // More secure PKCE flow
     },
     global: {
         headers: {
-            'X-Client-Info': 'wellvest-web@2.0.0',
+            'X-Client-Info': 'realworks-web@2.0.0',
         },
     },
 });

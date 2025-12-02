@@ -2,7 +2,7 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# WellVest - Your Holistic Wealth & Wellness Companion
+# RealWorks - Your Holistic Wealth & Wellness Companion
 
 A comprehensive progressive web app that integrates financial wellness, mental health support, and sexual health education in one beautiful interface.
 
@@ -117,7 +117,7 @@ npm run type-check
 
 ## 🎨 Design Philosophy
 
-WellVest follows a premium design aesthetic with:
+RealWorks follows a premium design aesthetic with:
 
 - Glassmorphism effects
 - Smooth animations and transitions

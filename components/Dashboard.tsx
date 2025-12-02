@@ -34,6 +34,15 @@ const getGoalIcon = (iconName: string) => {
   }
 };
 
+const formatCurrency = (value: number, options?: Intl.NumberFormatOptions) =>
+  new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'RWF',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+    ...options,
+  }).format(value);
+
 const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   // Get real data from store
   const { t } = useTranslation();
@@ -222,14 +231,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       results.push({
         id: 'budget',
         title: 'Ingengo y\'uyu munsi yarenze',
-        message: `Warenze $${Math.max(todaySpending - dailyBudget, 0).toFixed(0)} ku mugambi w\'uyu munsi. Hagarika ibidakenewe.`,
+        message: `Warenze ${formatCurrency(Math.max(todaySpending - dailyBudget, 0), { maximumFractionDigits: 0 })} ku mugambi w'uyu munsi. Hagarika ibidakenewe.`,
         tone: 'warning'
       });
     } else {
       results.push({
         id: 'budget',
         title: 'Hari aho wakoresha',
-        message: `Uracyafite $${Math.max(dailyBudget - todaySpending, 0).toFixed(0)} mu ngengo y\'uyu munsi.`,
+        message: `Uracyafite ${formatCurrency(Math.max(dailyBudget - todaySpending, 0), { maximumFractionDigits: 0 })} mu ngengo y'uyu munsi.`,
         tone: 'positive'
       });
     }
@@ -237,7 +246,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     results.push({
       id: 'savings',
       title: 'Ibizigamwe byose',
-      message: totalSavings > 0 ? `$${totalSavings.toLocaleString()} byazigamwe ku ntego zose.` : 'Tangira intego yo kubaka ubuzima bwawe.',
+      message: totalSavings > 0 ? `${formatCurrency(totalSavings)} byazigamwe ku ntego zose.` : 'Tangira intego yo kubaka ubuzima bwawe.',
       tone: totalSavings > 0 ? 'positive' : 'info'
     });
 
@@ -245,7 +254,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       results.push({
         id: 'category',
         title: 'Icyiciro cyakoreshejwe cyane',
-        message: `${topSpendingCategory.name} - $${topSpendingCategory.amount.toFixed(0)} muri uku kwezi.`,
+        message: `${topSpendingCategory.name} - ${formatCurrency(topSpendingCategory.amount, { maximumFractionDigits: 0 })} muri uku kwezi.`,
         tone: 'info'
       });
     }
@@ -275,7 +284,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       <div className="pt-14 px-6 pb-6 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl sticky top-0 z-30 flex justify-between items-center transition-all duration-300">
         <div className="animate-fade-in">
           <h2 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest mb-0.5">{t('dashboard.welcome')}</h2>
-          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             {user.name || t('auth.welcomeBack')}
           </h1>
         </div>
@@ -325,8 +334,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   {/* Orange Pulse */}
                   <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse"></span>
                 </p>
-                <h2 className="text-4xl font-extrabold tracking-tight">
-                  ${Math.abs(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <h2 className="text-3xl font-bold tracking-tight">
+                  {formatCurrency(Math.abs(balance), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </h2>
                 {balance < 0 && (
                   <span className="text-xs text-red-400 font-bold mt-1">{t('common.overdraft')}</span>
@@ -345,8 +354,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   </div>
                   <p className="text-[10px] text-slate-300 font-bold uppercase tracking-wider">{t('dashboard.income')}</p>
                 </div>
-                <p className="font-bold text-lg tracking-wide pl-1">
-                  +${monthlyIncome.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                <p className="font-semibold text-base tracking-wide pl-1">
+                  +{formatCurrency(monthlyIncome, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </p>
               </div>
               <div className="bg-white/5 rounded-2xl p-4 border border-white/5 backdrop-blur-md hover:bg-white/10 transition-colors group/item">
@@ -356,8 +365,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   </div>
                   <p className="text-[10px] text-slate-300 font-bold uppercase tracking-wider">{t('dashboard.expenses')}</p>
                 </div>
-                <p className="font-bold text-lg tracking-wide pl-1">
-                  -${monthlyExpenses.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                <p className="font-semibold text-base tracking-wide pl-1">
+                  -{formatCurrency(monthlyExpenses, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </p>
               </div>
             </div>
@@ -370,7 +379,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">Uku kwezi</p>
-                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">Incamake y'imari</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Incamake y'imari</h3>
               </div>
               <button onClick={() => onNavigate(Tab.BUDGET)} className="text-brand text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full bg-brand/10 hover:bg-brand/20 transition-colors">Reba ingengo</button>
             </div>
@@ -378,21 +387,21 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               <div className="flex items-center justify-between rounded-2xl border border-slate-100 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/40">
                 <div>
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Amafaranga yinjiye</p>
-                  <p className={`text-3xl font-black mt-1 ${cashFlow >= 0 ? 'text-teal-500' : 'text-red-500'}`}>
-                    {cashFlow >= 0 ? '+' : '-'}${Math.abs(cashFlow).toLocaleString()}
+                  <p className={`text-2xl font-bold mt-1 ${cashFlow >= 0 ? 'text-teal-500' : 'text-red-500'}`}>
+                    {cashFlow >= 0 ? '+' : '-'}{formatCurrency(Math.abs(cashFlow))}
                   </p>
-                  <span className="text-[10px] text-slate-400 font-bold">Ayinjiye ${monthlyIncome.toLocaleString()} • Ayasohotse ${monthlyExpenses.toLocaleString()}</span>
+                  <span className="text-[10px] text-slate-400 font-bold">Ayinjiye {formatCurrency(monthlyIncome)} • Ayasohotse {formatCurrency(monthlyExpenses)}</span>
                 </div>
                 <div className="w-24 h-24 rounded-full border-4 border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center">
                   <span className="text-xs font-bold text-slate-400">Ibizigamwe</span>
-                  <strong className="text-lg text-slate-900 dark:text-white">${totalSavings.toLocaleString()}</strong>
+                  <strong className="text-base text-slate-900 dark:text-white">{formatCurrency(totalSavings)}</strong>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-2xl border border-slate-100 dark:border-slate-800 p-4 bg-white dark:bg-slate-900/60">
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">Imikoreshereze</p>
                   <div className="flex items-baseline gap-2">
-                    <span className={`text-2xl font-black ${spendingProgress > 100 ? 'text-red-500' : 'text-brand'}`}>{Math.min(spendingProgress, 200).toFixed(0)}%</span>
+                    <span className={`text-xl font-bold ${spendingProgress > 100 ? 'text-red-500' : 'text-brand'}`}>{Math.min(spendingProgress, 200).toFixed(0)}%</span>
                     <span className="text-xs text-slate-400">by'uyu munsi</span>
                   </div>
                   <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full mt-3 overflow-hidden">
@@ -401,9 +410,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </div>
                 <div className="rounded-2xl border border-slate-100 dark:border-slate-800 p-4 bg-white dark:bg-slate-900/60">
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">Inyemezabuguzi itaha</p>
-                  <p className="text-lg font-bold text-slate-900 dark:text-white truncate">{recurringStatus.title}</p>
+                  <p className="text-base font-semibold text-slate-900 dark:text-white truncate">{recurringStatus.title}</p>
                   <p className="text-sm text-slate-500 dark:text-slate-400">{recurringStatus.status}</p>
-                  {recurringStatus.amount > 0 && <span className="text-xs font-bold text-slate-500 mt-2 inline-block">${recurringStatus.amount.toFixed(2)}</span>}
+                  {recurringStatus.amount > 0 && <span className="text-xs font-bold text-slate-500 mt-2 inline-block">{formatCurrency(recurringStatus.amount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>}
                 </div>
               </div>
               {topSpendingCategory && (
@@ -414,7 +423,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-slate-400">Byakoreshejwe</p>
-                    <p className="text-2xl font-black text-slate-900 dark:text-white">${topSpendingCategory.amount.toFixed(0)}</p>
+                    <p className="text-xl font-bold text-slate-900 dark:text-white">{formatCurrency(topSpendingCategory.amount, { maximumFractionDigits: 0 })}</p>
                   </div>
                 </div>
               )}
@@ -426,7 +435,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         {insights.length > 0 && (
           <div className="animate-slide-up" style={{ animationDelay: '0.3s' }}>
             <div className="flex justify-between items-center mb-4 px-1">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Inama z'ubwenge</h3>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">Inama z'ubwenge</h3>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bihinduka</span>
             </div>
             <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-6 px-6 pb-4 snap-x snap-mandatory">
@@ -443,7 +452,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         {/* Daily Pulse - Horizontal Scroll Widgets */}
         <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex justify-between items-center mb-5 px-1">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('dashboard.dailyPulse')}</h3>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white">{t('dashboard.dailyPulse')}</h3>
             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">{t('common.today')}</span>
           </div>
           <div className="flex gap-4 overflow-x-auto no-scrollbar pb-6 -mx-6 px-6 snap-x snap-mandatory">
@@ -455,8 +464,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               <div>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">{t('dashboard.dailySpend')}</p>
                 <div className="flex items-end gap-1 mb-3">
-                  <span className={`text-2xl font-black leading-none ${todaySpending > dailyBudget ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>${todaySpending.toFixed(0)}</span>
-                  <span className="text-xs text-slate-400 mb-0.5 font-medium">/ ${dailyBudget}</span>
+                  <span className={`text-xl font-bold leading-none ${todaySpending > dailyBudget ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>{formatCurrency(todaySpending, { maximumFractionDigits: 0 })}</span>
+                  <span className="text-xs text-slate-400 mb-0.5 font-medium">/ {formatCurrency(dailyBudget, { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className="h-1.5 w-full bg-orange-50 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div className={`h-full rounded-full shadow-[0_0_10px_rgba(249,115,22,0.5)] ${todaySpending > dailyBudget ? 'bg-red-500' : 'bg-brand'}`} style={{ width: `${Math.min((todaySpending / dailyBudget) * 100, 100)}%` }}></div>
@@ -498,7 +507,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
         {/* Quick Actions - Updated to use Brand Orange for the 'Add' button */}
         <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-5 px-1">{t('dashboard.quickActions')}</h3>
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-5 px-1">{t('dashboard.quickActions')}</h3>
           <div className="grid grid-cols-4 gap-4">
             {[
               // Made 'Add' action prominently Orange (Brand)
@@ -520,7 +529,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         {/* Savings Goals */}
         <div className="animate-slide-up pb-6" style={{ animationDelay: '0.3s' }}>
           <div className="flex justify-between items-center mb-5 px-1">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('dashboard.savingsGoals')}</h3>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white">{t('dashboard.savingsGoals')}</h3>
             <button className="text-brand text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full hover:bg-brand/10 transition-colors">{t('dashboard.viewAll')}</button>
           </div>
           <div className="space-y-4">
@@ -531,7 +540,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     {getGoalIcon(goal.icon)}
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 dark:text-white text-base mb-1">{goal.name}</h4>
+                    <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-1">{goal.name}</h4>
                     <div className="flex items-center gap-3">
                       <div className="w-24 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div className={`h-full ${goal.color} rounded-full transition-all duration-1000`} style={{ width: `${(goal.current / goal.target) * 100}%` }}></div>

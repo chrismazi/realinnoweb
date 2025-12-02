@@ -11,7 +11,7 @@ const slides = [
   {
     id: 1,
     title: "Genzura Amafaranga Yawe",
-    desc: "Kurikirana uko utunze, wubake ingengo y'imari, kandi ugenze neza ukoresheje WellVest.",
+    desc: "Kurikirana uko utunze, wubake ingengo y'imari, kandi ugenze neza ukoresheje RealWorks.",
     image: real1,
   },
   {
@@ -95,9 +95,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             {slides.map((_, idx) => (
               <span
                 key={idx}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  idx === currentSlide ? 'w-8 bg-slate-900' : 'w-3 bg-slate-300'
-                }`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentSlide ? 'w-8 bg-slate-900' : 'w-3 bg-slate-300'
+                  }`}
               />
             ))}
           </div>

@@ -95,7 +95,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                                 </svg>
                             </button>
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
+                                <h1 className="text-xl font-bold text-gray-900 dark:text-white">Analytics</h1>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Financial insights & trends</p>
                             </div>
                         </div>
@@ -110,7 +110,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Total Income</p>
-                                <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
+                                <p className="text-xl font-semibold text-green-600 dark:text-green-400 mt-1">
                                     ${analytics.totalIncome.toFixed(2)}
                                 </p>
                             </div>
@@ -122,7 +122,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Total Expenses</p>
-                                <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
+                                <p className="text-xl font-semibold text-red-600 dark:text-red-400 mt-1">
                                     ${analytics.totalExpenses.toFixed(2)}
                                 </p>
                             </div>
@@ -134,7 +134,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Net Income</p>
-                                <p className={`text-2xl font-bold mt-1 ${analytics.netIncome >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                <p className={`text-xl font-semibold mt-1 ${analytics.netIncome >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                                     }`}>
                                     ${analytics.netIncome.toFixed(2)}
                                 </p>
@@ -147,7 +147,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Savings Rate</p>
-                                <p className={`text-2xl font-bold mt-1 ${analytics.savingsRate >= 20 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'
+                                <p className={`text-xl font-semibold mt-1 ${analytics.savingsRate >= 20 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'
                                     }`}>
                                     {analytics.savingsRate.toFixed(1)}%
                                 </p>
@@ -161,7 +161,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     {/* Spending by Category */}
                     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
                             Spending by Category
                         </h3>
                         {analytics.categoryData.length > 0 ? (
@@ -193,7 +193,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
 
                     {/* Top Categories */}
                     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
                             Top Spending Categories
                         </h3>
                         <div className="space-y-4">

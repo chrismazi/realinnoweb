@@ -32,7 +32,7 @@ npx supabase link --project-ref [YOUR_PROJECT_REF]
 
 **To find YOUR_PROJECT_REF:**
 - Go to: https://supabase.com/dashboard
-- Click on your WellVest project
+- Click on your RealWorks project
 - Look at the URL bar
 - Copy the code after `/project/`
 

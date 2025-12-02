@@ -1,4 +1,4 @@
-# 🚀 WellVest Supabase Backend Setup Guide
+# 🚀 RealWorks Supabase Backend Setup Guide
 
 ## 📋 Prerequisites
 
@@ -15,7 +15,7 @@
 1. Go to [https://app.supabase.com](https://app.supabase.com)
 2. Click **"New Project"**
 3. Fill in:
-   - **Name**: `wellvest-app` (or your preferred name)
+   - **Name**: `realworks-app` (or your preferred name)
    - **Database Password**: Create a strong password (save this!)
    - **Region**: Choose closest to you
 4. Click **"Create new project"**
@@ -31,7 +31,7 @@
 
 ### Step 3: Configure Environment Variables
 
-1. In your WellVest project folder, find `.env.example`
+1. In your RealWorks project folder, find `.env.example`
 2. Copy it and rename to `.env.local`:
    ```bash
    cp .env.example .env.local
@@ -337,7 +337,7 @@ Before moving forward, verify:
 
 ---
 
-**🎉 Congratulations!** You now have a professional, production-ready Supabase backend powering your WellVest authentication system!
+**🎉 Congratulations!** You now have a professional, production-ready Supabase backend powering your RealWorks authentication system!
 
 The mock API has been completely replaced with real database operations, and your users' data is now secure, scalable, and backed by PostgreSQL.
 

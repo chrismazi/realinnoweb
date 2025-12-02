@@ -127,7 +127,7 @@ const App: React.FC = () => {
     await supabaseAuthService.signOut();
 
     // Clear Zustand store
-    const clearAllData = (window as any).__WELLVEST_STORE__?.getState?.()?.clearAllData;
+    const clearAllData = (window as any).__RealWorks_STORE__?.getState?.()?.clearAllData;
     if (clearAllData) {
       clearAllData();
     }
@@ -140,8 +140,8 @@ const App: React.FC = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
 
-    // Clear wellvest-storage (Zustand persist)
-    localStorage.removeItem('wellvest-storage');
+    // Clear RealWorks-storage (Zustand persist)
+    localStorage.removeItem('RealWorks-storage');
 
     // Reset state
     setUserName('');

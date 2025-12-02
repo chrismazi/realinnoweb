@@ -574,7 +574,7 @@ const useAppStore = create<AppState>()(
         })
       })),
       {
-        name: 'wellvest-storage',
+        name: 'realworks-storage',
         partialize: (state) => ({
           user: state.user,
           transactions: state.transactions,

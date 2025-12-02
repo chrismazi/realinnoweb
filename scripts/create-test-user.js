@@ -11,11 +11,11 @@ const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-console.log('👤 Creating Test User for WellVest\n');
+console.log('👤 Creating Test User for RealWorks\n');
 console.log('='.repeat(60));
 
 async function createTestUser() {
-    const testEmail = 'wellvest.test@gmail.com';
+    const testEmail = 'RealWorks.test@gmail.com';
     const testPassword = 'TestPass123!';
     const testName = 'Test User';
 

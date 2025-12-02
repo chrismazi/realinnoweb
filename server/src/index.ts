@@ -1,5 +1,5 @@
 /**
- * WellVest API Server
+ * RealWorks API Server
  * Express server with PostgreSQL and JWT authentication
  */
 
@@ -73,7 +73,7 @@ app.use('/api/v1', routes);
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    name: 'WellVest API',
+    name: 'RealWorks API',
     version: '1.0.0',
     status: 'running',
     documentation: '/api/v1/health',
@@ -104,7 +104,7 @@ const startServer = async (): Promise<void> => {
       console.log(`
 ╔═══════════════════════════════════════════════╗
 ║                                               ║
-║   🚀 WellVest API Server                      ║
+║   🚀 RealWorks API Server                      ║
 ║                                               ║
 ║   Environment: ${config.nodeEnv.padEnd(28)}║
 ║   Port: ${String(config.port).padEnd(35)}║

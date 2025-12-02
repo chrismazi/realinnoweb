@@ -24,7 +24,7 @@ async function testFinalConfig() {
         console.log('Vestie says:', response.text());
         console.log('\n📝 Model used: models/gemini-flash-latest');
         console.log('🔧 Library version: 0.21.0');
-        console.log('\n✨ You can now use the AI chat in your WellVest app!');
+        console.log('\n✨ You can now use the AI chat in your RealWorks app!');
     } catch (e) {
         console.error('❌ Error:', e.message);
     }

@@ -135,7 +135,7 @@ class ErrorBoundary extends Component<Props, State> {
             {/* Support Link */}
             <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
               If this problem persists, please{' '}
-              <a href="mailto:support@wellvest.app" className="text-brand hover:underline">
+              <a href="mailto:support@realworks.app" className="text-brand hover:underline">
                 contact support
               </a>
             </p>

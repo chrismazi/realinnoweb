@@ -68,7 +68,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
     const { settings, updateSettings, toggleDarkMode: toggleTheme, setUser } = useAppStore();
     const { notifications, biometrics: faceId, darkMode } = settings;
     const { t, language } = useTranslation();
-    
+
     // Get real data from store
     const user = useUser();
     const transactions = useTransactions();
@@ -128,39 +128,39 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
     const profileCompletion = useMemo(() => {
         let score = 0;
         const items: { label: string; completed: boolean; points: number }[] = [];
-        
+
         // Name (20 points)
         const hasName = profile.name && profile.name.length > 1 && profile.name !== 'User';
         items.push({ label: 'Add your name', completed: hasName, points: 20 });
         if (hasName) score += 20;
-        
+
         // Email (20 points)
         const hasEmail = profile.email && profile.email.includes('@');
         items.push({ label: 'Verify email', completed: hasEmail, points: 20 });
         if (hasEmail) score += 20;
-        
+
         // Phone (15 points)
         const hasPhone = profile.phone && profile.phone.length > 5;
         items.push({ label: 'Add phone number', completed: hasPhone, points: 15 });
         if (hasPhone) score += 15;
-        
+
         // Avatar (15 points)
         const hasAvatar = profile.avatar && !profile.avatar.includes('unsplash');
         items.push({ label: 'Upload profile photo', completed: hasAvatar, points: 15 });
         if (hasAvatar) score += 15;
-        
+
         // Has transactions (15 points)
         const hasTransactions = transactions.length > 0;
         items.push({ label: 'Add first transaction', completed: hasTransactions, points: 15 });
         if (hasTransactions) score += 15;
-        
+
         // Has savings goal (15 points)
         const hasSavings = savingsGoals.length > 0;
         items.push({ label: 'Create savings goal', completed: hasSavings, points: 15 });
         if (hasSavings) score += 15;
-        
+
         const nextAction = items.find(item => !item.completed);
-        
+
         return { score, items, nextAction };
     }, [profile, transactions, savingsGoals]);
 
@@ -170,17 +170,17 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
         const today = new Date();
         let streak = 0;
         const activityDates = new Set<string>();
-        
+
         transactions.forEach(t => {
             const date = new Date(t.date).toDateString();
             activityDates.add(date);
         });
-        
+
         chatHistory.forEach(m => {
             const date = new Date(m.timestamp).toDateString();
             activityDates.add(date);
         });
-        
+
         // Count consecutive days from today backwards
         for (let i = 0; i < 365; i++) {
             const checkDate = new Date(today);
@@ -191,29 +191,29 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 break;
             }
         }
-        
+
         // Total savings
         const totalSavings = savingsGoals.reduce((sum, goal) => sum + goal.current, 0);
-        
+
         // Financial health score (0-100)
         let healthScore = 50; // Base score
-        
+
         // Bonus for having savings goals
         if (savingsGoals.length > 0) healthScore += 10;
-        
+
         // Bonus for progress on goals
-        const avgProgress = savingsGoals.length > 0 
-            ? savingsGoals.reduce((sum, g) => sum + (g.current / g.target), 0) / savingsGoals.length 
+        const avgProgress = savingsGoals.length > 0
+            ? savingsGoals.reduce((sum, g) => sum + (g.current / g.target), 0) / savingsGoals.length
             : 0;
         healthScore += Math.round(avgProgress * 20);
-        
+
         // Bonus for regular tracking
         if (transactions.length > 10) healthScore += 10;
         if (transactions.length > 50) healthScore += 10;
-        
+
         // Cap at 100
         healthScore = Math.min(100, healthScore);
-        
+
         return {
             streak: streak || 0,
             savings: totalSavings,
@@ -225,10 +225,10 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
     const premiumStatus = useMemo((): PremiumStatus => {
         // In a real app, this would come from a subscription service
         // For now, determine based on activity level
-        const hasHealthData = Object.keys(healthData.cycleData || {}).length > 0 || 
-                             Object.keys(healthData.mentalHealth || {}).length > 0;
+        const hasHealthData = Object.keys(healthData.cycleData || {}).length > 0 ||
+            Object.keys(healthData.mentalHealth || {}).length > 0;
         const hasSignificantActivity = transactions.length > 20 && savingsGoals.length > 2;
-        
+
         if (hasSignificantActivity && hasHealthData) {
             return PREMIUM_TIERS.premium;
         } else if (transactions.length > 5 || savingsGoals.length > 0) {
@@ -269,7 +269,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
             showToast('Please log in to save changes', 'error');
             return;
         }
-        
+
         setIsSaving(true);
         try {
             // Update profile in Supabase
@@ -278,7 +278,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 phone: editForm.phone,
                 avatar_url: editForm.avatar
             });
-            
+
             if (result.success) {
                 // Update local state
                 setProfile(editForm);
@@ -323,28 +323,28 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
     const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
-        
+
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
             showToast('Image must be less than 5MB', 'error');
             return;
         }
-        
+
         // Validate file type
         if (!file.type.startsWith('image/')) {
             showToast('Please select an image file', 'error');
             return;
         }
-        
+
         setIsUploading(true);
-        
+
         try {
             // If user is logged in, upload to Supabase Storage
             if (user.id) {
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${user.id}-${Date.now()}.${fileExt}`;
                 const filePath = `avatars/${fileName}`;
-                
+
                 // Upload to Supabase Storage
                 const { data: uploadData, error: uploadError } = await supabase.storage
                     .from('avatars')
@@ -352,7 +352,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                         cacheControl: '3600',
                         upsert: true
                     });
-                
+
                 if (uploadError) {
                     console.error('Upload error:', uploadError);
                     // Fall back to base64 if storage fails
@@ -367,7 +367,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     const { data: { publicUrl } } = supabase.storage
                         .from('avatars')
                         .getPublicUrl(filePath);
-                    
+
                     setEditForm(prev => ({ ...prev, avatar: publicUrl }));
                     showToast('Photo uploaded!', 'success');
                 }
@@ -402,7 +402,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 settings: state.settings
             };
 
-            exportService.full.downloadJSON(data, 'wellvest_backup');
+            exportService.full.downloadJSON(data, 'realworks_backup');
 
             const toast = document.createElement('div');
             toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] animate-slide-up';
@@ -421,7 +421,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
 
     const handleExportTransactions = () => {
         const state = useAppStore.getState();
-        exportService.transactions.download(state.transactions, 'wellvest_transactions');
+        exportService.transactions.download(state.transactions, 'realworks_transactions');
 
         const toast = document.createElement('div');
         toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] animate-slide-up';
@@ -482,7 +482,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Profile</p>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Edit Information</h3>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Edit Information</h3>
                     </div>
                     <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
                         <Icons.Close className="w-5 h-5" />
@@ -498,7 +498,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                             {editForm.avatar ? (
                                 <img src={editForm.avatar} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
-                                <span className="text-2xl font-bold text-slate-500 dark:text-white">{getInitials(editForm.name || profile.name)}</span>
+                                <span className="text-xl font-bold text-slate-500 dark:text-white">{getInitials(editForm.name || profile.name)}</span>
                             )}
                         </div>
                         <span className="absolute -bottom-2 right-0 text-[10px] font-semibold text-brand bg-white rounded-full px-3 py-1 shadow">{isUploading ? 'Uploading...' : 'Change'}</span>
@@ -523,9 +523,8 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 <button
                     onClick={handleSaveProfile}
                     disabled={isSaving || isUploading}
-                    className={`w-full mt-8 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 ${
-                        isSaving || isUploading ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-slate-800'
-                    }`}
+                    className={`w-full mt-8 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 ${isSaving || isUploading ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-slate-800'
+                        }`}
                 >
                     {isSaving ? (
                         <>
@@ -548,7 +547,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 <div className="flex justify-between items-start mb-6">
                     <div>
                         <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Session</p>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Are you sure you want to log out?</h3>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Are you sure you want to log out?</h3>
                     </div>
                     <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
                         <Icons.Close className="w-5 h-5" />
@@ -585,7 +584,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Support</p>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Help Center</h3>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Help Center</h3>
                     </div>
                     <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
                         <Icons.Close className="w-5 h-5" />
@@ -596,9 +595,9 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 </div>
 
                 <div className="space-y-4 overflow-y-auto pr-1 no-scrollbar">
-                    {[ 
+                    {[
                         { q: 'How is my data secured?', a: 'We use 256-bit encryption, secure storage, and anonymized chat logs. Only you control exports.' },
-                        { q: 'Can I connect my bank account?', a: 'Manual entry is available today. Secure bank syncing is scheduled for WellVest v3.0.' },
+                        { q: 'Can I connect my bank account?', a: 'Manual entry is available today. Secure bank syncing is scheduled for RealWorks v3.0.' },
                         { q: 'How does the cycle tracker work?', a: 'Track your periods and symptoms; the predictions become smarter the more you log.' },
                         { q: 'Is Vestie giving medical advice?', a: 'Vestie offers supportive coaching, not diagnoses. Always consult licensed professionals for care.' }
                     ].map((faq, i) => (
@@ -800,7 +799,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     <div className="flex justify-between items-start mb-4">
                         <div>
                             <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Security</p>
-                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{getTitle()}</h3>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{getTitle()}</h3>
                         </div>
                         <div className="flex gap-2">
                             {securityView !== 'OVERVIEW' && (
@@ -832,7 +831,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Legal</p>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Terms & Conditions</h3>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Terms & Conditions</h3>
                     </div>
                     <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
                         <Icons.Close className="w-5 h-5" />
@@ -847,7 +846,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                         <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Eligibility</h4>
                         <ul className="list-decimal list-inside space-y-1">
                             <li>You are at least 18 years old or meet your country’s legal age.</li>
-                            <li>You can enter a binding agreement with WellVest.</li>
+                            <li>You can enter a binding agreement with RealWorks.</li>
                             <li>You will use the app for lawful personal finance and wellness tracking.</li>
                         </ul>
                     </section>
@@ -861,7 +860,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     </section>
                     <section>
                         <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Contact</h4>
-                        <p>Email legal@wellvest.africa for questions regarding these terms.</p>
+                        <p>Email legal@realworks.africa for questions regarding these terms.</p>
                     </section>
                 </div>
             </div>
@@ -875,7 +874,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Legal</p>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Privacy Policy</h3>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Privacy Policy</h3>
                     </div>
                     <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
                         <Icons.Close className="w-5 h-5" />
@@ -889,7 +888,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     <section>
                         <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">How we handle your data</h4>
                         <p>
-                            We collect the details you provide (name, email, phone, health logs) to personalize WellVest and power the AI companion. This data is encrypted in transit and at rest and is never sold to third parties.
+                            We collect the details you provide (name, email, phone, health logs) to personalize RealWorks and power the AI companion. This data is encrypted in transit and at rest and is never sold to third parties.
                         </p>
                     </section>
                     <section>
@@ -903,12 +902,12 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     <section>
                         <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Your control</h4>
                         <p>
-                            You can download, update, or delete your information at any time from the Account screen. Contact support@wellvest.africa for additional privacy requests.
+                            You can download, update, or delete your information at any time from the Account screen. Contact support@realworks.africa for additional privacy requests.
                         </p>
                     </section>
                     <section>
                         <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Questions?</h4>
-                        <p>Read the full policy at wellvest.africa/privacy or chat with support for clarifications.</p>
+                        <p>Read the full policy at realworks.africa/privacy or chat with support for clarifications.</p>
                     </section>
                 </div>
             </div>
@@ -922,7 +921,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md sticky top-0 z-20">
                     <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-6"></div>
                     <div className="flex justify-between items-center">
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Upgrade Plan</h3>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Upgrade Plan</h3>
                         <button onClick={() => setActiveModal('NONE')} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                             <Icons.Close className="w-6 h-6" />
                         </button>
@@ -937,13 +936,12 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     </div>
 
                     {Object.values(PREMIUM_TIERS).map((tier) => (
-                        <div 
+                        <div
                             key={tier.tier}
-                            className={`p-5 rounded-2xl border-2 transition-all ${
-                                tier.tier === premiumStatus.tier 
-                                    ? 'border-brand bg-brand/5' 
+                            className={`p-5 rounded-2xl border-2 transition-all ${tier.tier === premiumStatus.tier
+                                    ? 'border-brand bg-brand/5'
                                     : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                            }`}
+                                }`}
                         >
                             <div className="flex justify-between items-center mb-3">
                                 <div className="flex items-center gap-2">
@@ -1046,7 +1044,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 <div className="space-y-8">
                     {menuItems.map((group, idx) => (
                         <div key={idx}>
-                            <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">{group.section}</h3>
+                            <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">{group.section}</h3>
                             <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
                                 {group.items.map((item: any) => (
                                     <button
@@ -1092,7 +1090,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     {t('profile.logout')}
                 </button>
 
-                <p className="text-center text-[10px] text-gray-400 dark:text-slate-600 font-bold tracking-widest uppercase mb-4 opacity-50">WellVest v2.4.0 • Built with ❤️</p>
+                <p className="text-center text-[10px] text-gray-400 dark:text-slate-600 font-bold tracking-widest uppercase mb-4 opacity-50">RealWorks v2.4.0 • Built with ❤️</p>
             </div>
         </div>
     );

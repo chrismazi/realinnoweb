@@ -9,7 +9,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY;
 
-console.log('🧪 WellVest Backend Features - Comprehensive Test Suite\n');
+console.log('🧪 RealWorks Backend Features - Comprehensive Test Suite\n');
 console.log('='.repeat(60));
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);

@@ -49,7 +49,7 @@ const BreathingExercise = ({ onClose }: { onClose: () => void }) => {
             </button>
 
             <div className="relative z-10 flex flex-col items-center justify-center h-full pb-20">
-                <h2 className={`text-3xl font-light text-white mb-16 tracking-[0.2em] uppercase transition-all duration-1000 ${phase === 'Hold' ? 'opacity-100 scale-105' : 'opacity-70 scale-100'}`}>
+                <h2 className={`text-2xl font-light text-white mb-16 tracking-[0.2em] uppercase transition-all duration-1000 ${phase === 'Hold' ? 'opacity-100 scale-105' : 'opacity-70 scale-100'}`}>
                     {getText()}
                 </h2>
 
@@ -80,7 +80,7 @@ const SOSModal = ({ onClose }: { onClose: () => void }) => (
                     <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                 </div>
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Ubufasha bw'Ihutirwa</h2>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Ubufasha bw'Ihutirwa</h2>
                     <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">Nturi wenyine. Ubufasha burahari.</p>
                 </div>
             </div>
@@ -90,17 +90,17 @@ const SOSModal = ({ onClose }: { onClose: () => void }) => (
                         <span className="font-bold text-slate-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors">{RWANDA_EMERGENCY.crisis.name}</span>
                         <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">{RWANDA_EMERGENCY.crisis.desc}</span>
                     </div>
-                    <span className="font-bold text-slate-900 dark:text-white text-xl group-hover:text-red-700 dark:group-hover:text-red-400">{RWANDA_EMERGENCY.crisis.number}</span>
+                    <span className="font-bold text-slate-900 dark:text-white text-lg group-hover:text-red-700 dark:group-hover:text-red-400">{RWANDA_EMERGENCY.crisis.number}</span>
                 </a>
                 <a href="tel:112" className="flex items-center justify-between w-full p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all shadow-sm">
                     <span className="font-bold text-slate-700 dark:text-slate-300">{RWANDA_EMERGENCY.emergency.name}</span>
-                    <span className="font-bold text-slate-700 dark:text-slate-300 text-xl">{RWANDA_EMERGENCY.emergency.number}</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300 text-lg">{RWANDA_EMERGENCY.emergency.number}</span>
                 </a>
             </div>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-4">
                 Numero z'ihutirwa mu Rwanda. Mu gihe cy'ihutirwa, hamagara serivisi z'aho uherereye.
             </p>
-            <button onClick={onClose} className="mt-4 w-full py-4 text-slate-400 dark:text-slate-500 font-bold text-sm hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-slate-50 dark:bg-slate-900/50 rounded-2xl">Funga</button>
+            <button onClick={onClose} className="mt-4 w-full py-4 text-slate-400 dark:text-slate-500 font-bold text-xs hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-slate-50 dark:bg-slate-900/50 rounded-2xl">Funga</button>
         </div>
     </div>
 );
@@ -232,10 +232,10 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative font-sans text-slate-800 dark:text-slate-200 transition-colors duration-500">
+        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative font-sans text-slate-800 dark:text-slate-200 transition-colors duration-500 overflow-hidden">
             {showBreathing && <BreathingExercise onClose={() => setShowBreathing(false)} />}
             {showSOS && <SOSModal onClose={() => setShowSOS(false)} />}
-            
+
             {showClearConfirm && (
                 <div className="absolute inset-0 z-[60] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={() => setShowClearConfirm(false)}>
                     <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-slide-up" onClick={e => e.stopPropagation()}>
@@ -244,18 +244,18 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Tangira ikiganiro gishya?</h3>
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">Tangira ikiganiro gishya?</h3>
                                 <p className="text-xs text-slate-500 dark:text-slate-400">Ibi bizasiba amateka y'ikiganiro cyawe.</p>
                             </div>
                         </div>
                         <div className="flex gap-3 mt-6">
-                            <button onClick={() => setShowClearConfirm(false)} className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-sm">Hagarika</button>
-                            <button onClick={handleClearChat} className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold text-sm">Tangira Bishya</button>
+                            <button onClick={() => setShowClearConfirm(false)} className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-xs">Hagarika</button>
+                            <button onClick={handleClearChat} className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold text-xs">Tangira Bishya</button>
                         </div>
                     </div>
                 </div>
             )}
-            
+
             <div className="pt-14 px-6 pb-4 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-30 sticky top-0 flex justify-between items-end transition-colors duration-300">
                 <div className="flex items-center gap-3">
                     {onBack && (
@@ -264,15 +264,15 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                         </button>
                     )}
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Vestie</h1>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">Umufasha w'Ubuzima</span>
+                        <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Vestie</h1>
+                        <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">Umufasha w'Ubuzima</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <button
                         onClick={handleStartNewConversation}
                         disabled={messages.length === 0}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 active:scale-95 border transition-colors ${messages.length === 0 ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border-slate-200 dark:border-slate-800 cursor-not-allowed opacity-60' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                        className={`px-4 py-2 rounded-xl text-[11px] font-bold flex items-center gap-2 active:scale-95 border transition-colors ${messages.length === 0 ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border-slate-200 dark:border-slate-800 cursor-not-allowed opacity-60' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                         title="Start new conversation"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
@@ -283,25 +283,25 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                     )}
-                    <button onClick={() => setShowBreathing(true)} className="px-4 py-2 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-xl text-xs font-bold hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors flex items-center gap-2 active:scale-95 border border-teal-100 dark:border-teal-900/30">
+                    <button onClick={() => setShowBreathing(true)} className="px-4 py-2 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-xl text-[11px] font-bold hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors flex items-center gap-2 active:scale-95 border border-teal-100 dark:border-teal-900/30">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                         Humeka
                     </button>
-                    <button onClick={() => setShowSOS(true)} className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-bold hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-2 group active:scale-95 border border-slate-200 dark:border-slate-700">
+                    <button onClick={() => setShowSOS(true)} className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-[11px] font-bold hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-2 group active:scale-95 border border-slate-200 dark:border-slate-700">
                         <svg className="w-4 h-4 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                         Ubufasha
                     </button>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 pt-6 no-scrollbar space-y-6 pb-32" style={{ scrollBehavior: 'smooth' }}>
+            <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-6 space-y-6 pb-56" style={{ scrollBehavior: 'smooth' }}>
                 {messages.length === 0 && (
                     <div className="flex flex-col items-center justify-center min-h-[50vh] animate-fade-in text-center pt-10">
                         <div className="w-24 h-24 bg-gradient-to-tr from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-600 mb-8 shadow-sm border border-slate-100 dark:border-slate-800">
                             <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                         </div>
-                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">Wiyumva ute?</h2>
-                        <p className="text-slate-400 dark:text-slate-500 text-sm max-w-xs mb-10 leading-relaxed mx-auto">
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">Wiyumva ute?</h2>
+                        <p className="text-slate-400 dark:text-slate-500 text-xs max-w-xs mb-10 leading-relaxed mx-auto">
                             Aha ni ahantu hizewe kandi h'ibanga. Hitamo ingingo hepfo cyangwa wandike icyo utekereza.
                         </p>
                         <div className="grid grid-cols-2 gap-4 w-full max-w-sm mx-auto">
@@ -313,31 +313,31 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                             ].map((item) => (
                                 <button key={item.label} onClick={() => handleSend(item.prompt)} className="p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-teal-100 dark:hover:border-teal-900/50 transition-all active:scale-[0.98] group">
                                     <div className="text-slate-400 dark:text-slate-600 group-hover:text-teal-500 dark:group-hover:text-teal-400 mb-3 transition-colors">{item.icon}</div>
-                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">{item.label}</span>
+                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">{item.label}</span>
                                 </button>
                             ))}
                         </div>
                     </div>
                 )}
-                
+
                 {messagesWithDates.map((item) => {
                     if (item.type === 'date') {
                         return (
                             <div key={`date-${item.date}`} className="flex items-center justify-center my-6">
                                 <div className="px-4 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
-                                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                         {formatDateSeparator(item.date!)}
                                     </span>
                                 </div>
                             </div>
                         );
                     }
-                    
+
                     const msg = item.message!;
                     const msgIndex = messages.findIndex(m => m.id === msg.id);
                     const isUser = msg.role === 'user';
                     const isSequence = msgIndex > 0 && messages[msgIndex - 1].role === msg.role;
-                    
+
                     return (
                         <div key={msg.id} className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} ${!isSequence ? 'mt-6' : 'mt-2'} animate-slide-up`}>
                             {!isUser && !isSequence && (
@@ -347,13 +347,13 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                             )}
                             {!isUser && isSequence && <div className="w-[52px]"></div>}
                             <div className="flex flex-col max-w-[85%]">
-                                <div className={`px-6 py-4 text-[15px] leading-relaxed shadow-sm ${isUser ? 'bg-slate-900 dark:bg-teal-600 text-white rounded-[2rem] rounded-br-md' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-800 rounded-[2rem] rounded-bl-md'}`}>{msg.text}</div>
-                                {(!messages[msgIndex + 1] || messages[msgIndex + 1].role !== msg.role) && <p className={`text-[10px] text-slate-300 dark:text-slate-600 mt-2 px-2 font-bold uppercase tracking-wide ${isUser ? 'text-right' : 'text-left'}`}>{formatTime(msg.timestamp)}</p>}
+                                <div className={`px-6 py-4 text-[14px] leading-relaxed shadow-sm ${isUser ? 'bg-slate-900 dark:bg-teal-600 text-white rounded-[2rem] rounded-br-md' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-800 rounded-[2rem] rounded-bl-md'}`}>{msg.text}</div>
+                                {(!messages[msgIndex + 1] || messages[msgIndex + 1].role !== msg.role) && <p className={`text-[9px] text-slate-300 dark:text-slate-600 mt-2 px-2 font-bold uppercase tracking-wide ${isUser ? 'text-right' : 'text-left'}`}>{formatTime(msg.timestamp)}</p>}
                             </div>
                         </div>
                     );
                 })}
-                
+
                 {isLoading && (
                     <div className="flex justify-start mt-6 animate-fade-in ml-14">
                         <div className="bg-white dark:bg-slate-900 px-5 py-4 rounded-[2rem] rounded-bl-md shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-3">
@@ -371,7 +371,7 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                 <div ref={messagesEndRef} />
             </div>
 
-            <div className="absolute left-0 right-0 p-6 pb-10 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent dark:from-slate-950 dark:via-slate-950 z-20" style={{ bottom: '5.5rem' }}>
+            <div className="absolute left-0 right-0 p-6 pb-10 bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 backdrop-blur-xl z-20" style={{ bottom: '5.5rem' }}>
                 <div className="flex items-end gap-3 max-w-2xl mx-auto">
                     <textarea
                         ref={inputRef}
@@ -379,7 +379,7 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
                         placeholder="Andika ubutumwa bwawe..."
-                        className="flex-1 bg-white dark:bg-slate-900 rounded-[1.5rem] px-6 py-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none resize-none max-h-32 shadow-sm border border-slate-200 dark:border-slate-800 focus:border-teal-300 dark:focus:border-teal-700 transition-colors"
+                        className="flex-1 bg-white dark:bg-slate-900 rounded-[1.5rem] px-6 py-4 text-[13px] text-slate-900 dark:text-white placeholder-slate-400 outline-none resize-none max-h-32 shadow-sm border border-slate-200 dark:border-slate-800 focus:border-teal-300 dark:focus:border-teal-700 transition-colors"
                         rows={1}
                     />
                     <button
@@ -387,7 +387,7 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                         disabled={!input.trim() || isLoading}
                         className="w-14 h-14 bg-slate-900 dark:bg-teal-600 text-white rounded-2xl flex items-center justify-center shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all hover:bg-slate-800 dark:hover:bg-teal-500"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                     </button>
                 </div>
             </div>

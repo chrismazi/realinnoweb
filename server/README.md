@@ -1,4 +1,4 @@
-# WellVest Backend API
+# RealWorks Backend API
 
 A Node.js/Express REST API with PostgreSQL database and JWT authentication.
 
@@ -120,7 +120,7 @@ npm run db:seed
 
 After running the seed script:
 
-- **Email**: demo@wellvest.app
+- **Email**: demo@realworks.app
 - **Password**: demo123
 
 ## Environment Variables

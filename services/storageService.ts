@@ -6,7 +6,7 @@
 import { SavingsGoal, Transaction, ChatMessage } from '../types';
 
 // Encryption key (in production, this should be derived from user password)
-const STORAGE_KEY_PREFIX = 'wellvest_';
+const STORAGE_KEY_PREFIX = 'realworks_';
 const ENCRYPTION_KEY = 'temp_encryption_key'; // TODO: Replace with proper key derivation
 
 // Storage keys
@@ -57,7 +57,7 @@ export const storageService = {
     try {
       const storedData = localStorage.getItem(key);
       if (!storedData) return null;
-      
+
       const stringData = shouldDecrypt ? decrypt(storedData) : storedData;
       return JSON.parse(stringData) as T;
     } catch (error) {
@@ -122,9 +122,9 @@ export const userProfileService = {
 };
 
 export const transactionService = {
-  save: (transactions: Transaction[]) => 
+  save: (transactions: Transaction[]) =>
     storageService.save(STORAGE_KEYS.TRANSACTIONS, transactions),
-  load: (): Transaction[] => 
+  load: (): Transaction[] =>
     storageService.load<Transaction[]>(STORAGE_KEYS.TRANSACTIONS) || [],
   add: (transaction: Transaction): boolean => {
     const transactions = transactionService.load();
@@ -146,9 +146,9 @@ export const transactionService = {
 };
 
 export const savingsGoalService = {
-  save: (goals: SavingsGoal[]) => 
+  save: (goals: SavingsGoal[]) =>
     storageService.save(STORAGE_KEYS.SAVINGS_GOALS, goals),
-  load: (): SavingsGoal[] => 
+  load: (): SavingsGoal[] =>
     storageService.load<SavingsGoal[]>(STORAGE_KEYS.SAVINGS_GOALS) || [],
   update: (id: string, updates: Partial<SavingsGoal>): boolean => {
     const goals = savingsGoalService.load();
@@ -160,9 +160,9 @@ export const savingsGoalService = {
 };
 
 export const chatHistoryService = {
-  save: (messages: ChatMessage[]) => 
+  save: (messages: ChatMessage[]) =>
     storageService.save(STORAGE_KEYS.CHAT_HISTORY, messages, true),
-  load: (): ChatMessage[] => 
+  load: (): ChatMessage[] =>
     storageService.load<ChatMessage[]>(STORAGE_KEYS.CHAT_HISTORY, true) || [],
   add: (message: ChatMessage): boolean => {
     const messages = chatHistoryService.load();
@@ -175,9 +175,9 @@ export const chatHistoryService = {
 };
 
 export const healthDataService = {
-  save: (data: any) => 
+  save: (data: any) =>
     storageService.save(STORAGE_KEYS.HEALTH_DATA, data, true),
-  load: () => 
+  load: () =>
     storageService.load(STORAGE_KEYS.HEALTH_DATA, true) || {},
   update: (updates: any): boolean => {
     const current = healthDataService.load() || {};
@@ -187,9 +187,9 @@ export const healthDataService = {
 };
 
 export const settingsService = {
-  save: (settings: any) => 
+  save: (settings: any) =>
     storageService.save(STORAGE_KEYS.SETTINGS, settings),
-  load: () => 
+  load: () =>
     storageService.load(STORAGE_KEYS.SETTINGS) || {
       darkMode: false,
       notifications: true,
@@ -210,9 +210,9 @@ export const sessionService = {
     storageService.save(STORAGE_KEYS.AUTH_TOKEN, authToken, true);
     storageService.save(STORAGE_KEYS.REFRESH_TOKEN, refreshToken, true);
   },
-  getAuthToken: (): string | null => 
+  getAuthToken: (): string | null =>
     storageService.load<string>(STORAGE_KEYS.AUTH_TOKEN, true),
-  getRefreshToken: (): string | null => 
+  getRefreshToken: (): string | null =>
     storageService.load<string>(STORAGE_KEYS.REFRESH_TOKEN, true),
   clearTokens: () => {
     storageService.remove(STORAGE_KEYS.AUTH_TOKEN);
@@ -221,7 +221,7 @@ export const sessionService = {
   isAuthenticated: (): boolean => {
     const token = sessionService.getAuthToken();
     if (!token) return false;
-    
+
     // Check if token is expired (basic check)
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));

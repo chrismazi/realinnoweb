@@ -35,7 +35,7 @@ async function checkLoginStatus() {
         console.log('   3. Or click "Sign In" with existing credentials');
 
         console.log('\n🔑 Test Account (if you want to create one):');
-        console.log('   Email: test@wellvest.app');
+        console.log('   Email: test@realworks.app');
         console.log('   Password: TestPass123!');
         console.log('\n   Run: node scripts/create-test-user.js');
     }

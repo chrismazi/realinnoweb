@@ -14,14 +14,14 @@ export const csvExport = {
    */
   toCSV<T extends Record<string, any>>(data: T[], columns?: { key: keyof T; label: string }[]): string {
     if (data.length === 0) return '';
-    
+
     // Get columns from data or use provided columns
     const keys = columns?.map(c => c.key) || (Object.keys(data[0]) as (keyof T)[]);
     const headers = columns?.map(c => c.label) || keys.map(k => String(k));
-    
+
     // Create CSV header
     const headerRow = headers.map(h => `"${h}"`).join(',');
-    
+
     // Create CSV rows
     const rows = data.map(item => {
       return keys.map(key => {
@@ -32,7 +32,7 @@ export const csvExport = {
         return `"${String(value).replace(/"/g, '""')}"`;
       }).join(',');
     });
-    
+
     return [headerRow, ...rows].join('\n');
   },
 
@@ -69,14 +69,14 @@ export const transactionExport = {
       { key: 'amount' as keyof Transaction, label: 'Amount' },
       { key: 'isRecurring' as keyof Transaction, label: 'Recurring' },
     ];
-    
+
     const formattedData = transactions.map(t => ({
       ...t,
       date: new Date(t.date).toLocaleDateString(),
       amount: t.type === 'expense' ? -t.amount : t.amount,
       isRecurring: t.isRecurring ? 'Yes' : 'No',
     }));
-    
+
     return csvExport.toCSV(formattedData, columns);
   },
 
@@ -97,16 +97,16 @@ export const transactionExport = {
       const date = new Date(t.date);
       return date.getFullYear() === year && date.getMonth() === month;
     });
-    
+
     const income = monthTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
     const expenses = monthTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-    
+
     // Category breakdown
     const categoryTotals: Record<string, number> = {};
     monthTransactions.filter(t => t.type === 'expense').forEach(t => {
       categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
     });
-    
+
     let summary = `Monthly Financial Summary\n`;
     summary += `Period: ${new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}\n\n`;
     summary += `Total Income: $${income.toFixed(2)}\n`;
@@ -118,7 +118,7 @@ export const transactionExport = {
       .forEach(([cat, amt]) => {
         summary += `  ${cat}: $${amt.toFixed(2)}\n`;
       });
-    
+
     return summary;
   },
 };
@@ -137,14 +137,14 @@ export const savingsExport = {
       { key: 'target' as keyof SavingsGoal, label: 'Target Amount' },
       { key: 'deadline' as keyof SavingsGoal, label: 'Deadline' },
     ];
-    
+
     const formattedData = goals.map(g => ({
       ...g,
       current: `$${g.current.toFixed(2)}`,
       target: `$${g.target.toFixed(2)}`,
       progress: `${((g.current / g.target) * 100).toFixed(1)}%`,
     }));
-    
+
     return csvExport.toCSV(formattedData, columns);
   },
 
@@ -181,7 +181,7 @@ export const fullExport = {
   /**
    * Download all data as JSON
    */
-  downloadJSON(data: any, filename: string = 'wellvest_backup'): void {
+  downloadJSON(data: any, filename: string = 'realworks_backup'): void {
     const json = this.toJSON(data);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -239,7 +239,7 @@ export const pdfExport = {
     };
   }): string {
     const { title, period, transactions, savingsGoals, summary } = data;
-    
+
     let html = `
       <!DOCTYPE html>
       <html>

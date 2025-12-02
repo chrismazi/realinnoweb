@@ -1120,52 +1120,52 @@ const SexualHealth: React.FC = () => {
     const journeyPhases = [
       {
         id: 'PREP',
-        title: 'Preparation',
-        timeline: '3-6 Months Out',
+        title: 'Gutegura',
+        timeline: 'Amezi 3-6 mbere',
         color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
         icon: <Icons.Sparkles className="w-6 h-6" />,
-        description: 'Think of this as preparing the soil before planting. Focus on detoxing habits and building nutrient reserves.',
-        tips: ['Start prenatal vitamins with 400mcg Folic Acid.', 'Wean off caffeine to avoid withdrawal headaches later.', 'Schedule a preconception checkup.']
+        description: 'Tekereza nkaho utegura ubutaka mbere yo gutera. Shira umwete ku guhindura imyitwarire no kubika intungamubiri.',
+        tips: ['Tangira imiti yinda ifite 400mcg ya Folic Acid.', 'Gabanya ikawa kugira ngo wirinde kubabara umutwe nyuma.', 'Gena igihe cyo gusuzumwa mbere yo gusama.']
       },
       {
         id: 'TRACK',
-        title: 'Understanding',
-        timeline: '1-3 Months Out',
+        title: 'Gusobanukirwa',
+        timeline: 'Amezi 1-3 mbere',
         color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
         icon: <Icons.ChartBar className="w-6 h-6" />,
-        description: 'Your body gives you signs every month. Now is the time to learn the language of your cycle.',
-        tips: ['Ovulation isn’t always Day 14. Track BBT.', 'Look for "egg white" cervical mucus.', 'Reduce stress; high cortisol can delay ovulation.']
+        description: 'Umubiri wawe uguha ibimenyetso buri kwezi. Ubu ni igihe cyo kwiga ururimi rwimihango yawe.',
+        tips: ['Gusohora igi ntabwo buri gihe biba ku munsi wa 14. Kurikirana ubushyuhe bwumubiri.', 'Shakisha umwanda winkondo usa nubugi bwigi.', 'Gabanya stress; cortisol nyinshi ishobora gutinda gusohora igi.']
       },
       {
         id: 'TRY',
-        title: 'Active Trying',
-        timeline: 'The Window',
+        title: 'Kugerageza',
+        timeline: 'Igihe cyiza',
         color: 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300',
         icon: <Icons.Heart className="w-6 h-6" />,
-        description: 'The main event. Optimize your timing without losing the romantic spark.',
-        tips: ['Sperm lives up to 5 days; eggs only 12-24 hours.', 'Aim for intercourse on days O-2 and O-1.', 'Keep it fun—stress is a fertility blocker.']
+        description: 'Igikorwa nyamukuru. Tegura neza igihe utabuze urukundo.',
+        tips: ['Intanga zumugabo zimara kugeza iminsi 5; amagi amara amasaha 12-24 gusa.', 'Gerageza guhuza ku minsi O-2 na O-1.', 'Bikorwe mu bishimishije—stress ibuza uburumbuke.']
       }
     ];
 
     const checklistCategories = [
       {
-        name: 'Clinical', tasks: [
-          { id: 'folic', label: 'Daily Folic Acid', desc: 'Prevents neural tube defects.' },
-          { id: 'checkup', label: 'Doctor Visit', desc: 'Medication review & vaccines.' },
-          { id: 'dentist', label: 'Dental Cleaning', desc: 'Gum health impacts pregnancy.' }
+        name: 'Ubuvuzi', tasks: [
+          { id: 'folic', label: 'Folic Acid ya buri munsi', desc: 'Irinda ibibazo byuruti rwumwana.' },
+          { id: 'checkup', label: 'Gusura muganga', desc: 'Gusuzuma imiti ninkingo.' },
+          { id: 'dentist', label: 'Gusukura amenyo', desc: 'Ubuzima bwamenyo bugira ingaruka ku nda.' }
         ]
       },
       {
-        name: 'Lifestyle', tasks: [
-          { id: 'habits', label: 'Limit Caffeine', desc: 'Under 200mg/day (1 cup).' },
-          { id: 'smoke', label: 'Stop Smoking', desc: 'Crucial for egg quality.' },
-          { id: 'sleep', label: 'Sleep Hygiene', desc: '7-8 hours for hormone regulation.' }
+        name: 'Imibereho', tasks: [
+          { id: 'habits', label: 'Gabanya ikawa', desc: 'Munsi ya 200mg ku munsi (ikombe 1).' },
+          { id: 'smoke', label: 'Reka kunywa itabi', desc: 'Ni ngombwa ku migi myiza.' },
+          { id: 'sleep', label: 'Ibitotsi byiza', desc: 'Amasaha 7-8 kugira ngo hormone zitunganye.' }
         ]
       },
       {
-        name: 'Financial', tasks: [
-          { id: 'insurance', label: 'Review Insurance', desc: 'Check maternity coverage.' },
-          { id: 'fund', label: 'Emergency Fund', desc: 'Aim for 3 months expenses.' }
+        name: 'Amafaranga', tasks: [
+          { id: 'insurance', label: 'Suzuma ubwishingizi', desc: 'Reba niba bufite ubuvuzi bwabagore batwite.' },
+          { id: 'fund', label: 'Amafaranga yibihutirwa', desc: 'Tegura amafaranga yamezi 3.' }
         ]
       }
     ];
@@ -1181,9 +1181,9 @@ const SexualHealth: React.FC = () => {
                 onClick={() => setFamilyTab(tab)}
                 className={`px-6 py-3 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-sm flex items-center gap-2 border ${familyTab === tab ? 'bg-slate-900 text-white shadow-slate-300 dark:shadow-slate-900/50 scale-105 border-slate-900' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
               >
-                {tab === 'GUIDE' && <><Icons.UserPlus className="w-4 h-4" /> Journey Map</>}
-                {tab === 'CHECKLIST' && <><Icons.List className="w-4 h-4" /> Readiness Audit</>}
-                {tab === 'BUDGET' && <><Icons.Calculator className="w-4 h-4" /> Baby Budget</>}
+                {tab === 'GUIDE' && <><Icons.UserPlus className="w-4 h-4" /> Inzira</>}
+                {tab === 'CHECKLIST' && <><Icons.List className="w-4 h-4" /> Urutonde</>}
+                {tab === 'BUDGET' && <><Icons.Calculator className="w-4 h-4" /> Ingengo</>}
               </button>
             ))}
           </div>
@@ -1193,8 +1193,8 @@ const SexualHealth: React.FC = () => {
           {familyTab === 'GUIDE' && (
             <div className="space-y-6 animate-slide-up">
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Your Path to Parenthood</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Select your current stage for tailored advice.</p>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Inzira yo kuba umubyeyi</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Hitamo icyiciro uri kuri cyo kugira ngo ubone inama.</p>
               </div>
 
               <div className="flex justify-between relative mb-8 px-2">
@@ -1222,11 +1222,11 @@ const SexualHealth: React.FC = () => {
                     <div className={`inline-block px-3 py-1 rounded-lg text-[10px] font-bold uppercase mb-4 ${phase.color}`}>
                       {phase.timeline}
                     </div>
-                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{phase.title} Phase</h3>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Icyiciro cya {phase.title}</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-8 font-medium">{phase.description}</p>
 
                     <div className="space-y-4">
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Expert Tips</h4>
+                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Inama z'Impuguke</h4>
                       {phase.tips.map((tip, i) => (
                         <div key={i} className="flex gap-4 items-start p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl group hover:bg-white dark:hover:bg-slate-700 transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-600 shadow-sm hover:shadow-md">
                           <div className="w-2 h-2 rounded-full bg-slate-900 dark:bg-white mt-1.5 shrink-0 group-hover:scale-125 transition-transform"></div>
@@ -1244,8 +1244,8 @@ const SexualHealth: React.FC = () => {
             <div className="space-y-6 animate-slide-up">
               <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-[2.5rem] p-8 border border-indigo-100 dark:border-indigo-900/30 flex items-center justify-between shadow-sm">
                 <div>
-                  <h2 className="text-xl font-bold text-indigo-900 dark:text-indigo-300">Readiness Score</h2>
-                  <p className="text-xs text-indigo-700 dark:text-indigo-400 font-medium mt-1">Complete tasks to level up.</p>
+                  <h2 className="text-xl font-bold text-indigo-900 dark:text-indigo-300">Amanota yo Kwitegura</h2>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-400 font-medium mt-1">Rangiza ibikorwa kugira ngo uzamuke.</p>
                 </div>
                 <div className="w-16 h-16 relative flex items-center justify-center">
                   <svg className="w-full h-full transform -rotate-90">
@@ -1292,17 +1292,17 @@ const SexualHealth: React.FC = () => {
               <div className="bg-slate-900 dark:bg-slate-800 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden transition-colors group">
                 <div className="absolute -top-10 -right-10 w-48 h-48 bg-teal-500 rounded-full blur-[80px] opacity-20 group-hover:opacity-30 transition-opacity"></div>
                 <div className="relative z-10">
-                  <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Projected Year 1 Cost</p>
+                  <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Igiciro cy'Umwaka wa 1</p>
                   <h2 className="text-5xl font-black mb-8 tracking-tight">
                     ${(budgetItems.reduce((acc, item) => acc + (item.type === 'monthly' ? item.cost * 12 : item.cost), 0)).toLocaleString()}
                   </h2>
                   <div className="flex gap-4">
                     <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md flex-1 border border-white/5 hover:bg-white/15 transition-colors">
-                      <p className="text-[10px] text-teal-300 uppercase font-bold mb-1">Monthly</p>
+                      <p className="text-[10px] text-teal-300 uppercase font-bold mb-1">Buri kwezi</p>
                       <p className="font-bold text-xl">${budgetItems.filter(i => i.type === 'monthly').reduce((a, b) => a + b.cost, 0)}</p>
                     </div>
                     <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md flex-1 border border-white/5 hover:bg-white/15 transition-colors">
-                      <p className="text-[10px] text-orange-300 uppercase font-bold mb-1">One-Time</p>
+                      <p className="text-[10px] text-orange-300 uppercase font-bold mb-1">Rimwe</p>
                       <p className="font-bold text-xl">${budgetItems.filter(i => i.type === 'one-time').reduce((a, b) => a + b.cost, 0)}</p>
                     </div>
                   </div>
@@ -1310,7 +1310,7 @@ const SexualHealth: React.FC = () => {
               </div>
 
               <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-6">Financial Simulator</h3>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-6">Igikoresho cyo Kubara</h3>
                 <div className="space-y-8">
                   {budgetItems.map((item, i) => (
                     <div key={i}>
@@ -1341,7 +1341,7 @@ const SexualHealth: React.FC = () => {
 
               <button className="w-full py-4 bg-teal-600 text-white rounded-3xl font-bold text-sm shadow-xl shadow-teal-100 dark:shadow-teal-900/30 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
                 <Icons.Calculator className="w-4 h-4" />
-                Save to Budget Plan
+                Bika mu Ingengo
               </button>
             </div>
           )}

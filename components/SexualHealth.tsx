@@ -158,7 +158,7 @@ const SexualHealth: React.FC = () => {
   const [pregnancyWeek, setPregnancyWeek] = useState<number | null>(null);
 
   // Contraception State
-  const [methodFilter, setMethodFilter] = useState<string>('All');
+  const [methodFilter, setMethodFilter] = useState<string>('Byose');
   const [pillReminder, setPillReminder] = useState<boolean>(false);
   const [pillTime, setPillTime] = useState<string>('09:00');
   const [selectedSideEffect, setSelectedSideEffect] = useState<string | null>(null);
@@ -263,50 +263,50 @@ const SexualHealth: React.FC = () => {
   // --- Data ---
   const methods: ContraceptiveMethod[] = [
     {
-      id: '1', name: 'The Pill', efficacy: '99%', efficacyValue: 95, type: 'Hormonal',
-      desc: 'Daily oral medication.',
-      pros: ['Regulates cycles', 'Reduces acne', 'Reversible immediately'],
-      cons: ['Daily discipline', 'Mood changes'],
-      tags: ['Daily', 'Hormonal'],
-      bestFor: 'Routine-lovers needing acne control.'
+      id: '1', name: 'Ibinini', efficacy: '99%', efficacyValue: 95, type: 'Imiti ngendanubuzima',
+      desc: 'Imiti yo kumira buri munsi.',
+      pros: ['Itunganya imihango', 'Igabanya udusebe', 'Igaruka vuba'],
+      cons: ['Gusaba kwibuka buri munsi', 'Impinduka z\'imyumvire'],
+      tags: ['Buri munsi', 'Imiti ngendanubuzima'],
+      bestFor: 'Abakunda gahunda bakeneye kugabanya udusebe.'
     },
     {
-      id: '2', name: 'IUD (Copper)', efficacy: '>99%', efficacyValue: 99.8, type: 'Non-Hormonal',
-      desc: 'Hormone-free device in uterus.',
-      pros: ['Lasts 10-12 years', 'Zero hormones', 'Set & forget'],
-      cons: ['Heavier periods', 'Insertion cramps'],
-      tags: ['Long-term', 'Non-Hormonal'],
-      bestFor: 'Long-term hormone-free protection.'
+      id: '2', name: 'IUD (Umuringa)', efficacy: '>99%', efficacyValue: 99.8, type: 'Nta miti ngendanubuzima',
+      desc: 'Igikoresho kidafite imiti ngendanubuzima gishyirwa mu mura.',
+      pros: ['Imara imyaka 10-12', 'Nta miti ngendanubuzima', 'Ushyira ukirengagiza'],
+      cons: ['Imihango irushaho', 'Kubabara igihe bishyirwamo'],
+      tags: ['Igihe kirekire', 'Nta miti ngendanubuzima'],
+      bestFor: 'Uburyo bwo kwirinda igihe kirekire nta miti ngendanubuzima.'
     },
     {
-      id: '3', name: 'IUD (Hormonal)', efficacy: '>99%', efficacyValue: 99.5, type: 'Hormonal',
-      desc: 'Low-dose hormone device.',
-      pros: ['Lighter periods', 'Lasts 3-7 years', 'Set & forget'],
-      cons: ['Insertion discomfort', 'Spotting initially'],
-      tags: ['Long-term', 'Hormonal'],
-      bestFor: 'Lighter periods & long-term ease.'
+      id: '3', name: 'IUD (Imiti ngendanubuzima)', efficacy: '>99%', efficacyValue: 99.5, type: 'Imiti ngendanubuzima',
+      desc: 'Igikoresho gifite imiti ngendanubuzima nke.',
+      pros: ['Imihango yoroheje', 'Imara imyaka 3-7', 'Ushyira ukirengagiza'],
+      cons: ['Kutagira uburuhukiro igihe bishyirwamo', 'Gutakaza amaraso mu ntangiriro'],
+      tags: ['Igihe kirekire', 'Imiti ngendanubuzima'],
+      bestFor: 'Imihango yoroheje n\'uburyo bworoshye bw\'igihe kirekire.'
     },
     {
-      id: '4', name: 'Condoms', efficacy: '85-98%', efficacyValue: 88, type: 'Barrier',
-      desc: 'Barrier against STIs & pregnancy.',
-      pros: ['STI protection', 'No hormones', 'On-demand'],
-      cons: ['Interrupts moment', 'Can break/slip'],
-      tags: ['Non-Hormonal', 'On-demand'],
-      bestFor: 'STI protection & backup.'
+      id: '4', name: 'Agakingirizo', efficacy: '85-98%', efficacyValue: 88, type: 'Igikingirizo',
+      desc: 'Igikingirizo cy\'indwara zandurira mu mibonano mpuzabitsina n\'inda.',
+      pros: ['Kurinda indwara zandurira', 'Nta miti ngendanubuzima', 'Igihe icyo ari cyo cyose'],
+      cons: ['Bihagarika akanya', 'Bishobora gucika/kwiruka'],
+      tags: ['Nta miti ngendanubuzima', 'Igihe icyo ari cyo cyose'],
+      bestFor: 'Kurinda indwara zandurira n\'ubundi buryo.'
     },
     {
-      id: '5', name: 'Implant', efficacy: '>99%', efficacyValue: 99.9, type: 'Hormonal',
-      desc: 'Tiny rod under arm skin.',
-      pros: ['Lasts 3 years', 'Invisible', 'Effective'],
-      cons: ['Irregular bleeding', 'Minor procedure'],
-      tags: ['Long-term', 'Hormonal'],
-      bestFor: 'Maximum protection, zero effort.'
+      id: '5', name: 'Implanon', efficacy: '>99%', efficacyValue: 99.9, type: 'Imiti ngendanubuzima',
+      desc: 'Agati gato kashyirwa munsi y\'uruhu rw\'ukuboko.',
+      pros: ['Imara imyaka 3', 'Ntigaragara', 'Irakora neza'],
+      cons: ['Gutakaza amaraso bidahoraho', 'Igikorwa gito'],
+      tags: ['Igihe kirekire', 'Imiti ngendanubuzima'],
+      bestFor: 'Uburyo bwo kwirinda bwiza cyane, nta mwanya usabwa.'
     },
   ];
 
   const sideEffects = [
-    { id: 'nausea', label: 'Nausea', guidance: 'Common with estrogen. Usually subsides in 2-3 months.', tip: 'Take with dinner or before bed.', alert: 'Severe abdominal pain.' },
-    { id: 'spotting', label: 'Spotting', guidance: 'Common in first 3-6 months of LARC or pills.', tip: 'Track daily. Keep liners handy.', alert: 'Heavy bleeding soaking a pad in 1h.' },
+    { id: 'nausea', label: 'Kwongera kurya', guidance: 'Ibi birashobora kubaho kwa estrogen. Bimwe bifasha mu minsi 2-3.', tip: 'Kurya n\'ijoro cyangwa mbere yo kwiba.', alert: 'Kumira cyane mu nda.' },
+    { id: 'spotting', label: 'Kutakaza amaraso', guidance: 'Ibi birashobora kubaho mu minsi 3-6 ya mbere ya LARC cyangwa ibinini.', tip: 'Kwandika buri munsi. Kuba n\'amaraso ahari.', alert: 'Kutakaza amaraso kanke kandi kibisi.' },
   ];
 
   const dashboardCards = [
@@ -521,7 +521,7 @@ const SexualHealth: React.FC = () => {
   };
 
   const renderContraceptionGuide = () => {
-    const filteredMethods = methodFilter === 'All'
+    const filteredMethods = methodFilter === 'Byose'
       ? methods
       : methods.filter(m => m.tags.includes(methodFilter));
 
@@ -535,9 +535,7 @@ const SexualHealth: React.FC = () => {
                 onClick={() => setContraceptionTab(tab)}
                 className={`px-6 py-3 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-sm border ${contraceptionTab === tab ? 'bg-slate-900 text-white shadow-slate-300 dark:shadow-slate-900/50 scale-105 border-slate-900' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
               >
-                {tab === 'MATCH' && 'Method Matcher'}
-                {tab === 'REMINDERS' && 'Smart Reminders'}
-                {tab === 'SIDE_EFFECTS' && 'Side Effects'}
+                {tab === 'MATCH' ? 'Hitamo uburyo' : tab === 'REMINDERS' ? 'Kwibutsa' : 'Ingaruka mbi'}
               </button>
             ))}
           </div>
@@ -550,11 +548,11 @@ const SexualHealth: React.FC = () => {
               <div className="bg-slate-900 dark:bg-slate-800 rounded-[2.5rem] p-8 text-center text-white relative overflow-hidden transition-colors shadow-xl">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500 rounded-full blur-[60px] opacity-20 -mr-10 -mt-10"></div>
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500 rounded-full blur-[60px] opacity-20 -ml-10 -mb-10"></div>
-                <h2 className="text-3xl font-bold mb-2 relative z-10">Find Your Fit</h2>
-                <p className="text-slate-300 text-sm leading-relaxed relative z-10 max-w-xs mx-auto">Filter methods based on your lifestyle, preferences, and medical needs.</p>
+                <h2 className="text-3xl font-bold mb-2 relative z-10">Hitamo ibikwiye</h2>
+                <p className="text-slate-300 text-sm leading-relaxed relative z-10 max-w-xs mx-auto">Shaka uburyo ukurikije imibereho yawe, ibyo ukunda, n'ibyo ukeneye mu buzima.</p>
 
                 <div className="flex flex-wrap justify-center gap-2 mt-6 relative z-10">
-                  {['All', 'Hormonal', 'Non-Hormonal', 'Long-term', 'Daily'].map(tag => (
+                  {['Byose', 'Imiti ngendanubuzima', 'Nta miti ngendanubuzima', 'Igihe kirekire', 'Buri munsi'].map(tag => (
                     <button
                       key={tag}
                       onClick={() => setMethodFilter(tag)}
@@ -577,7 +575,7 @@ const SexualHealth: React.FC = () => {
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        <span>Efficacy</span>
+                        <span>Imikorere</span>
                         <span className="text-teal-600 dark:text-teal-400">{method.efficacy}</span>
                       </div>
                       <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -594,14 +592,14 @@ const SexualHealth: React.FC = () => {
             <div className="space-y-6 animate-slide-up">
               <div className="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-slate-900 dark:text-white text-lg">Daily Pill Reminder</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-lg">Kwibutsa ibinini bya buri munsi</h3>
                   <button onClick={() => setPillReminder(!pillReminder)} className={`w-12 h-7 rounded-full p-1 transition-colors duration-300 ${pillReminder ? 'bg-teal-500' : 'bg-slate-200 dark:bg-slate-700'}`}>
                     <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${pillReminder ? 'translate-x-5' : 'translate-x-0'}`}></div>
                   </button>
                 </div>
                 <input type="time" value={pillTime} onChange={(e) => setPillTime(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl text-center font-bold text-3xl text-slate-900 dark:text-white outline-none border border-slate-100 dark:border-slate-700 mb-6" />
                 <div className="grid grid-cols-7 gap-2">
-                  {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
+                  {['Mbe', 'Kab', 'Gat', 'Kan', 'Gat', 'Gic', 'Cyu'].map((d, i) => (
                     <div key={i} className={`h-10 rounded-xl flex items-center justify-center text-xs font-bold ${i < 4 ? 'bg-teal-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>{d}</div>
                   ))}
                 </div>
@@ -620,7 +618,7 @@ const SexualHealth: React.FC = () => {
                     <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-800 space-y-3">
                       <p className="text-sm text-slate-600 dark:text-slate-300">{effect.guidance}</p>
                       <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-100 dark:border-red-900/30">
-                        <p className="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase tracking-wider mb-1">When to call a doctor</p>
+                        <p className="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase tracking-wider mb-1">Igihe cyo guhamagara muganga</p>
                         <p className="text-xs text-red-700 dark:text-red-300 font-medium">{effect.alert}</p>
                       </div>
                     </div>
@@ -1363,7 +1361,7 @@ const SexualHealth: React.FC = () => {
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-none">
             {view === 'DASHBOARD' && 'Health'}
-            {view === 'CONTRACEPTION_GUIDE' && 'Contraception'}
+            {view === 'CONTRACEPTION_GUIDE' && 'Uburyo bwo kwirinda gusama'}
             {view === 'MENS_HEALTH_VIEW' && 'Men\'s Health'}
             {view === 'WOMENS_HEALTH' && 'Women\'s Wellness'}
             {view === 'ARTICLE_VIEW' && 'Family Planning'}

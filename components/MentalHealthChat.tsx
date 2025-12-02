@@ -256,64 +256,68 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                 </div>
             )}
 
-            <div className="pt-14 px-6 pb-4 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-30 sticky top-0 flex justify-between items-end transition-colors duration-300">
-                <div className="flex items-center gap-3">
-                    {onBack && (
-                        <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                            <svg className="w-5 h-5 text-slate-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                        </button>
-                    )}
-                    <div className="flex flex-col">
-                        <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Vestie</h1>
-                        <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">Umufasha w'Ubuzima</span>
+            <div className="pt-14 px-6 pb-4 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-30 sticky top-0 transition-colors duration-300">
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                        {onBack && (
+                            <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <svg className="w-5 h-5 text-slate-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+                        )}
+                        <div className="flex items-baseline gap-3">
+                            <h1 className="text-xl font-black text-slate-900 dark:text-white">Vestie</h1>
+                            <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">Umufasha w'Ubuzima</span>
+                        </div>
                     </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={handleStartNewConversation}
-                        disabled={messages.length === 0}
-                        className={`px-4 py-2 rounded-xl text-[11px] font-bold flex items-center gap-2 active:scale-95 border transition-colors ${messages.length === 0 ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 border-slate-200 dark:border-slate-800 cursor-not-allowed opacity-60' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
-                        title="Start new conversation"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                        Ikiganiro Gishya
-                    </button>
-                    {messages.length > 0 && (
-                        <button onClick={() => setShowClearConfirm(true)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors active:scale-95" title="Clear chat">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                    )}
-                    <button onClick={() => setShowBreathing(true)} className="px-4 py-2 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-xl text-[11px] font-bold hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors flex items-center gap-2 active:scale-95 border border-teal-100 dark:border-teal-900/30">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                        Humeka
-                    </button>
-                    <button onClick={() => setShowSOS(true)} className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-[11px] font-bold hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-2 group active:scale-95 border border-slate-200 dark:border-slate-700">
-                        <svg className="w-4 h-4 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        Ubufasha
-                    </button>
+
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center gap-2 px-2 py-2 rounded-full bg-white/85 dark:bg-slate-900/70 border border-white/50 dark:border-slate-800/60 shadow-[0_10px_26px_rgba(15,23,42,0.12)] backdrop-blur">
+                            <button onClick={() => setShowClearConfirm(true)} className="h-10 px-4 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-2 active:scale-95 text-[10px] font-bold">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                                Gishya
+                            </button>
+
+                            {messages.length > 0 && (
+                                <button onClick={() => setShowClearConfirm(true)} className="h-10 px-4 rounded-full bg-white/95 dark:bg-slate-900/55 text-slate-500 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/50 shadow-[0_6px_16px_rgba(15,23,42,0.12)] hover:text-red-500 hover:border-red-200/80 dark:hover:border-red-500/50 transition-all flex items-center gap-2 active:scale-95 text-[10px] font-bold">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    Siba
+                                </button>
+                            )}
+
+                            <button onClick={() => setShowBreathing(true)} className="h-10 px-4 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-2 active:scale-95 text-[10px] font-bold">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                Humeka
+                            </button>
+
+                            <button onClick={() => setShowSOS(true)} className="h-10 px-4 rounded-full bg-gradient-to-br from-[#FF8A3D] via-[#FF6B3D] to-[#FFB347] text-white shadow-[0_14px_30px_rgba(255,107,61,0.38)] hover:shadow-[0_18px_36px_rgba(255,107,61,0.48)] transition-all flex items-center gap-2 active:scale-95 text-[10px] font-bold">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                SOS
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-6 space-y-6 pb-56" style={{ scrollBehavior: 'smooth' }}>
+            <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-4 space-y-6 pb-56" style={{ scrollBehavior: 'smooth' }}>
                 {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center min-h-[50vh] animate-fade-in text-center pt-10">
-                        <div className="w-24 h-24 bg-gradient-to-tr from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-600 mb-8 shadow-sm border border-slate-100 dark:border-slate-800">
-                            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                    <div className="flex flex-col items-center justify-center animate-fade-in text-center px-4">
+                        <div className="w-16 h-16 bg-teal-50 dark:bg-teal-900/20 rounded-2xl flex items-center justify-center text-teal-500 dark:text-teal-400 mb-4 border border-teal-100 dark:border-teal-900/30">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                         </div>
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">Wiyumva ute?</h2>
-                        <p className="text-slate-400 dark:text-slate-500 text-xs max-w-xs mb-10 leading-relaxed mx-auto">
+                        <h2 className="text-xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Wiyumva ute?</h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs max-w-[280px] mb-5 leading-relaxed">
                             Aha ni ahantu hizewe kandi h'ibanga. Hitamo ingingo hepfo cyangwa wandike icyo utekereza.
                         </p>
-                        <div className="grid grid-cols-2 gap-4 w-full max-w-sm mx-auto">
+                        <div className="grid grid-cols-2 gap-2 w-full max-w-[280px]">
                             {[
-                                { label: 'Ubwoba', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>, prompt: "Mfite ubwoba" },
-                                { label: 'Stress', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>, prompt: "Mfite stress nyinshi" },
-                                { label: 'Ibitotsi', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>, prompt: "Mfite ikibazo cyo gusinzira" },
-                                { label: 'Kuvuga', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>, prompt: "Nshaka kuvuga ibyanjye" }
+                                { label: 'Ubwoba', icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>, prompt: "Mfite ubwoba" },
+                                { label: 'Stress', icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>, prompt: "Mfite stress nyinshi" },
+                                { label: 'Ibitotsi', icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>, prompt: "Mfite ikibazo cyo gusinzira" },
+                                { label: 'Kuvuga', icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>, prompt: "Nshaka kuvuga ibyanjye" }
                             ].map((item) => (
-                                <button key={item.label} onClick={() => handleSend(item.prompt)} className="p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-teal-100 dark:hover:border-teal-900/50 transition-all active:scale-[0.98] group">
-                                    <div className="text-slate-400 dark:text-slate-600 group-hover:text-teal-500 dark:group-hover:text-teal-400 mb-3 transition-colors">{item.icon}</div>
-                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">{item.label}</span>
+                                <button key={item.label} onClick={() => handleSend(item.prompt)} className="p-3 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-xl text-center hover:bg-white dark:hover:bg-slate-800 hover:border-teal-200 dark:hover:border-teal-800 transition-all active:scale-[0.97] group">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 flex items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-teal-50 dark:group-hover:bg-teal-900/30 group-hover:text-teal-600 dark:group-hover:text-teal-400 mb-2 mx-auto transition-all">{item.icon}</div>
+                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{item.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -334,6 +338,7 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                     }
 
                     const msg = item.message!;
+
                     const msgIndex = messages.findIndex(m => m.id === msg.id);
                     const isUser = msg.role === 'user';
                     const isSequence = msgIndex > 0 && messages[msgIndex - 1].role === msg.role;
@@ -371,26 +376,31 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                 <div ref={messagesEndRef} />
             </div>
 
-            <div className="absolute left-0 right-0 p-6 pb-10 bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 backdrop-blur-xl z-20" style={{ bottom: '5.5rem' }}>
-                <div className="flex items-end gap-3 max-w-2xl mx-auto">
-                    <textarea
-                        ref={inputRef}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                        placeholder="Andika ubutumwa bwawe..."
-                        className="flex-1 bg-white dark:bg-slate-900 rounded-[1.5rem] px-6 py-4 text-[13px] text-slate-900 dark:text-white placeholder-slate-400 outline-none resize-none max-h-32 shadow-sm border border-slate-200 dark:border-slate-800 focus:border-teal-300 dark:focus:border-teal-700 transition-colors"
-                        rows={1}
-                    />
-                    <button
-                        onClick={() => handleSend()}
-                        disabled={!input.trim() || isLoading}
-                        className="w-14 h-14 bg-slate-900 dark:bg-teal-600 text-white rounded-2xl flex items-center justify-center shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all hover:bg-slate-800 dark:hover:bg-teal-500"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                    </button>
+            <div className="absolute left-0 right-0 p-5 pb-9 bg-gradient-to-t from-slate-50 via-slate-50/85 to-transparent dark:from-slate-950 dark:via-slate-950/85 backdrop-blur-xl z-20" style={{ bottom: '5.5rem' }}>
+                <div className="flex items-end max-w-2xl mx-auto">
+                    <div className="relative flex-1">
+                        <textarea
+                            ref={inputRef}
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                            placeholder="Andika ubutumwa bwawe..."
+                            className="w-full bg-white/95 dark:bg-slate-900/95 rounded-[1.6rem] px-5 py-4 pr-16 text-[13px] text-slate-900 dark:text-white placeholder-slate-400 outline-none resize-none max-h-32 shadow-[0_8px_24px_rgba(15,23,42,0.08)] border border-slate-200/60 dark:border-slate-700/60 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/50 transition"
+                            rows={1}
+                        />
+                        <button
+                            onClick={() => handleSend()}
+                            disabled={!input.trim() || isLoading}
+                            className="absolute bottom-2 right-2 w-11 h-11 rounded-xl flex items-center justify-center bg-transparent text-slate-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/35 dark:focus-visible:ring-white/35"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.6} d="M5 12h14m0 0l-6-6m6 6l-6 6" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
+
         </div>
     );
 };

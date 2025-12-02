@@ -14,7 +14,7 @@ const BudgetPlanner = lazy(() => import('./components/BudgetPlanner'));
 const MentalHealthChat = lazy(() => import('./components/MentalHealthChat'));
 const SexualHealth = lazy(() => import('./components/SexualHealth'));
 const Profile = lazy(() => import('./components/Profile'));
-const Learn = lazy(() => import('./components/Learn'));
+// const Learn = lazy(() => import('./components/Learn'));
 
 const App: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -170,7 +170,7 @@ const App: React.FC = () => {
           <Suspense fallback={<PageLoader />}>
             {activeTab === Tab.DASHBOARD && <Dashboard onNavigate={(tab) => setActiveTab(tab)} />}
             {activeTab === Tab.BUDGET && <BudgetPlanner />}
-            {activeTab === Tab.LEARN && <Learn />}
+            {/* Learn tab temporarily hidden */}
             {activeTab === Tab.WELLNESS && <MentalHealthChat />}
             {activeTab === Tab.HEALTH && <SexualHealth />}
             {activeTab === Tab.PROFILE && <Profile onBack={() => setActiveTab(Tab.DASHBOARD)} onLogout={handleLogout} />}

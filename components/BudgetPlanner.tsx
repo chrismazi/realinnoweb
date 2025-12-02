@@ -137,7 +137,7 @@ const incomeCategories: BudgetCategory[] = [
 ];
 
 // --- Main Component ---
-const BudgetPlanner = memo(() => {
+const BudgetPlannerComponent = () => {
     // Store hooks
     const transactions = useTransactions();
     const savings = useSavingsGoals();
@@ -157,6 +157,9 @@ const BudgetPlanner = memo(() => {
     const [showSavingsModal, setShowSavingsModal] = useState(false);
     const [showEditBudgetModal, setShowEditBudgetModal] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showEjoHezaModal, setShowEjoHezaModal] = useState(false);
+    const [ejoHezaTab, setEjoHezaTab] = useState<'about' | 'calculator' | 'howto'>('about');
+    const [ejoHezaContribution, setEjoHezaContribution] = useState(15000);
 
     // Transaction Form State
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -266,6 +269,8 @@ const BudgetPlanner = memo(() => {
         }));
     }, [expenseCategories, realSpendingByCategory, budgetLimits]);
 
+    const pieChartData = useMemo(() => budgetCategoriesWithRealData.filter(cat => cat.spent > 0), [budgetCategoriesWithRealData]);
+
     const totalSpent = useMemo(() => budgetCategoriesWithRealData.reduce((sum, cat) => sum + cat.spent, 0), [budgetCategoriesWithRealData]);
 
     const monthlyExpenseTotal = useMemo(
@@ -306,112 +311,35 @@ const BudgetPlanner = memo(() => {
         [budgetCategoriesWithRealData]
     );
 
-    const upcomingRecurring = useMemo(() => {
-        const recurring = transactions.filter(tx => tx.isRecurring);
-        if (!recurring.length) return null;
-        const today = new Date();
-        const sorted = [...recurring].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        const next = sorted.find(tx => new Date(tx.date) >= today) || sorted[0];
-        const txDate = new Date(next.date);
-        const diffDays = Math.ceil((txDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        let status = '';
-        if (diffDays === 0) status = 'Due today';
-        else if (diffDays === 1) status = 'Due tomorrow';
-        else if (diffDays < 0) status = 'Overdue';
-        else status = `In ${diffDays} days`;
-        return { title: next.title, amount: next.amount, status };
-    }, [transactions]);
-
-    const plannerInsights = useMemo(() => {
-        const items: { id: string; title: string; message: string; tone: 'positive' | 'info' | 'warning' }[] = [];
-
-        if (availableToSave > 0) {
-            items.push({
-                id: 'available',
-                title: 'Room to save',
-                message: `You can still set aside ${formatCurrency(availableToSave, { maximumFractionDigits: 0 })} this month.`,
-                tone: 'positive'
-            });
-        } else {
-            items.push({
-                id: 'overspend',
-                title: 'Spending ahead',
-                message: `Expenses exceeded income by ${formatCurrency(Math.abs(availableToSave), { maximumFractionDigits: 0 })} this month.`,
-                tone: 'warning'
-            });
-        }
-
-        if (overspentCategories.length > 0) {
-            items.push({
-                id: 'over-category',
-                title: 'Over budget category',
-                message: `${overspentCategories[0].name} is ${formatCurrency(overspentCategories[0].spent - overspentCategories[0].limit, { maximumFractionDigits: 0 })} above limit.`,
-                tone: 'warning'
-            });
-        }
-
-        if (savingsProgressAvg > 0) {
-            items.push({
-                id: 'savings-progress',
-                title: 'Savings progress',
-                message: `${savingsProgressAvg.toFixed(0)}% average across goals.`,
-                tone: 'info'
-            });
-        }
-
-        if (upcomingRecurring) {
-            items.push({
-                id: 'recurring',
-                title: 'Next recurring bill',
-                message: `${upcomingRecurring.title} ${upcomingRecurring.status}.`,
-                tone: upcomingRecurring.status === 'Overdue' ? 'warning' : 'info'
-            });
-        }
-
-        return items;
-    }, [availableToSave, overspentCategories, savingsProgressAvg, upcomingRecurring]);
-
-    const recentActivity = useMemo(() => {
-        return [...transactions]
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, 4);
-    }, [transactions]);
-
-    const realTrendData = useMemo(() => {
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const result: { day: string; amount: number }[] = [];
-
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date();
-
-            date.setDate(date.getDate() - i);
-            const dayName = days[date.getDay()];
-
-            const dayTotal = transactions
-                .filter(t => {
-                    const txDate = new Date(t.date);
-                    return t.type === 'expense' && txDate.toDateString() === date.toDateString();
-                })
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            result.push({ day: dayName, amount: dayTotal });
-        }
-        return result;
-    }, [transactions]);
-
-    const pieChartData = useMemo(() => budgetCategoriesWithRealData.filter(cat => cat.spent > 0), [budgetCategoriesWithRealData]);
-
     const alerts = useMemo(() => {
-        const msgs = [];
+        const msgs: { type: 'info' | 'warning'; title: string; text: string }[] = [];
         const recurringCount = transactions.filter(t => t.isRecurring).length;
         if (recurringCount > 0) {
-            msgs.push({ type: 'info', title: 'Recurring Bills', text: `You have ${recurringCount} active recurring charges tracking in your budget.` });
+            msgs.push({ type: 'info', title: 'Inyemezabuguzi zihoraho', text: `Ufite ${recurringCount} nyemezabuguzi zihoraho ziri gukurikiranwa mu ngengo yawe.` });
         }
-        const highSpends = transactions.filter(t => t.amount > 100 && t.type === 'expense' && new Date(t.date).getTime() > Date.now() - 86400000 * 7);
-        if (highSpends.length > 0) {
-            msgs.push({ type: 'warning', title: 'High Spending', text: `You spent ${formatCurrency(highSpends[0].amount)} at ${highSpends[0].title} recently.` });
+        if (overspentCategories.length > 0) {
+            msgs.push({ type: 'warning', title: 'Ibyiciro birenze ingengo', text: `Ibyiciro ${overspentCategories.length} birenze urugero rw'ingengo muri uku kwezi.` });
+        }
+        if (budgetUsage > 80 && budgetUsage <= 100) {
+            msgs.push({ type: 'warning', title: 'Ingengo igeze hafi', text: `Wakoresheje ${budgetUsage.toFixed(0)}% by'ingengo yawe y'uku kwezi.` });
         }
         return { msgs };
+    }, [transactions, overspentCategories, budgetUsage]);
+
+    const realTrendData = useMemo(() => {
+        const days = ['Ku', 'Mb', 'Kb', 'Gt', 'Ga', 'Gat', 'Cy'];
+        const today = new Date();
+        const data = [];
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dayName = days[date.getDay()];
+            const daySpending = transactions
+                .filter(t => t.type === 'expense' && new Date(t.date).toDateString() === date.toDateString())
+                .reduce((sum, t) => sum + t.amount, 0);
+            data.push({ day: dayName, amount: daySpending });
+        }
+        return data;
     }, [transactions]);
 
     const openAddModal = () => {
@@ -511,7 +439,7 @@ const BudgetPlanner = memo(() => {
         if (!newGoalName || !newGoalTarget) {
             const toast = document.createElement('div');
             toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] animate-slide-up';
-            toast.textContent = 'Nyamuneka andika izina ry\'intego n\'amafaranga agamijwe';
+            toast.textContent = `Nyamuneka andika izina ry'intego n'amafaranga agamijwe`;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
             return;
@@ -539,10 +467,21 @@ const BudgetPlanner = memo(() => {
         setNewGoalDeadline(null);
     };
 
+    const ejoHezaMatchRate = 0.33;
+    const ejoHezaMaxMatch = 20000;
+
+    const ejoHezaProjectedMatch = useMemo(() => {
+        return Math.min(Math.round(ejoHezaContribution * ejoHezaMatchRate), ejoHezaMaxMatch);
+    }, [ejoHezaContribution]);
+
+    const ejoHezaProjectedTotal = useMemo(() => ejoHezaContribution + ejoHezaProjectedMatch, [ejoHezaContribution, ejoHezaProjectedMatch]);
+    const ejoHezaFiveYearTotal = useMemo(() => ejoHezaProjectedTotal * 12 * 5, [ejoHezaProjectedTotal]);
+
     const getSavingsAnalysis = (goal: SavingsGoal) => {
         if (!goal.deadline) return null;
         const targetDate = new Date(goal.deadline);
         const today = new Date();
+
         const timeDiff = targetDate.getTime() - today.getTime();
         const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
@@ -587,7 +526,7 @@ const BudgetPlanner = memo(() => {
                         {alerts.msgs.length > 0 && (
                             <div className="space-y-3">
                                 {alerts.msgs.slice(0, 3).map((alert, idx) => (
-                                    <div key={idx} className={`p-4 rounded-[1.5rem] shadow-sm flex items-start gap-4 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800 transition-transform active:scale-[0.98]`}>
+                                    <div key={idx} className={`p-4 rounded-[1.5rem] shadow-sm flex items-start gap-4 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800 transition-transform active:scale-90`}>
                                         <div className={`p-2 rounded-full shrink-0 ${alert.type === 'warning' ? 'bg-amber-100 text-amber-500 dark:bg-amber-500/10' : 'bg-blue-100 text-blue-500 dark:bg-blue-500/10'}`}>
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         </div>
@@ -657,7 +596,7 @@ const BudgetPlanner = memo(() => {
                                             </div>
                                             <div className="text-right">
                                                 <span className={`font-bold ${isOverBudget ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>{formatCurrency(cat.spent)} <span className="text-slate-300 dark:text-slate-600 font-normal">/ {formatCurrency(cat.limit)}</span></span>
-                                                <p className="text-[10px] text-teal-500 opacity-0 group-hover:opacity-100 transition-opacity font-bold">Hindura</p>
+                                                <p className="text-[10px] text-teal-600 opacity-0 group-hover:opacity-100 transition-opacity font-bold">Hindura</p>
                                             </div>
                                         </div>
                                         <ProgressBar current={cat.spent} max={cat.limit} color={cat.color} />
@@ -694,7 +633,7 @@ const BudgetPlanner = memo(() => {
                         <div className="space-y-3">
                             {filteredTransactions.length > 0 ? (
                                 filteredTransactions.map((tx) => (
-                                    <div key={tx.id} onClick={() => openEditModal(tx)} className="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] flex items-center justify-between shadow-sm border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all cursor-pointer group hover:shadow-md hover:border-slate-200 dark:hover:border-slate-600">
+                                    <div key={tx.id} onClick={() => openEditModal(tx)} className="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] flex items-center justify-between shadow-sm border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all cursor-pointer hover:shadow-md hover:border-slate-200 dark:hover:border-slate-600">
                                         <div className="flex items-center gap-4">
                                             <div className={`w-14 h-14 rounded-2xl ${tx.color.includes('bg-') ? tx.color : (tx.type === 'income' ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400' : 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400')} flex items-center justify-center text-xl relative`}>
                                                 {getIcon(tx.icon)}
@@ -740,44 +679,86 @@ const BudgetPlanner = memo(() => {
                         </div>
 
                         <div className="space-y-4">
+                            <div
+                                onClick={() => { setShowEjoHezaModal(true); setEjoHezaTab('about'); }}
+                                className="rounded-[1.8rem] border border-emerald-200 bg-white shadow-sm p-5 dark:bg-slate-900 dark:border-teal-900/40 text-slate-800 dark:text-slate-100 active:scale-[0.98] transition-all cursor-pointer hover:border-emerald-300"
+                            >
+                                <div className="flex items-center justify-between mb-3">
+                                    <div>
+                                        <h3 className="text-xl font-black text-slate-900 dark:text-white">EjoHeza</h3>
+                                    </div>
+                                    <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 dark:bg-teal-900/30 dark:text-teal-200 flex items-center justify-center text-sm font-black">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                                    </span>
+                                </div>
+                                <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-emerald-400 dark:text-teal-400 mb-3">Gahunda yo kuzigamira ejo hazaza</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    Hari aho wakoresha. Uracyafite {formatCurrency(60000)} mu ngengo y'uyu munsi — shyira mu EjoHeza kugira ngo wungukire kuri +33% y'impano ya Leta.
+                                </p>
+                            </div>
+
                             {savings.map(goal => {
                                 const analysis = getSavingsAnalysis(goal);
+                                const progress = (goal.current / goal.target) * 100;
+                                const hue = progress > 75 ? 120 : progress > 50 ? 60 : progress > 25 ? 30 : 0;
+
                                 return (
-                                    <div key={goal.id} className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors group">
-                                        <div className="flex justify-between items-start mb-6">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
-                                                    {getIcon(goal.icon)}
+                                    <div key={goal.id} className={`bg-gradient-to-br from-${progress > 75 ? 'emerald' : progress > 50 ? 'blue' : progress > 25 ? 'indigo' : 'purple'}-600 via-${progress > 75 ? 'emerald' : progress > 50 ? 'blue' : progress > 25 ? 'indigo' : 'purple'}-700 to-${progress > 75 ? 'teal' : progress > 50 ? 'indigo' : progress > 25 ? 'purple' : 'pink'}-800 rounded-[2rem] p-6 relative overflow-hidden cursor-pointer group active:scale-[0.98] transition-all duration-300 shadow-xl shadow-${progress > 75 ? 'emerald' : progress > 50 ? 'blue' : progress > 25 ? 'indigo' : 'purple'}-900/20`}>
+                                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+                                        <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+                                        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+                                        <div className="relative z-10">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                                                        {getIcon(goal.icon)}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-xl font-black text-white mb-1">{goal.name}</h4>
+                                                        {goal.deadline && <p className="text-xs text-white/60 font-medium">Intego: {new Date(goal.deadline).toLocaleDateString()}</p>}
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <h4 className="font-bold text-slate-900 dark:text-white text-lg">{goal.name}</h4>
-                                                    {goal.deadline && <p className="text-xs text-slate-400 font-medium">Intego: {new Date(goal.deadline).toLocaleDateString()}</p>}
+                                                <div className="text-right">
+                                                    <span className="text-xl font-black text-white">{formatCurrency(goal.current)}</span>
+                                                    <p className="text-xs text-white/60">/ {formatCurrency(goal.target)}</p>
                                                 </div>
                                             </div>
-                                            <span className="font-black text-slate-900 dark:text-white text-lg">{formatCurrency(goal.current)} <span className="text-xs text-slate-400 font-normal">/ {formatCurrency(goal.target)}</span></span>
-                                        </div>
 
-                                        <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-5">
-                                            <div className="h-full bg-indigo-500 rounded-full transition-all duration-1000 relative overflow-hidden" style={{ width: `${(goal.current / goal.target) * 100}%` }}>
-                                                <div className="absolute inset-0 bg-white/20 animate-pulse-slow"></div>
-                                            </div>
-                                        </div>
-
-                                        {analysis && (
-                                            <div className={`p-4 rounded-xl ${analysis.bg} flex items-start gap-3`}>
-                                                <svg className={`w-5 h-5 ${analysis.color} mt-0.5 shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                <div>
-                                                    <p className={`text-[10px] font-bold ${analysis.color} uppercase tracking-wider mb-1`}>Isesengura</p>
-                                                    {analysis.type === 'active' ? (
-                                                        <p className={`text-sm ${analysis.color} font-medium leading-relaxed`}>Zigama <span className="font-black">${Math.ceil(analysis.monthlyRate)}/ukwezi</span> kugira ngo ugere ku ntego mu mezi {Math.ceil(analysis.daysLeft / 30)}.</p>
-                                                    ) : (
-                                                        <p className={`text-sm ${analysis.color} font-medium`}>{analysis.msg}</p>
-                                                    )}
+                                            <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden mb-4">
+                                                <div className="h-full bg-white rounded-full transition-all duration-1000 relative overflow-hidden" style={{ width: `${progress}%` }}>
+                                                    <div className="absolute inset-0 bg-white/30 animate-pulse-slow"></div>
                                                 </div>
                                             </div>
-                                        )}
+
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-3">
+                                                    <p className="text-[10px] text-white/60 uppercase tracking-wider font-bold mb-1">Aho wigeze</p>
+                                                    <p className="text-lg font-black text-white">{Math.round(progress)}%</p>
+                                                </div>
+                                                <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-3">
+                                                    <p className="text-[10px] text-white/60 uppercase tracking-wider font-bold mb-1">Imvura</p>
+                                                    <p className="text-lg font-black text-white">{formatCurrency(goal.target - goal.current)}</p>
+                                                </div>
+                                            </div>
+
+                                            {analysis && (
+                                                <div className={`mt-4 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20`}>
+                                                    <div className="flex items-start gap-3">
+                                                        <svg className="w-5 h-5 text-white/80 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                        <div>
+                                                            <p className="text-[10px] font-bold text-white/80 uppercase tracking-wider mb-1">Isesengura</p>
+                                                            {analysis.type === 'active' ? (
+                                                                <p className="text-sm text-white/90 font-medium leading-relaxed">Zigama <span className="font-black text-white">{Math.ceil(analysis.monthlyRate)}/ukwezi</span> kugira ngo ugere ku ntego mu mezi {Math.ceil(analysis.daysLeft / 30)}.</p>
+                                                            ) : (
+                                                                <p className="text-sm text-white/90 font-medium">{analysis.msg}</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                )
+                                );
                             })}
                         </div>
                     </div>
@@ -789,7 +770,6 @@ const BudgetPlanner = memo(() => {
                 <div className="fixed inset-0 z-[70] flex items-end justify-center">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowAddModal(false)}></div>
                     <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-t-[2.5rem] p-6 pb-28 shadow-2xl animate-slide-up relative z-10 transition-colors border-t border-white/10 max-h-[calc(100vh-7rem)] overflow-y-auto">
-
                         <div className="drag-handle mb-6"></div>
 
                         <div className="flex justify-between items-center mb-8">
@@ -850,8 +830,66 @@ const BudgetPlanner = memo(() => {
                             {editingId && (
                                 <button onClick={handleDeleteTransaction} className="flex-1 py-4 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-3xl font-bold text-sm hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors border border-red-100 dark:border-red-900/30">Siba</button>
                             )}
-                            <button onClick={handleSaveTransaction} className="flex-[2] py-4 bg-slate-900 dark:bg-teal-600 text-white rounded-3xl font-bold text-sm shadow-xl dark:shadow-teal-900/40 active:scale-[0.98] transition-transform">
+                            <button onClick={handleSaveTransaction} className="flex-[2] py-4 bg-slate-900 dark:bg-teal-600 text-white rounded-3xl font-bold text-sm shadow-xl dark:shadow-teal-900/40 active:scale-95 transition-transform">
                                 {editingId ? 'Bika Impinduka' : 'Ongeraho'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Budget Modal */}
+            {showEditBudgetModal && editingBudgetCategory && (
+                <div className="fixed inset-0 z-[80] flex items-end justify-center">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowEditBudgetModal(false)}></div>
+                    <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-t-[2.5rem] p-6 pb-10 shadow-2xl animate-slide-up transition-colors border-t border-white/10 relative z-10">
+                        <div className="drag-handle mb-6"></div>
+                        <div className="flex justify-between items-center mb-6">
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Hindura Ingengo</p>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{getCategoryLabel(editingBudgetCategory.icon)}</h3>
+                            </div>
+                            <button onClick={() => setShowEditBudgetModal(false)} className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                                <Icons.Close className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-5">
+                            <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-5 border border-slate-100 dark:border-slate-800">
+                                <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.3em] mb-2">Urugero rushya</p>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-slate-400 font-black text-2xl">RWF</span>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        value={newBudgetLimit}
+                                        onChange={(e) => setNewBudgetLimit(e.target.value)}
+                                        className="flex-1 bg-transparent border-none text-4xl font-black text-slate-900 dark:text-white outline-none"
+                                        placeholder="0"
+                                    />
+                                </div>
+                                <p className="text-xs text-slate-400 mt-3">Ubu: {formatCurrency(editingBudgetCategory.limit)}</p>
+                            </div>
+
+                            <div className="rounded-3xl border border-slate-100 dark:border-slate-800 p-4 bg-white dark:bg-slate-900">
+                                <div className="flex justify-between text-xs text-slate-400 font-semibold mb-2">
+                                    <span>Ayakozwe</span>
+                                    <span>Ingengo</span>
+                                </div>
+                                <ProgressBar current={editingBudgetCategory.spent} max={Math.max(parseFloat(newBudgetLimit) || editingBudgetCategory.limit, 1)} color={editingBudgetCategory.color} />
+                                <div className="flex justify-between text-sm font-bold mt-2 text-slate-900 dark:text-white">
+                                    <span>{formatCurrency(editingBudgetCategory.spent)}</span>
+                                    <span>{formatCurrency(parseFloat(newBudgetLimit) || editingBudgetCategory.limit)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4 mt-8">
+                            <button onClick={() => setShowEditBudgetModal(false)} className="flex-1 py-4 rounded-3xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold text-sm">
+                                Kureka
+                            </button>
+                            <button onClick={handleSaveBudgetLimit} className="flex-[1.5] py-4 bg-slate-900 dark:bg-teal-500 text-white rounded-3xl font-bold text-sm shadow-xl active:scale-95 transition-transform">
+                                Bika
                             </button>
                         </div>
                     </div>
@@ -885,8 +923,174 @@ const BudgetPlanner = memo(() => {
                     </div>
                 </div>
             )}
+
+            {/* EjoHeza Info Modal */}
+            {showEjoHezaModal && (
+                <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowEjoHezaModal(false)}></div>
+                    <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl animate-slide-up sm:animate-zoom-in relative z-10 overflow-hidden border border-slate-100 dark:border-slate-800 max-h-[90vh] flex flex-col">
+                        {/* Header */}
+                        <div className="relative h-32 bg-white dark:bg-slate-900 overflow-hidden shrink-0 border-b border-slate-100 dark:border-slate-800">
+                            <button onClick={() => setShowEjoHezaModal(false)} className="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full transition-colors z-20">
+                                <Icons.Close className="w-5 h-5" />
+                            </button>
+                            <div className="absolute bottom-4 left-6 right-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-slate-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-black text-slate-900 dark:text-white">EjoHeza</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Tabs */}
+                        <div className="flex p-1.5 bg-slate-100 dark:bg-slate-900 mx-6 mt-4 rounded-xl shrink-0">
+                            <button onClick={() => setEjoHezaTab('about')} className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${ejoHezaTab === 'about' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500'}`}>Ibisobanuro</button>
+                            <button onClick={() => setEjoHezaTab('calculator')} className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${ejoHezaTab === 'calculator' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500'}`}>Kubara</button>
+                            <button onClick={() => setEjoHezaTab('howto')} className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${ejoHezaTab === 'howto' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500'}`}>Uko Bimera</button>
+                        </div>
+
+                        {/* Tab Content */}
+                        <div className="flex-1 overflow-y-auto p-6">
+                            {ejoHezaTab === 'about' && (
+                                <div className="space-y-5 animate-fade-in">
+                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm">
+                                        EjoHeza ni gahunda ya Leta y'u Rwanda ifasha buri munyarwanda kwizigamira no kubona impano ya Leta ku byo atekereza ejo hazaza.
+                                    </p>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {[{ label: 'Impano ya Leta', value: '+33%' }, { label: 'Tangirira kuri', value: 'RWF 1K' }].map((item) => (
+                                            <div key={item.label} className="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm dark:bg-slate-900 dark:border-slate-700">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-2">{item.label}</p>
+                                                <p className="text-2xl font-black text-slate-900 dark:text-white">{item.value}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <h4 className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400">Ibyiza by'EjoHeza</h4>
+                                        <div className="grid gap-2">
+                                            {[
+                                                'Impano ya Leta kuri buri RWF uzigama',
+                                                'Amafaranga yawe arinzwe neza',
+                                                'Inyungu ziyongera buri mwaka',
+                                                'Intego zo kuzigama zisobanutse'
+                                            ].map((text, i) => (
+                                                <div key={i} className="rounded-[1.5rem] border border-slate-100 bg-white p-3 shadow-sm flex items-center gap-3 dark:bg-slate-900 dark:border-slate-800">
+                                                    <span className="w-8 h-8 rounded-full bg-brand/10 text-brand dark:bg-brand/20 dark:text-brand flex items-center justify-center text-sm font-black">{i + 1}</span>
+                                                    <p className="text-sm text-slate-600 dark:text-slate-200">{text}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {ejoHezaTab === 'calculator' && (
+                                <div className="space-y-6 animate-fade-in">
+                                    <div className="rounded-[1.8rem] border border-slate-100 bg-white p-5 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div>
+                                                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Shyiramo Ku kwezi</p>
+                                                <h3 className="text-2xl font-black text-slate-900 dark:text-white">{formatCurrency(ejoHezaContribution, { maximumFractionDigits: 0 })}</h3>
+                                            </div>
+                                            <span className="text-[11px] font-bold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Kubara</span>
+
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min={1000}
+                                            max={100000}
+                                            step={1000}
+                                            value={ejoHezaContribution}
+                                            onChange={(e) => setEjoHezaContribution(Number(e.target.value))}
+                                            className="w-full accent-brand"
+
+                                        />
+                                        <div className="flex justify-between text-[11px] font-semibold text-slate-400 mt-2">
+                                            <span>RWF 1K</span>
+                                            <span>RWF 100K</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                        {[{
+                                            label: 'Ufatiweho',
+                                            value: formatCurrency(ejoHezaContribution, { maximumFractionDigits: 0 })
+                                        }, {
+                                            label: "Impano ya Leta (+33%)",
+                                            value: formatCurrency(ejoHezaProjectedMatch, { maximumFractionDigits: 0 })
+                                        }, {
+                                            label: 'Utahana buri kwezi',
+                                            value: formatCurrency(ejoHezaProjectedTotal, { maximumFractionDigits: 0 })
+                                        }].map((item) => (
+                                            <div key={item.label} className="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm dark:bg-slate-900 dark:border-slate-700">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-2">{item.label}</p>
+                                                <p className="text-xl font-black text-slate-900 dark:text-white">{item.value}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="rounded-[1.8rem] border border-slate-100 bg-white p-5 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-2">Mu myaka 5</p>
+                                        <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">{formatCurrency(ejoHezaFiveYearTotal, { maximumFractionDigits: 0 })}</h3>
+
+                                        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                            Ushyira kuri konti ya EjoHeza amafaranga angana n'aya buri kwezi, ukoresheje impano ya Leta ya +33%,
+                                            ushobora kugira iyi nyongeragaciro mu myaka 5, utabariyemo inyungu y'isoko.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {ejoHezaTab === 'howto' && (
+                                <div className="space-y-5 animate-fade-in">
+                                    <div className="rounded-[1.8rem] border border-slate-100 bg-white p-5 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-1">Uko Bimera</p>
+
+                                        <p className="text-sm text-slate-600 dark:text-slate-300">
+                                            Kurikiza izi ntambwe nto kugirango winjire muri gahunda ya EjoHeza kandi utangire kwakira impano ya Leta.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        {[{
+                                            title: 'Iyandikishe',
+                                            desc: 'Sura urubuga rwa EjoHeza cyangwa ukoreshe *506# kuri telefone yawe.'
+                                        }, {
+                                            title: 'Reba konti ya banki cyangwa MoMo',
+                                            desc: 'Hitamo aho uzajya ufatira amafaranga buri kwezi—banki, SACCO cyangwa Mobile Money.'
+                                        }, {
+                                            title: 'Shyiraho gahunda yo kuzigama',
+                                            desc: 'Teganya umubare uhora ubika buri kwezi (RWF 1,000 kugeza hejuru).'
+                                        }, {
+                                            title: 'Komeza kubika',
+                                            desc: 'Iyo ushyizemo amafaranga ku gihe, Leta igufasha kongeraho 33% kugeza ku RWF 20,000 ku kwezi.'
+                                        }].map((step, idx) => (
+                                            <div key={step.title} className="rounded-[1.6rem] border border-slate-100 bg-white p-4 shadow-sm flex gap-4 dark:bg-slate-900 dark:border-slate-800">
+                                                <div className="w-10 h-10 rounded-full bg-brand/10 text-brand dark:bg-brand/20 dark:text-brand flex items-center justify-center font-black">
+                                                    {idx + 1}
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black text-slate-900 dark:text-white">{step.title}</p>
+                                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{step.desc}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
-});
+};
+
+const BudgetPlanner = memo(BudgetPlannerComponent);
 
 export default BudgetPlanner;

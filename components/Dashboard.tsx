@@ -54,11 +54,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   // Loading state
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showSendModal, setShowSendModal] = useState(false);
-  const [showScanModal, setShowScanModal] = useState(false);
-  const [showMoreModal, setShowMoreModal] = useState(false);
 
   // Load data on mount
   useEffect(() => {
@@ -75,29 +70,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     loadData();
   }, []);
 
-  // Load saved mood from localStorage
-  useEffect(() => {
-    const savedMood = localStorage.getItem('dailyMood');
-    const savedDate = localStorage.getItem('moodDate');
-    const today = new Date().toDateString();
-    if (savedMood && savedDate === today) {
-      setSelectedMood(savedMood);
-    }
-  }, []);
-
-  // Save mood handler
-  const handleMoodSelect = (mood: string) => {
-    setSelectedMood(mood);
-    localStorage.setItem('dailyMood', mood);
-    localStorage.setItem('moodDate', new Date().toDateString());
-    
-    // Show toast
-    const toast = document.createElement('div');
-    toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] animate-slide-up';
-    toast.textContent = `Ibyiyumviro byabitswe: ${mood === 'happy' ? '😊 Mfite ibyishimo' : mood === 'neutral' ? '😐 Ndi meze neza' : '😔 Mfite agahinda'}`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
-  };
 
   // Calculate today's spending
   const todaySpending = useMemo(() => {
@@ -107,12 +79,60 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       .reduce((sum, t) => sum + t.amount, 0);
   }, [transactions]);
 
-  // Get daily budget limit from localStorage or default
-  const dailyBudget = useMemo(() => {
-    const saved = localStorage.getItem('dailyBudget');
-    return saved ? parseFloat(saved) : 60;
+  // Calculate budget by category from localStorage or defaults
+  const budgetCategories = useMemo(() => {
+    const saved = localStorage.getItem('budgetLimits');
+    const defaultLimits: Record<string, number> = {
+      'Food': 600,
+      'Transport': 400,
+      'Housing': 1500,
+      'Entertainment': 300,
+      'Shopping': 500
+    };
+    return saved ? { ...defaultLimits, ...JSON.parse(saved) } : defaultLimits;
   }, []);
 
+  // Calculate today's spending by category
+  const todaySpendingByCategory = useMemo(() => {
+    const today = new Date().toDateString();
+    const spending: Record<string, number> = {};
+    transactions
+      .filter(t => t.type === 'expense' && new Date(t.date).toDateString() === today)
+      .forEach(tx => {
+        spending[tx.category] = (spending[tx.category] || 0) + tx.amount;
+      });
+    return spending;
+  }, [transactions]);
+
+  // Calculate total daily budget and remaining by category
+  const { totalDailyBudget, remainingBudgetByCategory, categoriesWithRemaining } = useMemo(() => {
+    const values = Object.values(budgetCategories) as number[];
+    const total = values.reduce((sum, limit) => sum + limit, 0);
+    const dailyTotal = total / 30; // Convert monthly to daily
+    
+    const remaining: Record<string, number> = {};
+    const withRemaining: Array<{ category: string; remaining: number; percentage: number }> = [];
+    
+    (Object.entries(budgetCategories) as [string, number][]).forEach(([category, limit]) => {
+      const spent = todaySpendingByCategory[category] || 0;
+      const dailyLimit = limit / 30;
+      const dailyRemaining = Math.max(dailyLimit - spent, 0);
+      remaining[category] = dailyRemaining;
+      
+      if (dailyRemaining > 0) {
+        const percentage = (dailyRemaining / dailyLimit) * 100;
+        withRemaining.push({ category, remaining: dailyRemaining, percentage });
+      }
+    });
+    
+    return {
+      totalDailyBudget: dailyTotal,
+      remainingBudgetByCategory: remaining,
+      categoriesWithRemaining: withRemaining.sort((a, b) => b.remaining - a.remaining)
+    };
+  }, [budgetCategories, todaySpendingByCategory]);
+
+  
   // Get next recurring transaction
   const nextRecurring = useMemo(() => {
     const recurring = transactions.filter(t => t.isRecurring);
@@ -203,9 +223,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const cashFlow = useMemo(() => monthlyIncome - monthlyExpenses, [monthlyIncome, monthlyExpenses]);
 
   const spendingProgress = useMemo(() => {
-    if (!dailyBudget) return 0;
-    return Math.min((todaySpending / dailyBudget) * 100, 200);
-  }, [todaySpending, dailyBudget]);
+    if (!totalDailyBudget) return 0;
+    return Math.min((todaySpending / totalDailyBudget) * 100, 200);
+  }, [todaySpending, totalDailyBudget]);
 
   const topSpendingCategory = useMemo(() => {
     const categoryTotals: Record<string, number> = {};
@@ -227,18 +247,47 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const insights = useMemo(() => {
     const results: { id: string; title: string; message: string; tone: 'positive' | 'warning' | 'info' }[] = [];
 
-    if (todaySpending >= dailyBudget) {
+    // Check if user has any transactions (not a first-time user)
+    const hasTransactions = transactions.length > 0;
+    const hasTodaySpending = todaySpending > 0;
+
+    if (!hasTransactions) {
+      // First-time user with no transactions
+      results.push({
+        id: 'budget',
+        title: 'Murakaza neza!',
+        message: 'Tangira wongera ibyakozwe byawe kugirango ubone inama z\'ubwenge.',
+        tone: 'info'
+      });
+    } else if (todaySpending >= totalDailyBudget) {
       results.push({
         id: 'budget',
         title: 'Ingengo y\'uyu munsi yarenze',
-        message: `Warenze ${formatCurrency(Math.max(todaySpending - dailyBudget, 0), { maximumFractionDigits: 0 })} ku mugambi w'uyu munsi. Hagarika ibidakenewe.`,
+        message: `Warenze ${formatCurrency(Math.max(todaySpending - totalDailyBudget, 0), { maximumFractionDigits: 0 })} ku mugambi w'uyu munsi. Hagarika ibidakenewe.`,
         tone: 'warning'
+      });
+    } else if (hasTodaySpending && categoriesWithRemaining.length > 0) {
+      // Only show category remaining if user has spent something today
+      const topCategory = categoriesWithRemaining[0];
+      results.push({
+        id: 'budget',
+        title: 'Hari aho wakoresha',
+        message: `${topCategory.category}: Uracyafite ${formatCurrency(topCategory.remaining, { maximumFractionDigits: 0 })} mu ngengo y'uyu munsi.`,
+        tone: 'positive'
+      });
+    } else if (hasTransactions && !hasTodaySpending) {
+      // Returning user but no spending today yet
+      results.push({
+        id: 'budget',
+        title: 'Hari aho wakoresha',
+        message: `Uracyafite ${formatCurrency(totalDailyBudget, { maximumFractionDigits: 0 })} mu ngengo y'uyu munsi.`,
+        tone: 'positive'
       });
     } else {
       results.push({
         id: 'budget',
         title: 'Hari aho wakoresha',
-        message: `Uracyafite ${formatCurrency(Math.max(dailyBudget - todaySpending, 0), { maximumFractionDigits: 0 })} mu ngengo y'uyu munsi.`,
+        message: `Uracyafite ${formatCurrency(Math.max(totalDailyBudget - todaySpending, 0), { maximumFractionDigits: 0 })} mu ngengo y'uyu munsi.`,
         tone: 'positive'
       });
     }
@@ -269,7 +318,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     }
 
     return results;
-  }, [todaySpending, dailyBudget, totalSavings, topSpendingCategory, recurringStatus]);
+  }, [todaySpending, totalDailyBudget, totalSavings, topSpendingCategory, recurringStatus, categoriesWithRemaining]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -381,7 +430,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">Uku kwezi</p>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">Incamake y'imari</h3>
               </div>
-              <button onClick={() => onNavigate(Tab.BUDGET)} className="text-brand text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full bg-brand/10 hover:bg-brand/20 transition-colors">Reba ingengo</button>
+              <button
+                onClick={() => onNavigate(Tab.BUDGET)}
+                className="text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full text-white bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 border border-white/10 shadow-sm hover:shadow-md transition-all"
+              >
+                Reba ingengo
+              </button>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between rounded-2xl border border-slate-100 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/40">
@@ -449,111 +503,136 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           </div>
         )}
 
-        {/* Daily Pulse - Horizontal Scroll Widgets */}
+        {/* Daily Pulse - Unified subtle card style */}
         <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex justify-between items-center mb-5 px-1">
             <h3 className="text-base font-semibold text-slate-900 dark:text-white">{t('dashboard.dailyPulse')}</h3>
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-800 shadow-sm">{t('common.today')}</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">{t('common.today')}</span>
           </div>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-6 -mx-6 px-6 snap-x snap-mandatory">
-            {/* Budget Widget - Using Brand Color */}
-            <div className="snap-center shrink-0 w-40 bg-white dark:bg-slate-900 p-5 rounded-[2.2rem] border border-slate-100 dark:border-slate-800 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] dark:shadow-none flex flex-col justify-between h-44 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-              <div className="w-10 h-10 bg-orange-50 dark:bg-brand/10 text-brand rounded-2xl flex items-center justify-center group-hover:rotate-6 transition-transform">
-                <Icons.Wallet className="w-5 h-5" />
-              </div>
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-6 px-6 snap-x snap-mandatory">
+            {/* Budget Widget */}
+            <div className="snap-center shrink-0 w-44 bg-white dark:bg-slate-900 p-5 rounded-[1.8rem] border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-between h-40 group hover:scale-[1.02] active:scale-[0.98] transition-all">
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">{t('dashboard.dailySpend')}</p>
               <div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">{t('dashboard.dailySpend')}</p>
-                <div className="flex items-end gap-1 mb-3">
-                  <span className={`text-xl font-bold leading-none ${todaySpending > dailyBudget ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>{formatCurrency(todaySpending, { maximumFractionDigits: 0 })}</span>
-                  <span className="text-xs text-slate-400 mb-0.5 font-medium">/ {formatCurrency(dailyBudget, { maximumFractionDigits: 0 })}</span>
+                <div className="flex items-end gap-1.5 mb-3">
+                  <span className={`text-2xl font-black leading-none ${todaySpending > totalDailyBudget ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>{formatCurrency(todaySpending, { maximumFractionDigits: 0 })}</span>
+                  <span className="text-xs text-slate-400 mb-0.5 font-medium">/ {formatCurrency(totalDailyBudget, { maximumFractionDigits: 0 })}</span>
                 </div>
-                <div className="h-1.5 w-full bg-orange-50 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full shadow-[0_0_10px_rgba(249,115,22,0.5)] ${todaySpending > dailyBudget ? 'bg-red-500' : 'bg-brand'}`} style={{ width: `${Math.min((todaySpending / dailyBudget) * 100, 100)}%` }}></div>
+                <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full ${todaySpending > totalDailyBudget ? 'bg-red-500' : 'bg-slate-900 dark:bg-white'}`} style={{ width: `${Math.min((todaySpending / totalDailyBudget) * 100, 100)}%` }}></div>
                 </div>
               </div>
             </div>
 
-            {/* Mood Widget */}
-            <div className="snap-center shrink-0 w-40 bg-white dark:bg-slate-900 p-5 rounded-[2.2rem] border border-slate-100 dark:border-slate-800 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] dark:shadow-none flex flex-col justify-between h-44 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-              <div className="w-10 h-10 bg-teal-50 dark:bg-teal-500/10 text-teal-500 rounded-2xl flex items-center justify-center group-hover:rotate-6 transition-transform">
-                <Icons.Sparkles className="w-5 h-5" />
-              </div>
+            {/* Weekly Summary Widget */}
+            <div className="snap-center shrink-0 w-44 bg-white dark:bg-slate-900 p-5 rounded-[1.8rem] border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-between h-40 group hover:scale-[1.02] active:scale-[0.98] transition-all">
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">Uku kwezi</p>
               <div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-3">{t('dashboard.checkMood')}</p>
-                <div className="flex justify-between items-center px-0.5">
-                  <button onClick={() => handleMoodSelect('happy')} className={`text-2xl hover:scale-125 transition-transform active:scale-90 ${selectedMood === 'happy' ? 'grayscale-0 scale-110' : 'grayscale hover:grayscale-0'}`}>😊</button>
-                  <button onClick={() => handleMoodSelect('neutral')} className={`text-2xl hover:scale-125 transition-transform active:scale-90 ${selectedMood === 'neutral' ? 'grayscale-0 scale-110' : 'grayscale hover:grayscale-0'}`}>😐</button>
-                  <button onClick={() => handleMoodSelect('sad')} className={`text-2xl hover:scale-125 transition-transform active:scale-90 ${selectedMood === 'sad' ? 'grayscale-0 scale-110' : 'grayscale hover:grayscale-0'}`}>😔</button>
+                <p className="text-2xl font-black text-slate-900 dark:text-white leading-none mb-1">{formatCurrency(monthlyExpenses, { maximumFractionDigits: 0 })}</p>
+                <p className="text-xs text-slate-400 font-medium">Ayakoreshejwe</p>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className={`w-1.5 h-1.5 rounded-full ${cashFlow >= 0 ? 'bg-teal-500' : 'bg-red-500'}`}></span>
+                  <p className={`text-[10px] font-bold ${cashFlow >= 0 ? 'text-teal-600 dark:text-teal-400' : 'text-red-600 dark:text-red-400'}`}>{cashFlow >= 0 ? '+' : ''}{formatCurrency(cashFlow, { maximumFractionDigits: 0 })}</p>
                 </div>
               </div>
             </div>
 
             {/* Bill Widget */}
-            <div className="snap-center shrink-0 w-40 bg-white dark:bg-slate-900 p-5 rounded-[2.2rem] border border-slate-100 dark:border-slate-800 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] dark:shadow-none flex flex-col justify-between h-44 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-              <div className="w-10 h-10 bg-blue-50 dark:bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center group-hover:rotate-6 transition-transform">
-                <Icons.Bell className="w-5 h-5" />
-              </div>
+            <div className="snap-center shrink-0 w-44 bg-white dark:bg-slate-900 p-5 rounded-[1.8rem] border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-between h-40 group hover:scale-[1.02] active:scale-[0.98] transition-all">
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">{t('dashboard.upNext')}</p>
               <div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">{t('dashboard.upNext')}</p>
-                <p className="font-bold text-slate-900 dark:text-white text-sm truncate leading-snug">{recurringStatus.title}</p>
-                <div className={`flex items-center gap-1.5 mt-1.5 w-fit px-2 py-1 rounded-md ${recurringStatus.status === 'Overdue' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-blue-50 dark:bg-blue-900/20'}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${recurringStatus.status === 'Overdue' ? 'bg-red-500' : 'bg-blue-500'}`}></span>
-                  <p className={`text-[10px] font-bold ${recurringStatus.status === 'Overdue' ? 'text-red-600 dark:text-red-300' : 'text-blue-600 dark:text-blue-300'}`}>{recurringStatus.status}</p>
+                <p className="font-bold text-slate-900 dark:text-white text-sm truncate leading-snug mb-1.5">{recurringStatus.title}</p>
+                <div className={`flex items-center gap-1.5 w-fit px-2 py-1 rounded-lg ${recurringStatus.status === 'Byarenze' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-slate-50 dark:bg-slate-800'}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${recurringStatus.status === 'Byarenze' ? 'bg-red-500 animate-pulse' : 'bg-slate-400'}`}></span>
+                  <p className={`text-[10px] font-bold ${recurringStatus.status === 'Byarenze' ? 'text-red-600 dark:text-red-300' : 'text-slate-500 dark:text-slate-400'}`}>{recurringStatus.status}</p>
                 </div>
               </div>
             </div>
+
+            {/* Add Transaction Widget - Functional */}
+            <button onClick={() => onNavigate(Tab.BUDGET)} className="snap-center shrink-0 w-44 bg-white dark:bg-slate-900 p-5 rounded-[1.8rem] border border-dashed border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center h-40 group hover:scale-[1.02] hover:border-brand hover:bg-brand/5 active:scale-[0.98] transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-3 group-hover:bg-brand/10 transition-colors">
+                <Icons.Plus className="w-6 h-6 text-slate-400 group-hover:text-brand transition-colors" />
+              </div>
+              <p className="text-xs font-bold text-slate-400 group-hover:text-brand transition-colors">{t('dashboard.addTransaction')}</p>
+            </button>
           </div>
         </div>
 
-        {/* Quick Actions - Updated to use Brand Orange for the 'Add' button */}
-        <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-5 px-1">{t('dashboard.quickActions')}</h3>
-          <div className="grid grid-cols-4 gap-4">
-            {[
-              // Made 'Add' action prominently Orange (Brand)
-              { label: t('dashboard.add'), icon: <Icons.Plus className="w-6 h-6" />, color: 'bg-brand/10 text-brand', hover: 'hover:bg-brand/20', action: () => onNavigate(Tab.BUDGET) },
-              { label: t('dashboard.send'), icon: <Icons.Send className="w-5 h-5 translate-x-0.5 -translate-y-0.5" />, color: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400', hover: 'hover:bg-indigo-100 dark:hover:bg-indigo-500/20', action: () => setShowSendModal(true) },
-              { label: t('dashboard.scan'), icon: <Icons.Scan className="w-5 h-5" />, color: 'bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400', hover: 'hover:bg-teal-100 dark:hover:bg-teal-500/20', action: () => setShowScanModal(true) },
-              { label: t('dashboard.more'), icon: <Icons.Dots className="w-6 h-6" />, color: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400', hover: 'hover:bg-slate-100 dark:hover:bg-slate-700', action: () => setShowMoreModal(true) }
-            ].map((action, i) => (
-              <button key={i} onClick={action.action} className="flex flex-col items-center gap-3 group active:scale-95 transition-transform duration-200">
-                <div className={`w-16 h-16 rounded-[1.2rem] ${action.color} flex items-center justify-center shadow-sm dark:shadow-none group-hover:shadow-md transition-all duration-300 ${action.hover}`}>
-                  {action.icon}
-                </div>
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{action.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
 
-        {/* Savings Goals */}
-        <div className="animate-slide-up pb-6" style={{ animationDelay: '0.3s' }}>
-          <div className="flex justify-between items-center mb-5 px-1">
-            <h3 className="text-base font-semibold text-slate-900 dark:text-white">{t('dashboard.savingsGoals')}</h3>
-            <button className="text-brand text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full hover:bg-brand/10 transition-colors">{t('dashboard.viewAll')}</button>
-          </div>
-          <div className="space-y-4">
-            {savingsGoals.map((goal) => (
-              <div key={goal.id} className="bg-white dark:bg-slate-900 p-5 rounded-[1.8rem] shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-none border border-slate-100 dark:border-slate-800 flex items-center justify-between group active:scale-[0.98] transition-all duration-300 hover:shadow-lg hover:shadow-slate-100 dark:hover:shadow-none cursor-pointer">
-                <div className="flex items-center space-x-5">
-                  <div className={`w-14 h-14 rounded-2xl ${goal.color} bg-opacity-10 dark:bg-opacity-10 flex items-center justify-center text-${goal.color.replace('bg-', '')} group-hover:scale-110 transition-transform`}>
-                    {getGoalIcon(goal.icon)}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-1">{goal.name}</h4>
-                    <div className="flex items-center gap-3">
-                      <div className="w-24 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div className={`h-full ${goal.color} rounded-full transition-all duration-1000`} style={{ width: `${(goal.current / goal.target) * 100}%` }}></div>
-                      </div>
-                      <span className="text-[10px] text-slate-400 font-bold">{Math.round((goal.current / goal.target) * 100)}%</span>
+        {/* Recent Transactions */}
+        {recentTransactions.length > 0 && (
+          <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <div className="flex justify-between items-center mb-4 px-1">
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">{t('dashboard.recentTransactions')}</h3>
+              <button onClick={() => onNavigate(Tab.BUDGET)} className="text-brand text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full hover:bg-brand/10 transition-colors">{t('dashboard.viewAll')}</button>
+            </div>
+            <div className="bg-white dark:bg-slate-900 rounded-[1.8rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+              {recentTransactions.slice(0, 4).map((tx, idx) => (
+                <div 
+                  key={tx.id} 
+                  onClick={() => onNavigate(Tab.BUDGET)}
+                  className={`flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${idx !== recentTransactions.slice(0, 4).length - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tx.type === 'income' ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
+                      {tx.type === 'income' ? (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" transform="rotate(180 12 12)" /></svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{tx.title}</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{new Date(tx.date).toLocaleDateString('rw-RW', { day: 'numeric', month: 'short' })}</p>
                     </div>
                   </div>
+                  <span className={`text-sm font-bold ${tx.type === 'income' ? 'text-teal-600 dark:text-teal-400' : 'text-slate-900 dark:text-white'}`}>
+                    {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, { maximumFractionDigits: 0 })}
+                  </span>
                 </div>
-                <span className="text-sm font-bold text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-100 dark:border-slate-700">${goal.current.toLocaleString()}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Savings Goals - Clickable */}
+        {savingsGoals.length > 0 && (
+          <div className="animate-slide-up pb-6" style={{ animationDelay: '0.3s' }}>
+            <div className="flex justify-between items-center mb-4 px-1">
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">{t('dashboard.savingsGoals')}</h3>
+              <button onClick={() => onNavigate(Tab.BUDGET)} className="text-brand text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full hover:bg-brand/10 transition-colors">{t('dashboard.viewAll')}</button>
+            </div>
+            <div className="space-y-3">
+              {savingsGoals.slice(0, 3).map((goal) => (
+                <div 
+                  key={goal.id} 
+                  onClick={() => onNavigate(Tab.BUDGET)}
+                  className="bg-white dark:bg-slate-900 p-4 rounded-[1.8rem] shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between group active:scale-[0.98] transition-all cursor-pointer hover:border-slate-200 dark:hover:border-slate-700"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:scale-105 transition-transform">
+                      {getGoalIcon(goal.icon)}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-1">{goal.name}</h4>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-slate-900 dark:bg-white rounded-full transition-all duration-1000" style={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }}></div>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-bold">{Math.round((goal.current / goal.target) * 100)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(goal.current)}</span>
+                    <p className="text-[10px] text-slate-400">/ {formatCurrency(goal.target)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -16,6 +16,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@supabase/supabase-js": "^2.86.0",
+    "framer-motion": "^12.23.25",
     "immer": "^11.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

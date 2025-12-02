@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '../hooks/useTranslation';
 import { Tab } from '../types';
 
@@ -32,40 +33,87 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
             )
         },
         {
-            id: Tab.LEARN, label: t('common.learn'), icon: (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+            id: Tab.PROFILE, label: t('common.profile'), icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 18.75a7.5 7.5 0 0115 0" /></svg>
             )
         },
     ];
 
     return (
-        <div className="absolute bottom-8 left-0 w-full px-6 z-50 pointer-events-none">
-            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-[2.5rem] py-3 px-2 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.6)] pointer-events-auto flex justify-between items-center border border-white/50 dark:border-white/5 transition-colors duration-500">
-                {navItems.map((item) => {
-                    const isActive = activeTab === item.id;
-                    return (
-                        <button
-                            key={item.id}
-                            onClick={() => onTabChange(item.id)}
-                            className="relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 group"
-                        >
-                            {/* Active Pill Indicator - Updated to Brand Orange */}
-                            {isActive && (
-                                <span className="absolute inset-0 bg-gradient-to-tr from-brand/10 to-brand/5 dark:from-brand/20 dark:to-brand/5 rounded-2xl animate-scale-in"></span>
-                            )}
+        <motion.div
+            className="absolute bottom-8 left-0 w-full px-3 z-50 pointer-events-none"
+            initial={{ y: 96, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 28, delay: 0.15 }}
+        >
+            <motion.div
+                className="relative pointer-events-auto mx-auto max-w-sm"
+                whileHover={{ scale: 1.015 }}
+                transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+            >
+                <div className="absolute inset-0 rounded-[2.25rem] bg-gradient-to-br from-[#FF8A3D] via-[#FF6B3D] to-[#FFB347] shadow-[0_18px_50px_-24px_rgba(255,107,61,0.6)]" />
+                <div className="absolute inset-0 rounded-[2.25rem] bg-white/18 backdrop-blur-xl border border-white/35" />
+                <div className="relative flex items-center justify-between px-2.5 py-2.5 gap-1">
+                    {navItems.map((item, index) => {
+                        const isActive = activeTab === item.id;
+                        return (
+                            <motion.button
+                                key={item.id}
+                                onClick={() => onTabChange(item.id)}
+                                className="relative flex flex-col items-center justify-center w-12 h-12"
+                                whileTap={{ scale: 0.92 }}
+                                initial={{ opacity: 0, y: 18 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{
+                                    type: 'spring',
+                                    stiffness: 420,
+                                    damping: 30,
+                                    delay: 0.25 + index * 0.05,
+                                }}
+                            >
+                                <AnimatePresence>
+                                    {isActive && (
+                                        <motion.span
+                                            layoutId="nav-active-pill"
+                                            className="absolute inset-0 rounded-2xl bg-white/22 border border-white/40 shadow-[0_15px_30px_rgba(15,23,42,0.12)]"
+                                            initial={{ opacity: 0, scale: 0.75 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.75 }}
+                                            transition={{ type: 'spring', stiffness: 480, damping: 32 }}
+                                        />
+                                    )}
+                                </AnimatePresence>
 
-                            {/* Icon */}
-                            <div className={`relative z-10 transition-all duration-500 ${isActive ? 'text-brand -translate-y-1' : 'text-slate-400 dark:text-slate-500 group-active:scale-95'}`}>
-                                {item.icon}
-                            </div>
+                                <motion.div
+                                    className={`relative z-10 flex items-center justify-center ${isActive ? 'text-white' : 'text-white/70'}`}
+                                    animate={{ y: isActive ? -4 : 0, scale: isActive ? 1.08 : 1 }}
+                                    transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+                                >
+                                    {item.icon}
+                                </motion.div>
 
-                            {/* Active Dot - Updated to Brand Orange */}
-                            <div className={`absolute bottom-2 w-1 h-1 rounded-full bg-brand transition-all duration-500 ${isActive ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}></div>
-                        </button>
-                    )
-                })}
-            </div>
-        </div>
+                                <AnimatePresence>
+                                    {isActive && (
+                                        <motion.div
+                                            className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-white"
+                                            initial={{ scale: 0, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            exit={{ scale: 0, opacity: 0 }}
+                                            transition={{ type: 'spring', stiffness: 480, damping: 28 }}
+                                        />
+                                    )}
+                                </AnimatePresence>
+
+                                <motion.span
+                                    className="absolute inset-0 rounded-2xl"
+                                    whileTap={{ backgroundColor: 'rgba(255,255,255,0.2)', transition: { duration: 0.12 } }}
+                                />
+                            </motion.button>
+                        );
+                    })}
+                </div>
+            </motion.div>
+        </motion.div>
     );
 };
 

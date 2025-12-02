@@ -74,7 +74,9 @@ const Icons = {
   ChartBar: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>,
   Book: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>,
   Brain: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>,
-  Pen: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+  Pen: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>,
+  Male: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="10" cy="14" r="4" strokeWidth={1.8} /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13.5 10.5l7-7M20.5 3.5h-5M20.5 3.5v5" /></svg>,
+  Female: (props: any) => <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="9.5" r="4.5" strokeWidth={1.8} /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 14v6M9 19h6" /></svg>,
 };
 
 const KegelTimer = () => {
@@ -313,39 +315,63 @@ const SexualHealth: React.FC = () => {
   const dashboardCards = [
     {
       id: 'mental',
-      title: 'Mental Health',
-      subtitle: 'Mood tracking, meditation, and guided support.',
-      image: 'https://images.unsplash.com/photo-1544367563-12123d8250a6?auto=format&fit=crop&q=80&w=800',
+      title: 'Mental Health Support',
+      subtitle: 'Find guidance and resources to support your wellbeing.',
+      cta: 'Learn More',
+      icon: 'Brain' as const,
+      iconBg: 'bg-[#FFDAB9]/40 text-[#FF7A1C]',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCfWj8Wr-VYsgwzhZal_ONQ8LtyX6FSXsS9RAAglcdtdAx7_aNYfMLpVoWGAX2hREy367qmykuyYx05gaZmKrim-rIpqO1ATVEt99BXMCRm_qNneco404KndFceTQ90LZYHSc_j0Y2fW1jngkouxu87yE9tBqUyUbs3dHWqwZIoAgH8sZhBx8o-bCbKyGbIRk1Ptpj78U96T8WMh-r9AcWg_ZZ9YXa_ZpUiA4Dxb_6kE61dg5FGDzCRj1xJTFm7b97byxA8C8Cyn3U',
+      imageAlt: 'Illustration of a person meditating in nature symbolizing mental wellness.',
+      imageBg: 'bg-[#FFDAB9]/35',
       action: () => setView('MENTAL_HEALTH_VIEW'),
     },
     {
-      id: 'womens',
-      title: 'Women\'s Cycle & Wellness',
-      subtitle: 'Sync your life with your natural rhythm.',
-      image: 'https://images.unsplash.com/photo-1518544806876-4927f8728d22?auto=format&fit=crop&q=80&w=800',
-      action: () => setView('WOMENS_HEALTH')
-    },
-    {
-      id: 'mens',
-      title: 'Men\'s Health & Vitality',
-      subtitle: 'Hormones, screening, and preventative care.',
-      image: 'https://images.unsplash.com/photo-1552674605-469523254d5d?auto=format&fit=crop&q=80&w=800',
-      action: () => setView('MENS_HEALTH_VIEW')
-    },
-    {
       id: 'contraception',
-      title: 'Contraception Guide',
-      subtitle: 'Compare methods, track reminders, and monitor side effects.',
-      image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800',
+      title: 'Understanding Contraception',
+      subtitle: "Explore different methods and find what's right for you.",
+      cta: 'Learn More',
+      icon: 'Shield' as const,
+      iconBg: 'bg-[#FFDAB9]/40 text-[#FF9500]',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAv9eKUvF9G7gPr3ggKbg1CoJ-PGUc-XtNfFcG0wAxfJ5iBLDl3HihiPxVQz3m50BsK3-oxZU6J1TjroZXDB4X_O3o-hv_y9igGuXita-DXCvbZpT9OCIfHm04yuOstWYpMxemZmUEEakqW85LpXFMWyg8n6hImyA6k0qWYyz4m-SeEbRGmofgA87PvA643VNtFNTEEbaTbwyLoXBu0RsyqEYzIyeyIPsuD1iZoEw1XW7znTi5tJeVUX6sWt5Uornb-6KPeX7CNwb4',
+      imageAlt: 'Abstract illustration of different contraceptive methods in soft peach and blue tones.',
+      imageBg: 'bg-[#B0E0E6]/30',
       action: () => setView('CONTRACEPTION_GUIDE'),
-      badge: 'Tools'
     },
     {
       id: 'family',
       title: 'Planning for a Family',
-      subtitle: 'Fertility awareness and preparation.',
-      image: 'https://images.unsplash.com/photo-1635652434575-b91c4912234e?auto=format&fit=crop&q=80&w=800',
-      action: () => { setActiveArticle('planning'); setView('ARTICLE_VIEW'); }
+      subtitle: 'Resources and support for your journey to parenthood.',
+      cta: 'Learn More',
+      icon: 'UserPlus' as const,
+      iconBg: 'bg-[#FFE2D5]/45 text-[#FF6B3D]',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB-Y694N-6I_QDJAtNbTba7QN2gUnkU1Sf9q2msvZGBN7DKSkeL0nJtZQp8lrC8ZYsMYPYcoqN91kUHQddtqBFGMsqHgB07yzHwwLxZSmZSJR1EbEae3koqzGeTxX7zEQn29J08Yo3sOBCX031_D_odruOWAm02ULmSMd6ImmeU81B50h1vOkKlASDmeKO3WWqRKI7XCTj1_6yKvqJhVwBeVSl5Zrv31tqJ6cjuQK8qUsAA1kGitIicyOwAbZy_EP_5gWAICio7-mU',
+      imageAlt: 'Calming illustration of a couple planning their future in peach and blue hues.',
+      imageBg: 'bg-[#B0E0E6]/30',
+      action: () => { setActiveArticle('planning'); setView('ARTICLE_VIEW'); },
+    },
+    {
+      id: 'mens',
+      title: "Men's Reproductive Health",
+      subtitle: 'Information on health, wellness, and preventative care.',
+      cta: 'Learn More',
+      icon: 'Male' as const,
+      iconBg: 'bg-[#FFDAB9]/35 text-[#2563EB]',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBenVMuDCMT1GgC_J5KgOd9CwYdJtC5BJ5PZvbM2BDDCh7awvd29VIg2V45ArvvN5lQK1KGvkHwja0v3xC0hq9vaGjz-DRl8NQOK-D2dJ7Vqzt9o5fV5V8S3DWJr9ahCZHvRlaj5nVevPgYZPsYK3Avca1CqGWTIcB4HpqF_RsRoCKpqMviSZG6bR0WoxeneCu4R-drljH-p5mU_KRp-TwuXKs1xGJ64MDzBj9ALenF_-4WtjfJE44Yv82oSp6If8rN_yW3-vPBr5A',
+      imageAlt: "Modern illustration of a confident young man promoting men's health.",
+      imageBg: 'bg-[#FFDAB9]/30',
+      action: () => setView('MENS_HEALTH_VIEW'),
+    },
+    {
+      id: 'womens',
+      title: "Women's Reproductive Health",
+      subtitle: 'Guidance on cycles, health screenings, and more.',
+      cta: 'Learn More',
+      icon: 'Female' as const,
+      iconBg: 'bg-[#FFE2F2]/45 text-[#D946EF]',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCNdM0AGZDhQS2qvyp08uKmBmqpYocEGxlowZjBpwfP5Uj2pSfu4572EOfFgBzUJIVwc2IP9F2IjrBDAFZXE1vFmp-_CyHqsoXamjIrOwhDyMfrNDAHsrMWBHRu0cCApmKa1dRbvlVxKIVmoC7EiANyYul8gCTHRVCZ_ohoq6bxAC87LvCjNbTCynicHIGmBHFhUkcXi_H4S547hmchdVr43blj4sefeX19gAOS-efP6i9xMyPkEfw5TLgBRZEA_0raXaVOmPqUCBw',
+      imageAlt: "Modern illustration of a thoughtful young woman promoting women's wellness.",
+      imageBg: 'bg-[#B0E0E6]/25',
+      action: () => setView('WOMENS_HEALTH'),
     },
   ];
 
@@ -425,7 +451,7 @@ const SexualHealth: React.FC = () => {
                 <div className="flex justify-between items-center mb-6">
                   <div>
                     <h3 className="font-bold text-slate-900 dark:text-white">Weekly Mood</h3>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Last 7 Days</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Last 7 Days</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-teal-500"></div>
@@ -480,7 +506,7 @@ const SexualHealth: React.FC = () => {
             <div className="space-y-8 animate-slide-up flex flex-col items-center">
               <div className="w-full bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 flex flex-col items-center text-center relative overflow-hidden">
                 <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-6">Breathing Timer</h3>
-                <div className="flex gap-2 mb-8">{[{ id: 'SILENCE', label: 'Quiet' }, { id: 'RAIN', label: 'Rain' }, { id: 'NATURE', label: 'Forest' }].map(s => (<button key={s.id} onClick={() => setSoundscape(s.id)} className={`px-4 py-2 rounded-full text-[10px] font-bold border transition-all ${soundscape === s.id ? 'bg-teal-500 text-white border-teal-500' : 'text-slate-500 border-slate-200 dark:border-slate-700'}`}>{s.label}</button>))}</div>
+                <div className="flex gap-2 mb-8">{[{ id: 'SILENCE', label: 'Quiet' }, { id: 'RAIN', label: 'Rain' }, { id: 'NATURE', label: 'Forest' }].map(s => (<button key={s.id} onClick={() => setSoundscape(s.id)} className={`px-4 py-2 rounded-full text-[10px] font-bold border transition-all ${soundscape === s.id ? 'bg-teal-500 text-white border-teal-500' : 'text-slate-500 border-slate-200 dark:border-slate-700 hover:border-teal-200'}`}>{s.label}</button>))}</div>
                 <div className="w-64 h-64 rounded-full border-8 border-slate-50 dark:border-slate-800 flex items-center justify-center relative mb-8">{meditationActive && (<><div className="absolute inset-0 rounded-full border-4 border-teal-500 opacity-20 animate-ping" style={{ animationDuration: '4s' }}></div><div className="absolute inset-0 rounded-full border-t-4 border-teal-500 animate-spin" style={{ animationDuration: '4s' }}></div></>)}<div><span className="block text-5xl font-black text-slate-900 dark:text-white tabular-nums">{formatTime(meditationTime)}</span><span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 block">{meditationActive ? 'Inhale... Exhale' : 'Ready'}</span></div></div>
                 <button onClick={() => setMeditationActive(!meditationActive)} className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg transition-transform active:scale-90 ${meditationActive ? 'bg-slate-300 text-slate-500' : 'bg-teal-500'}`}>{meditationActive ? <Icons.Pause className="w-6 h-6" /> : <Icons.Play className="w-6 h-6 ml-1" />}</button>
               </div>
@@ -488,8 +514,11 @@ const SexualHealth: React.FC = () => {
             </div>
           )}
           {mentalTab === 'LIBRARY' && !readingArticle && (<div className="space-y-6 animate-slide-up"><div className="space-y-4">{articles.map(article => (<div key={article.id} onClick={() => setReadingArticle(article)} className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm flex gap-4 cursor-pointer active:scale-[0.98] transition-all group"><div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl shrink-0 flex items-center justify-center text-2xl group-hover:bg-teal-50 dark:group-hover:bg-teal-900/20 transition-colors">{article.category === 'Sleep' ? '💤' : article.category === 'Money' ? '💸' : article.category === 'Family' ? '🏠' : '🩺'}</div><div><h3 className="font-bold text-slate-900 dark:text-white leading-tight mb-1">{article.title}</h3><p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{article.desc}</p></div></div>))}</div></div>)}
-          {readingArticle && (<div className="animate-slide-up"><button onClick={() => setReadingArticle(null)} className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"><Icons.Back className="w-5 h-5" /> Back to Library</button><div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm"><h1 className="text-2xl font-black text-slate-900 dark:text-white mb-6 leading-tight">{readingArticle.title}</h1><div className="prose prose-slate dark:prose-invert prose-sm"><p className="leading-relaxed">This is a placeholder for the full article content.</p></div></div></div>)}
-          {mentalTab === 'JOURNAL' && (<div className="space-y-6 animate-slide-up"><div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">{showJournalSuccess && (<div className="absolute top-0 left-0 w-full bg-green-500 text-white text-xs font-bold py-2 text-center animate-fade-in z-20">Entry Saved Successfully!</div>)}<div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-2xl mb-4 relative"><p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Writing Prompt</p><p className="text-indigo-900 dark:text-indigo-200 font-medium text-sm leading-relaxed pr-8">"{activePrompt}"</p><button onClick={shufflePrompt} className="absolute top-4 right-4 text-indigo-400 hover:text-indigo-600 dark:hover:text-white transition-colors"><Icons.Refresh className="w-4 h-4" /></button></div><textarea value={journalEntry} onChange={(e) => setJournalEntry(e.target.value)} placeholder="Start writing here..." className="w-full h-40 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl resize-none outline-none focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900/40 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 transition-all border border-slate-100 dark:border-slate-700" /><div className="flex justify-between items-center mt-4"><span className="text-xs text-slate-400 font-medium">{new Date().toLocaleDateString()}</span><button onClick={handleSaveJournal} className="px-6 py-3 bg-slate-900 dark:bg-purple-600 text-white rounded-xl font-bold text-xs shadow-lg shadow-purple-200 dark:shadow-purple-900/30 active:scale-95 transition-transform flex items-center gap-2"><Icons.Check className="w-4 h-4" /> Save Entry</button></div></div><div className="space-y-4"><h3 className="font-bold text-slate-400 dark:text-slate-500 text-xs uppercase tracking-widest px-2">Recent Reflections</h3>{journalHistory.length === 0 ? (<div className="text-center py-10 opacity-50 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem]"><p className="text-sm font-medium text-slate-500">No entries yet. Start writing!</p></div>) : (journalHistory.map((entry) => (<div key={entry.id} className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] relative group"><div className="flex justify-between items-start mb-3"><div className="flex gap-2"><span className="text-[10px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">{entry.date.toLocaleDateString()}</span></div><button onClick={() => deleteJournal(entry.id)} className="text-slate-300 hover:text-red-500 transition-colors"><Icons.Trash className="w-4 h-4" /></button></div><p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium whitespace-pre-wrap">{entry.text}</p></div>)))}</div></div>)}
+          {readingArticle && (<div className="animate-slide-up"><button onClick={() => setReadingArticle(null)} className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors bg-white dark:bg-slate-900 px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:border-slate-800 w-fit">
+            <Icons.Back className="w-5 h-5" />
+            Back to Library
+          </button><div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm"><h1 className="text-2xl font-black text-slate-900 dark:text-white mb-6 leading-tight">{readingArticle.title}</h1><div className="prose prose-slate dark:prose-invert prose-sm"><p className="leading-relaxed">This is a placeholder for the full article content.</p></div></div></div>)}
+          {mentalTab === 'JOURNAL' && (<div className="space-y-6 animate-slide-up"><div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">{showJournalSuccess && (<div className="absolute top-0 left-0 w-full bg-green-500 text-white text-xs font-bold py-2 text-center animate-fade-in z-20">Entry Saved Successfully!</div>)}<div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-2xl mb-4 relative"><p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Writing Prompt</p><p className="text-indigo-900 dark:text-indigo-200 font-medium text-sm leading-relaxed pr-8">"{activePrompt}"</p><button onClick={shufflePrompt} className="absolute top-4 right-4 text-indigo-400 hover:text-indigo-600 dark:hover:text-white transition-colors"><Icons.Refresh className="w-4 h-4" /></button></div><textarea value={journalEntry} onChange={(e) => setJournalEntry(e.target.value)} placeholder="Start writing here..." className="w-full h-40 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl resize-none outline-none focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900/40 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 transition-all border border-slate-100 dark:border-slate-700" /><div className="flex justify-between mt-4"><span className="text-xs text-slate-400 font-medium">{new Date().toLocaleDateString()}</span><button onClick={handleSaveJournal} className="px-6 py-3 bg-slate-900 dark:bg-purple-600 text-white rounded-xl font-bold text-xs shadow-lg shadow-purple-200 dark:shadow-purple-900/30 active:scale-95 transition-transform flex items-center gap-2"><Icons.Check className="w-4 h-4" /> Save Entry</button></div></div><div className="space-y-4"><h3 className="font-bold text-slate-400 dark:text-slate-500 text-xs uppercase tracking-widest px-2">Recent Reflections</h3>{journalHistory.length === 0 ? (<div className="text-center py-10 opacity-50 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem]"><p className="text-sm font-medium text-slate-500">No entries yet. Start writing!</p></div>) : (journalHistory.map((entry) => (<div key={entry.id} className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-none relative group"><div className="flex justify-between items-start mb-3"><div className="flex gap-2"><span className="text-[10px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">{entry.date.toLocaleDateString()}</span></div><button onClick={() => deleteJournal(entry.id)} className="text-slate-300 hover:text-red-500 transition-colors"><Icons.Trash className="w-4 h-4" /></button></div><p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium whitespace-pre-wrap">{entry.text}</p></div>)))}</div></div>)}
           {mentalTab === 'SUPPORT' && (<div className="space-y-6 animate-slide-up"><div className="bg-slate-900 dark:bg-white p-8 rounded-[2.5rem] text-center shadow-xl"><h2 className="text-2xl font-bold text-white dark:text-slate-900 mb-2">You are not alone.</h2><p className="text-slate-300 dark:text-slate-600 text-sm mb-8 leading-relaxed">Asking for help is a sign of strength, not weakness.</p><div className="grid grid-cols-1 gap-3"><a href="tel:988" className="flex items-center justify-center gap-3 py-4 bg-red-500 text-white rounded-2xl font-bold shadow-lg shadow-red-500/30 active:scale-95 transition-transform">Call Crisis Line (988)</a></div></div></div>)}
           {isCheckInOpen && (<div className="fixed inset-0 z-50 flex items-end justify-center"><div className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-fade-in" onClick={() => { if (checkInStep === 0) setIsCheckInOpen(false); }}></div><div className="bg-white dark:bg-slate-900 w-full max-w-lg h-[85vh] rounded-t-[2.5rem] shadow-2xl animate-slide-up relative z-10 flex flex-col overflow-hidden"><div className="p-6 flex justify-between items-center"><button onClick={() => { if (checkInStep > 0) setCheckInStep(checkInStep - 1); else setIsCheckInOpen(false); }}><Icons.Back className="w-6 h-6 text-slate-400" /></button><span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Step {checkInStep + 1} of 4</span><button onClick={() => setIsCheckInOpen(false)}><Icons.Close className="w-6 h-6 text-slate-400" /></button></div><div className="flex-1 p-8 flex flex-col items-center justify-center text-center animate-fade-in">{checkInStep === 0 && (<><h2 className="text-3xl font-black text-slate-900 dark:text-white mb-8">How was your day?</h2><div className="flex flex-col gap-4 w-full max-w-xs">{[{ lvl: 5, label: 'Really Good', emoji: '🤩' }, { lvl: 4, label: 'Good', emoji: '🙂' }, { lvl: 3, label: 'Okay', emoji: '😐' }, { lvl: 2, label: 'Tough', emoji: '😔' }, { lvl: 1, label: 'Terrible', emoji: '😫' }].map(opt => (<button key={opt.lvl} onClick={() => { setCurrentMood(opt.lvl); setCheckInStep(1); }} className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between hover:scale-105 ${currentMood === opt.lvl ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20' : 'border-slate-100 dark:border-slate-800 hover:border-teal-200'}`}><span className="font-bold text-slate-700 dark:text-slate-200">{opt.label}</span><span className="text-2xl">{opt.emoji}</span></button>))}</div></>)}{checkInStep === 1 && (<><h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Physical Check</h2><div className="flex flex-wrap justify-center gap-3">{['Fatigue', 'Back Pain', 'Headache', 'Energetic', 'Relaxed', 'Tension'].map(tag => (<button key={tag} onClick={() => currentPhysical.includes(tag) ? setCurrentPhysical(currentPhysical.filter(t => t !== tag)) : setCurrentPhysical([...currentPhysical, tag])} className={`px-6 py-3 rounded-full text-sm font-bold transition-all border-2 ${currentPhysical.includes(tag) ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900' : 'border-slate-200 dark:border-slate-800 text-slate-500'}`}>{tag}</button>))}</div><button onClick={() => setCheckInStep(2)} className="mt-12 px-8 py-4 bg-teal-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">Next Step</button></>)}{checkInStep === 2 && (<><h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">What's affecting you?</h2><div className="flex flex-wrap justify-center gap-3">{['Work', 'Money', 'Family', 'Health'].map(tag => (<button key={tag} onClick={() => currentFactors.includes(tag) ? setCurrentFactors(currentFactors.filter(t => t !== tag)) : setCurrentFactors([...currentFactors, tag])} className={`px-6 py-3 rounded-full text-sm font-bold transition-all border-2 ${currentFactors.includes(tag) ? 'bg-indigo-600 text-white border-indigo-600' : 'border-slate-200 dark:border-slate-800 text-slate-500'}`}>{tag}</button>))}</div><button onClick={() => setCheckInStep(3)} className="mt-12 px-8 py-4 bg-teal-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">Next Step</button></>)}{checkInStep === 3 && (<><h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Final Thoughts</h2><textarea value={currentNote} onChange={e => setCurrentNote(e.target.value)} placeholder="Optional note..." className="w-full h-32 bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 mb-8 resize-none focus:ring-2 focus:ring-teal-500 outline-none" /><button onClick={finishCheckIn} className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold shadow-xl active:scale-95 transition-transform">Complete Check-in</button></>)}</div></div></div>)}
         </div>
@@ -979,7 +1008,7 @@ const SexualHealth: React.FC = () => {
                 { id: 'PELVIC', label: 'Pelvic', icon: <Icons.Chip className="w-5 h-5" />, color: 'bg-teal-100 text-teal-600' },
               ].map(item => (
                 <button key={item.id} onClick={() => navigateToResource(item.id as WomensResourceView)} className="flex flex-col items-center gap-2 group">
-                  <div className={`w-14 h-14 rounded-2xl ${item.color} flex items-center justify-center shadow-sm group-active:scale-90 transition-transform`}>
+                  <div className={`w-14 h-14 rounded-2xl ${item.color} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
                     {item.icon}
                   </div>
                   <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">{item.label}</span>
@@ -991,8 +1020,7 @@ const SexualHealth: React.FC = () => {
               <div className="relative z-10 flex flex-col items-center">
                 <span className="text-rose-500 font-extrabold tracking-widest uppercase text-[10px] mb-6 bg-white dark:bg-slate-900 px-3 py-1 rounded-full shadow-sm">Igihe cya Follicular</span>
                 <div className="w-48 h-48 relative flex items-center justify-center mb-6">
-                  <svg className="absolute w-full h-full transform -rotate-90">
-                    <circle cx="96" cy="96" r="88" stroke="#ffe4e6" strokeWidth="12" fill="transparent" className="dark:stroke-rose-900/20" />
+                  <svg className="absolute w-full h-full transform -rotate-90"><circle cx="96" cy="96" r="88" stroke="#ffe4e6" strokeWidth="12" fill="transparent" className="dark:stroke-rose-900/20" />
                     <circle cx="96" cy="96" r="88" stroke="#f43f5e" strokeWidth="12" fill="transparent" strokeDasharray="552" strokeDashoffset="380" strokeLinecap="round" className="transition-all duration-1000 ease-out" />
                   </svg>
                   <div className="text-center">
@@ -1353,26 +1381,49 @@ const SexualHealth: React.FC = () => {
       {view === 'DASHBOARD' && (
         <div className="p-6 grid grid-cols-1 gap-8 animate-slide-up">
           {dashboardCards.map(card => (
-            <div key={card.id} onClick={card.action} className="bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] dark:shadow-none cursor-pointer group active:scale-[0.98] transition-all relative border border-slate-100 dark:border-slate-800">
-              {card.badge && (
-                <div className="absolute top-5 right-5 bg-teal-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg z-10 animate-pulse-slow">
-                  {card.badge}
+              <div
+                key={card.id}
+                role="button"
+                tabIndex={0}
+                onClick={card.action}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.action?.();
+                  }
+                }}
+                className="rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-[0_4px_12px_rgba(15,23,42,0.08)] p-5 flex flex-col gap-4 transition-transform active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF9500] cursor-pointer"
+              >
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+                    {card.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1">
+                    {card.subtitle}
+                  </p>
                 </div>
-              )}
-              <div className="h-48 overflow-hidden relative">
-                <img src={card.image} alt={card.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                <div className="absolute bottom-5 left-5 text-white">
-                  <h3 className="font-bold text-2xl tracking-tight">{card.title}</h3>
+
+                <div className={`relative h-24 rounded-xl overflow-hidden ${card.imageBg || 'bg-slate-100 dark:bg-slate-800'}`}>
+                  <img
+                    src={card.image}
+                    alt={card.imageAlt || card.title}
+                    className="w-full h-full object-cover rounded-xl"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      card.action?.();
+                    }}
+                    className="text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full text-white bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 border border-white/10 shadow-sm hover:shadow-md transition-all"
+                  >
+                    {card.cta}
+                  </button>
                 </div>
               </div>
-              <div className="p-6 flex justify-between items-center">
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed pr-4">{card.subtitle}</p>
-                <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 dark:group-hover:bg-teal-500 group-hover:text-white transition-colors shrink-0">
-                  <Icons.ChevronRight className="w-5 h-5" />
-                </div>
-              </div>
-            </div>
           ))}
         </div>
       )}

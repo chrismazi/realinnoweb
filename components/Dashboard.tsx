@@ -34,14 +34,28 @@ const getGoalIcon = (iconName: string) => {
   }
 };
 
-const formatCurrency = (value: number, options?: Intl.NumberFormatOptions) =>
-  new Intl.NumberFormat('en-US', {
+// Smart currency formatter that abbreviates large numbers
+const formatCurrency = (value: number, options?: Intl.NumberFormatOptions & { compact?: boolean }) => {
+  const { compact, ...intlOptions } = options || {};
+  
+  // For large numbers, use compact notation
+  if (compact || Math.abs(value) >= 1000000) {
+    if (Math.abs(value) >= 1000000) {
+      return `RWF ${(value / 1000000).toFixed(1)}M`;
+    }
+    if (Math.abs(value) >= 100000) {
+      return `RWF ${(value / 1000).toFixed(0)}K`;
+    }
+  }
+  
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'RWF',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-    ...options,
+    ...intlOptions,
   }).format(value);
+};
 
 const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   // Get real data from store
@@ -71,11 +85,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   }, []);
 
 
-  // Calculate today's spending
+  // Calculate today's spending (excluding savings contributions)
   const todaySpending = useMemo(() => {
     const today = new Date().toDateString();
+    const excludedCategories = ['Kuzigama', 'savings_contribution'];
     return transactions
-      .filter(t => t.type === 'expense' && new Date(t.date).toDateString() === today)
+      .filter(t => t.type === 'expense' && new Date(t.date).toDateString() === today && !excludedCategories.includes(t.category))
       .reduce((sum, t) => sum + t.amount, 0);
   }, [transactions]);
 
@@ -92,12 +107,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     return saved ? { ...defaultLimits, ...JSON.parse(saved) } : defaultLimits;
   }, []);
 
-  // Calculate today's spending by category
+  // Calculate today's spending by category (excluding savings contributions)
   const todaySpendingByCategory = useMemo(() => {
     const today = new Date().toDateString();
     const spending: Record<string, number> = {};
+    const excludedCategories = ['Kuzigama', 'savings_contribution'];
     transactions
-      .filter(t => t.type === 'expense' && new Date(t.date).toDateString() === today)
+      .filter(t => t.type === 'expense' && new Date(t.date).toDateString() === today && !excludedCategories.includes(t.category))
       .forEach(tx => {
         spending[tx.category] = (spending[tx.category] || 0) + tx.amount;
       });
@@ -229,8 +245,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   const topSpendingCategory = useMemo(() => {
     const categoryTotals: Record<string, number> = {};
+    // Exclude savings contributions from top spending calculation
+    const excludedCategories = ['Kuzigama', 'savings_contribution'];
     transactions.forEach((tx) => {
       if (tx.type !== 'expense') return;
+      if (excludedCategories.includes(tx.category)) return;
       categoryTotals[tx.category] = (categoryTotals[tx.category] || 0) + tx.amount;
     });
     const sorted = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
@@ -427,17 +446,18 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               </button>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-2xl border border-slate-100 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/40">
-                <div>
+              <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/40">
+                <div className="min-w-0 flex-1">
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Amafaranga yinjiye</p>
-                  <p className={`text-2xl font-bold mt-1 ${cashFlow >= 0 ? 'text-teal-500' : 'text-red-500'}`}>
+                  <p className={`text-xl font-bold mt-1 truncate ${cashFlow >= 0 ? 'text-teal-500' : 'text-red-500'}`}>
                     {cashFlow >= 0 ? '+' : '-'}{formatCurrency(Math.abs(cashFlow))}
                   </p>
-                  <span className="text-[10px] text-slate-400 font-bold">Ayinjiye {formatCurrency(monthlyIncome)} • Ayasohotse {formatCurrency(monthlyExpenses)}</span>
+                  <p className="text-[10px] text-slate-400 font-bold truncate">Ayinjiye {formatCurrency(monthlyIncome)}</p>
+                  <p className="text-[10px] text-slate-400 font-bold truncate">Ayasohotse {formatCurrency(monthlyExpenses)}</p>
                 </div>
-                <div className="w-24 h-24 rounded-full border-4 border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center">
-                  <span className="text-xs font-bold text-slate-400">Ibizigamwe</span>
-                  <strong className="text-base text-slate-900 dark:text-white">{formatCurrency(totalSavings)}</strong>
+                <div className="w-20 h-20 shrink-0 rounded-full border-4 border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center">
+                  <span className="text-[10px] font-bold text-slate-400">Ibizigamwe</span>
+                  <strong className="text-sm text-slate-900 dark:text-white truncate max-w-[70px]">{formatCurrency(totalSavings)}</strong>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -459,14 +479,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </div>
               </div>
               {topSpendingCategory && (
-                <div className="rounded-2xl border border-slate-100 dark:border-slate-800 p-4 flex items-center justify-between bg-slate-50 dark:bg-slate-900/40">
-                  <div>
+                <div className="rounded-2xl border border-slate-100 dark:border-slate-800 p-4 flex items-center justify-between gap-4 bg-slate-50 dark:bg-slate-900/40">
+                  <div className="min-w-0 flex-1">
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Icyiciro cya mbere</p>
-                    <p className="font-bold text-slate-900 dark:text-white text-lg">{topSpendingCategory.name}</p>
+                    <p className="font-bold text-slate-900 dark:text-white text-base truncate">{topSpendingCategory.name}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     <p className="text-xs text-slate-400">Byakoreshejwe</p>
-                    <p className="text-xl font-bold text-slate-900 dark:text-white">{formatCurrency(topSpendingCategory.amount, { maximumFractionDigits: 0 })}</p>
+                    <p className="text-lg font-bold text-slate-900 dark:text-white">{formatCurrency(topSpendingCategory.amount, { maximumFractionDigits: 0 })}</p>
                   </div>
                 </div>
               )}
@@ -563,20 +583,20 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   onClick={() => onNavigate(Tab.BUDGET)}
                   className={`flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${idx !== recentTransactions.slice(0, 4).length - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tx.type === 'income' ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center ${tx.type === 'income' ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
                       {tx.type === 'income' ? (
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" transform="rotate(180 12 12)" /></svg>
                       ) : (
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                       )}
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{tx.title}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{tx.title}</p>
                       <p className="text-[10px] text-slate-400 font-medium">{new Date(tx.date).toLocaleDateString('rw-RW', { day: 'numeric', month: 'short' })}</p>
                     </div>
                   </div>
-                  <span className={`text-sm font-bold ${tx.type === 'income' ? 'text-teal-600 dark:text-teal-400' : 'text-slate-900 dark:text-white'}`}>
+                  <span className={`text-sm font-bold shrink-0 ${tx.type === 'income' ? 'text-teal-600 dark:text-teal-400' : 'text-slate-900 dark:text-white'}`}>
                     {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, { maximumFractionDigits: 0 })}
                   </span>
                 </div>
@@ -597,25 +617,23 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <div 
                   key={goal.id} 
                   onClick={() => onNavigate(Tab.BUDGET)}
-                  className="bg-white dark:bg-slate-900 p-4 rounded-[1.8rem] shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between group active:scale-[0.98] transition-all cursor-pointer hover:border-slate-200 dark:hover:border-slate-700"
+                  className="bg-white dark:bg-slate-900 p-4 rounded-[1.8rem] shadow-sm border border-slate-100 dark:border-slate-800 group active:scale-[0.98] transition-all cursor-pointer hover:border-slate-200 dark:hover:border-slate-700"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:scale-105 transition-transform">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:scale-105 transition-transform">
                       {getGoalIcon(goal.icon)}
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-1">{goal.name}</h4>
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-slate-900 dark:bg-white rounded-full transition-all duration-1000" style={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }}></div>
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-bold">{Math.round((goal.current / goal.target) * 100)}%</span>
-                      </div>
-                    </div>
+                    <h4 className="font-semibold text-slate-900 dark:text-white text-sm truncate flex-1 min-w-0">{goal.name}</h4>
                   </div>
-                  <div className="text-right">
-                    <span className="text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(goal.current)}</span>
-                    <p className="text-[10px] text-slate-400">/ {formatCurrency(goal.target)}</p>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-base font-bold text-slate-900 dark:text-white truncate">{formatCurrency(goal.current)}</span>
+                    <span className="text-xs text-slate-400 shrink-0">/ {formatCurrency(goal.target)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-slate-900 dark:bg-white rounded-full transition-all duration-1000" style={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }}></div>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-bold shrink-0">{Math.round((goal.current / goal.target) * 100)}%</span>
                   </div>
                 </div>
               ))}

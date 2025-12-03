@@ -42,18 +42,33 @@ const getIcon = (name: string, className: string = "w-5 h-5") => {
         case 'emergency': return <Icons.Emergency className={className} />;
         case 'vacation': return <Icons.Vacation className={className} />;
         case 'goal': return <Icons.Goal className={className} />;
+        case 'savings': return <Icons.Goal className={className} />;
         default: return <Icons.Default className={className} />;
     }
 };
 
-const formatCurrency = (value: number, options?: Intl.NumberFormatOptions) =>
-    new Intl.NumberFormat('en-US', {
+// Smart currency formatter that abbreviates large numbers
+const formatCurrency = (value: number, options?: Intl.NumberFormatOptions & { compact?: boolean }) => {
+    const { compact, ...intlOptions } = options || {};
+    
+    // For large numbers, use compact notation
+    if (compact || Math.abs(value) >= 1000000) {
+        if (Math.abs(value) >= 1000000) {
+            return `RWF ${(value / 1000000).toFixed(1)}M`;
+        }
+        if (Math.abs(value) >= 100000) {
+            return `RWF ${(value / 1000).toFixed(0)}K`;
+        }
+    }
+    
+    return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'RWF',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
-        ...options,
+        ...intlOptions,
     }).format(value);
+};
 
 const CATEGORY_LABELS: Record<string, string> = {
     housing: 'Icumbi',
@@ -105,6 +120,35 @@ const getTimeRangeLabel = (range: 'WEEK' | 'MONTH' | 'YEAR') => TIME_RANGE_LABEL
 
 const getFilterLabel = (filter: 'ALL' | 'INCOME' | 'EXPENSE' | 'RECURRING') => TRANSACTION_FILTER_LABELS[filter];
 
+const getSavingsAccent = (progress: number) => {
+    if (progress >= 80) {
+        return {
+            border: 'border-emerald-200 dark:border-emerald-900/40',
+            accent: '#059669',
+            pill: 'bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-300'
+        };
+    }
+    if (progress >= 50) {
+        return {
+            border: 'border-indigo-200 dark:border-indigo-900/40',
+            accent: '#4338ca',
+            pill: 'bg-indigo-50 dark:bg-indigo-900/10 text-indigo-600 dark:text-indigo-300'
+        };
+    }
+    if (progress >= 25) {
+        return {
+            border: 'border-purple-200 dark:border-purple-900/40',
+            accent: '#7e22ce',
+            pill: 'bg-purple-50 dark:bg-purple-900/10 text-purple-600 dark:text-purple-300'
+        };
+    }
+    return {
+        border: 'border-rose-200 dark:border-rose-900/40',
+        accent: '#be123c',
+        pill: 'bg-rose-50 dark:bg-rose-900/10 text-rose-600 dark:text-rose-300'
+    };
+};
+
 // --- ProgressBar Helper ---
 const ProgressBar = ({ current, max, color }: { current: number; max: number; color: string }) => {
     const percentage = Math.min((current / max) * 100, 100);
@@ -142,7 +186,7 @@ const BudgetPlannerComponent = () => {
     const transactions = useTransactions();
     const savings = useSavingsGoals();
     const balance = useBalance();
-    const { addTransaction, updateTransaction, deleteTransaction, addSavingsGoal } = useAppStore();
+    const { addTransaction, updateTransaction, deleteTransaction, addSavingsGoal, updateSavingsGoal } = useAppStore();
 
     // UI state
     const [activeSection, setActiveSection] = useState<'OVERVIEW' | 'TRANSACTIONS' | 'SAVINGS'>('OVERVIEW');
@@ -150,8 +194,6 @@ const BudgetPlannerComponent = () => {
     const [dateFilter, setDateFilter] = useState<'WEEK' | 'MONTH' | 'YEAR'>('MONTH');
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Force a file change to trigger Vite rebuild and clear cache
-    const dummy = 'dummy';
     // Modal State
     const [showAddModal, setShowAddModal] = useState(false);
     const [showSavingsModal, setShowSavingsModal] = useState(false);
@@ -178,6 +220,13 @@ const BudgetPlannerComponent = () => {
     const [newGoalName, setNewGoalName] = useState('');
     const [newGoalTarget, setNewGoalTarget] = useState('');
     const [newGoalDeadline, setNewGoalDeadline] = useState<Date | null>(null);
+    const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
+
+    // Savings contribution state
+    const [activeGoal, setActiveGoal] = useState<SavingsGoal | null>(null);
+    const [showContributionModal, setShowContributionModal] = useState(false);
+    const [contributionType, setContributionType] = useState<'add' | 'withdraw'>('add');
+    const [contributionAmount, setContributionAmount] = useState('');
 
     // Budget Limit State
     const [budgetLimits, setBudgetLimits] = useState<Record<string, number>>({});
@@ -520,6 +569,115 @@ const BudgetPlannerComponent = () => {
         return { type: 'active', daysLeft, monthlyRate, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20' };
     };
 
+    const openNewGoalModal = () => {
+        setNewGoalName('');
+        setNewGoalTarget('');
+        setNewGoalDeadline(null);
+        setShowSavingsModal(true);
+    };
+
+    const openGoalEditModal = (goal: SavingsGoal) => {
+        setEditingGoalId(goal.id);
+        setNewGoalName(goal.name);
+        setNewGoalTarget(goal.target.toString());
+        setNewGoalDeadline(goal.deadline ? new Date(goal.deadline) : null);
+        setShowSavingsModal(true);
+    };
+
+    const handleSaveGoal = () => {
+        if (!newGoalName || !newGoalTarget) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] animate-slide-up';
+            toast.textContent = `Nyamuneka andika izina ry'intego n'amafaranga agamijwe`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+            return;
+        }
+        const payload = {
+            name: newGoalName.trim(),
+            target: parseFloat(newGoalTarget),
+            deadline: newGoalDeadline ? newGoalDeadline.toISOString().split('T')[0] : undefined
+        };
+
+        if (editingGoalId) {
+            updateSavingsGoal(editingGoalId, payload);
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-indigo-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] animate-slide-up';
+            toast.textContent = 'Intego yahinduwe neza!';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        } else {
+            const goal: SavingsGoal = {
+                id: `goal_${Date.now()}`,
+                name: payload.name,
+                target: payload.target,
+                current: 0,
+                deadline: payload.deadline,
+                color: '#6366f1',
+                icon: 'goal'
+            };
+            addSavingsGoal(goal);
+
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-xl z-[60] animate-slide-up';
+            toast.textContent = 'Intego yo kuzigama yashyizweho!';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        setShowSavingsModal(false);
+        setNewGoalName('');
+        setNewGoalTarget('');
+        setNewGoalDeadline(null);
+    };
+
+    const handleOpenContribution = (goal: SavingsGoal, type: 'add' | 'withdraw') => {
+        setActiveGoal(goal);
+        setContributionType(type);
+        setContributionAmount('');
+        setShowContributionModal(true);
+    };
+
+    const handleSaveContribution = () => {
+        if (!activeGoal) return;
+        const amount = parseFloat(contributionAmount);
+        if (isNaN(amount) || amount <= 0) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-xl z-[70] animate-slide-up';
+            toast.textContent = 'Injiza amafaranga yemewe';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+            return;
+        }
+
+        const delta = contributionType === 'add' ? amount : -amount;
+        const updatedCurrent = Math.max(0, Math.min(activeGoal.target, activeGoal.current + delta));
+        updateSavingsGoal(activeGoal.id, { current: updatedCurrent });
+
+        const newTx: Transaction = {
+            id: `tx_${Date.now()}`,
+            title: contributionType === 'add' ? `Kuzigama: ${activeGoal.name}` : `Gukuramo: ${activeGoal.name}`,
+            amount,
+            category: 'Kuzigama',
+            date: new Date(),
+            type: contributionType === 'add' ? 'expense' : 'income',
+            isRecurring: false,
+            icon: 'savings',
+            color: contributionType === 'add' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'
+        };
+        addTransaction(newTx);
+
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-xl shadow-xl z-[70] animate-slide-up';
+        toast.textContent = contributionType === 'add' ? 'Amafaranga yongewe ku ntego' : 'Amafaranga yakuwemo ku ntego';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+
+        setShowContributionModal(false);
+        setActiveGoal(null);
+        setContributionAmount('');
+    };
+
     return (
         <div className="h-full overflow-hidden bg-slate-50 dark:bg-slate-950 relative flex flex-col transition-colors duration-500">
             {/* Top Header */}
@@ -553,7 +711,7 @@ const BudgetPlannerComponent = () => {
                         {alerts.msgs.length > 0 && (
                             <div className="space-y-3">
                                 {alerts.msgs.slice(0, 3).map((alert, idx) => (
-                                    <div key={idx} className={`p-4 rounded-[1.5rem] shadow-sm flex items-start gap-4 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800 transition-transform active:scale-90`}>
+                                    <div key={idx} className={`p-4 rounded-[1.5rem] shadow-sm flex items-start gap-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-transform active:scale-90`}>
                                         <div className={`p-2 rounded-full shrink-0 ${alert.type === 'warning' ? 'bg-amber-100 text-amber-500 dark:bg-amber-500/10' : 'bg-blue-100 text-blue-500 dark:bg-blue-500/10'}`}>
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         </div>
@@ -613,18 +771,16 @@ const BudgetPlannerComponent = () => {
                                 const isOverBudget = cat.spent > cat.limit;
                                 return (
                                     <div key={cat.id} onClick={() => openEditBudgetModal(cat)} className="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-slate-100 dark:border-slate-800 transition-colors group cursor-pointer hover:shadow-md active:scale-[0.98]">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors">{getIcon(cat.icon)}</div>
-                                                <div>
-                                                    <h4 className="font-bold text-slate-900 dark:text-white">{getCategoryLabel(cat.icon)}</h4>
-                                                    {isOverBudget && <span className="text-[10px] text-red-500 font-bold">Byarenze ingengo!</span>}
-                                                </div>
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors">{getIcon(cat.icon)}</div>
+                                            <div className="min-w-0 flex-1">
+                                                <h4 className="font-bold text-slate-900 dark:text-white text-sm">{getCategoryLabel(cat.icon)}</h4>
+                                                {isOverBudget && <span className="text-[10px] text-red-500 font-bold">Byarenze ingengo!</span>}
                                             </div>
-                                            <div className="text-right">
-                                                <span className={`font-bold ${isOverBudget ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>{formatCurrency(cat.spent)} <span className="text-slate-300 dark:text-slate-600 font-normal">/ {formatCurrency(cat.limit)}</span></span>
-                                                <p className="text-[10px] text-teal-600 opacity-0 group-hover:opacity-100 transition-opacity font-bold">Hindura</p>
-                                            </div>
+                                        </div>
+                                        <div className="flex items-baseline justify-between gap-2 mb-2">
+                                            <span className={`text-lg font-bold ${isOverBudget ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>{formatCurrency(cat.spent)}</span>
+                                            <span className="text-sm text-slate-400 font-medium shrink-0">/ {formatCurrency(cat.limit)}</span>
                                         </div>
                                         <ProgressBar current={cat.spent} max={cat.limit} color={cat.color} />
                                     </div>
@@ -660,17 +816,17 @@ const BudgetPlannerComponent = () => {
                         <div className="space-y-3">
                             {filteredTransactions.length > 0 ? (
                                 filteredTransactions.map((tx) => (
-                                    <div key={tx.id} onClick={() => openEditModal(tx)} className="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] flex items-center justify-between shadow-sm border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all cursor-pointer hover:shadow-md hover:border-slate-200 dark:hover:border-slate-600">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-14 h-14 rounded-2xl ${tx.color.includes('bg-') ? tx.color : (tx.type === 'income' ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400' : 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400')} flex items-center justify-center text-xl relative`}>
+                                    <div key={tx.id} onClick={() => openEditModal(tx)} className="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] flex items-center justify-between gap-3 shadow-sm border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all cursor-pointer hover:shadow-md hover:border-slate-200 dark:hover:border-slate-600 overflow-hidden">
+                                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                                            <div className={`w-12 h-12 shrink-0 rounded-2xl ${tx.color.includes('bg-') ? tx.color : (tx.type === 'income' ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400' : 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400')} flex items-center justify-center text-xl relative`}>
                                                 {getIcon(tx.icon)}
                                                 {tx.isRecurring && (
                                                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-500 rounded-full border-2 border-white dark:border-slate-900 flex items-center justify-center"><svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></div>
                                                 )}
                                             </div>
-                                            <div><h4 className="font-bold text-slate-900 dark:text-white text-base mb-0.5">{tx.title}</h4><div className="flex items-center gap-2"><p className="text-xs text-slate-400 font-medium">{tx.category}</p><span className="text-[10px] text-slate-300">•</span><p className="text-xs text-slate-400 font-medium">{new Date(tx.date).toLocaleDateString()}</p></div></div>
+                                            <div className="min-w-0 flex-1"><h4 className="font-bold text-slate-900 dark:text-white text-sm mb-0.5 truncate">{tx.title}</h4><div className="flex items-center gap-2"><p className="text-xs text-slate-400 font-medium truncate">{tx.category}</p><span className="text-[10px] text-slate-300 shrink-0">•</span><p className="text-xs text-slate-400 font-medium shrink-0">{new Date(tx.date).toLocaleDateString()}</p></div></div>
                                         </div>
-                                        <div className="flex flex-col items-end"><span className={`font-black text-lg ${tx.type === 'income' ? 'text-teal-600 dark:text-teal-400' : 'text-slate-900 dark:text-white'}`}>{tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}</span><span className="text-[10px] text-teal-600 opacity-0 group-hover:opacity-100 transition-opacity font-bold mt-1">Hindura</span></div>
+                                        <div className="flex flex-col items-end shrink-0"><span className={`font-black text-base ${tx.type === 'income' ? 'text-teal-600 dark:text-teal-400' : 'text-slate-900 dark:text-white'}`}>{tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}</span></div>
                                     </div>
                                 ))
                             ) : (
@@ -726,64 +882,74 @@ const BudgetPlannerComponent = () => {
 
                             {savings.map(goal => {
                                 const analysis = getSavingsAnalysis(goal);
-                                const progress = (goal.current / goal.target) * 100;
-                                const hue = progress > 75 ? 120 : progress > 50 ? 60 : progress > 25 ? 30 : 0;
+                                const progress = Math.min((goal.current / goal.target) * 100, 100);
+                                const { border, accent, pill } = getSavingsAccent(progress);
 
                                 return (
-                                    <div key={goal.id} className={`bg-gradient-to-br from-${progress > 75 ? 'emerald' : progress > 50 ? 'blue' : progress > 25 ? 'indigo' : 'purple'}-600 via-${progress > 75 ? 'emerald' : progress > 50 ? 'blue' : progress > 25 ? 'indigo' : 'purple'}-700 to-${progress > 75 ? 'teal' : progress > 50 ? 'indigo' : progress > 25 ? 'purple' : 'pink'}-800 rounded-[2rem] p-6 relative overflow-hidden cursor-pointer group active:scale-[0.98] transition-all duration-300 shadow-xl shadow-${progress > 75 ? 'emerald' : progress > 50 ? 'blue' : progress > 25 ? 'indigo' : 'purple'}-900/20`}>
-                                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
-                                        <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
-                                        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
-                                        <div className="relative z-10">
-                                            <div className="flex items-start justify-between mb-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                                                        {getIcon(goal.icon)}
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-xl font-black text-white mb-1">{goal.name}</h4>
-                                                        {goal.deadline && <p className="text-xs text-white/60 font-medium">Intego: {new Date(goal.deadline).toLocaleDateString()}</p>}
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <span className="text-xl font-black text-white">{formatCurrency(goal.current)}</span>
-                                                    <p className="text-xs text-white/60">/ {formatCurrency(goal.target)}</p>
-                                                </div>
-                                            </div>
-
-                                            <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden mb-4">
-                                                <div className="h-full bg-white rounded-full transition-all duration-1000 relative overflow-hidden" style={{ width: `${progress}%` }}>
-                                                    <div className="absolute inset-0 bg-white/30 animate-pulse-slow"></div>
-                                                </div>
-                                            </div>
-
+                                    <div
+                                        key={goal.id}
+                                        className={`rounded-[1.8rem] border ${border} bg-white shadow-sm p-6 dark:bg-slate-900 flex flex-col gap-4 active:scale-[0.98] transition-all cursor-pointer hover:border-slate-200 dark:hover:border-slate-700`}
+                                        onClick={() => openEditModal(goal as unknown as Transaction)}
+                                    >
+                                        <div className="flex flex-col gap-3 mb-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-3">
-                                                    <p className="text-[10px] text-white/60 uppercase tracking-wider font-bold mb-1">Aho wigeze</p>
-                                                    <p className="text-lg font-black text-white">{Math.round(progress)}%</p>
+                                                <div className={`w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center text-xl ${pill}`}>
+                                                    {getIcon(goal.icon)}
                                                 </div>
-                                                <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-3">
-                                                    <p className="text-[10px] text-white/60 uppercase tracking-wider font-bold mb-1">Imvura</p>
-                                                    <p className="text-lg font-black text-white">{formatCurrency(goal.target - goal.current)}</p>
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="text-lg font-black text-slate-900 dark:text-white truncate">{goal.name}</h4>
+                                                    {goal.deadline && <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Intego: {new Date(goal.deadline).toLocaleDateString()}</p>}
                                                 </div>
                                             </div>
+                                            <div className="flex items-baseline justify-between gap-2 px-1">
+                                                <span className="text-xl font-black text-slate-900 dark:text-white truncate">{formatCurrency(goal.current)}</span>
+                                                <span className="text-sm font-semibold text-slate-400 shrink-0">/ {formatCurrency(goal.target)}</span>
+                                            </div>
+                                        </div>
 
-                                            {analysis && (
-                                                <div className={`mt-4 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20`}>
-                                                    <div className="flex items-start gap-3">
-                                                        <svg className="w-5 h-5 text-white/80 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                        <div>
-                                                            <p className="text-[10px] font-bold text-white/80 uppercase tracking-wider mb-1">Isesengura</p>
-                                                            {analysis.type === 'active' ? (
-                                                                <p className="text-sm text-white/90 font-medium leading-relaxed">Zigama <span className="font-black text-white">{Math.ceil(analysis.monthlyRate)}/ukwezi</span> kugira ngo ugere ku ntego mu mezi {Math.ceil(analysis.daysLeft / 30)}.</p>
-                                                            ) : (
-                                                                <p className="text-sm text-white/90 font-medium">{analysis.msg}</p>
-                                                            )}
-                                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            <button onClick={() => handleOpenContribution(goal, 'add')} className="px-4 py-1.5 rounded-2xl text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                Shyiramo
+                                            </button>
+                                            <button onClick={() => handleOpenContribution(goal, 'withdraw')} className="px-4 py-1.5 rounded-2xl text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                Sohora
+                                            </button>
+                                            <button onClick={() => openGoalEditModal(goal)} className="px-4 py-1.5 rounded-2xl text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                Hindura
+                                            </button>
+                                        </div>
+
+                                        <div className="rounded-[1.5rem] border border-slate-100 dark:border-slate-800 p-4 bg-slate-50/80 dark:bg-slate-900/40">
+                                            <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.35em] font-bold text-slate-400 mb-3">
+                                                <span>Aho wigeze</span>
+                                                <span>Imvura</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-2xl font-black" style={{ color: accent }}>{Math.round(progress)}%</p>
+                                                <p className="text-lg font-black text-slate-900 dark:text-white">{formatCurrency(goal.target - goal.current)}</p>
+                                            </div>
+                                            <div className="h-2 w-full bg-white dark:bg-slate-800 rounded-full overflow-hidden mt-3">
+                                                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${accent}, ${accent}dd)` }} />
+                                            </div>
+                                        </div>
+
+                                        {analysis && (
+                                            <div className="rounded-[1.5rem] border border-slate-100 dark:border-slate-800 p-4 bg-white dark:bg-slate-900">
+                                                <div className="flex items-start gap-3">
+                                                    <svg className="w-5 h-5 mt-0.5 shrink-0" style={{ color: accent }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    <div>
+                                                        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-slate-400">Isesengura</p>
+                                                        {analysis.type === 'active' ? (
+                                                            <p className="text-sm text-slate-600 dark:text-slate-200 leading-relaxed">
+                                                                Zigama <span className="font-black text-slate-900 dark:text-white">{Math.ceil(analysis.monthlyRate)}/ukwezi</span> kugira ngo ugere ku ntego mu mezi {Math.ceil(analysis.daysLeft / 30)}.
+                                                            </p>
+                                                        ) : (
+                                                            <p className="text-sm text-slate-600 dark:text-slate-200">{analysis.msg}</p>
+                                                        )}
                                                     </div>
                                                 </div>
-                                            )}
-                                        </div>
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -796,7 +962,7 @@ const BudgetPlannerComponent = () => {
             {showAddModal && (
                 <div className="fixed inset-0 z-[70] flex items-end justify-center">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowAddModal(false)}></div>
-                    <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-t-[2.5rem] p-6 pb-28 shadow-2xl animate-slide-up relative z-10 transition-colors border-t border-white/10 max-h-[calc(100vh-7rem)] overflow-y-auto">
+                    <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-t-[2.5rem] p-6 pb-28 shadow-2xl animate-slide-up transition-colors border-t border-white/10 relative z-10 max-h-[calc(100vh-7rem)] overflow-y-auto">
                         <div className="drag-handle mb-6"></div>
 
                         <div className="flex justify-between items-center mb-8">
@@ -855,7 +1021,9 @@ const BudgetPlannerComponent = () => {
 
                         <div className="flex gap-4 mt-8">
                             {editingId && (
-                                <button onClick={handleDeleteTransaction} className="flex-1 py-4 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-3xl font-bold text-sm hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors border border-red-100 dark:border-red-900/30">Siba</button>
+                                <button onClick={handleDeleteTransaction} className="flex-1 py-4 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-3xl font-bold text-sm">
+                                    Siba
+                                </button>
                             )}
                             <button onClick={handleSaveTransaction} className="flex-[2] py-4 bg-slate-900 dark:bg-teal-600 text-white rounded-3xl font-bold text-sm shadow-xl dark:shadow-teal-900/40 active:scale-95 transition-transform">
                                 {editingId ? 'Bika Impinduka' : 'Ongeraho'}
@@ -912,7 +1080,7 @@ const BudgetPlannerComponent = () => {
 
                         <div className="space-y-5">
                             <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-5 border border-slate-100 dark:border-slate-800">
-                                <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.3em] mb-2">Urugero rushya</p>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1 mb-2 block">Urugero rushya</p>
                                 <div className="flex items-center gap-3">
                                     <span className="text-slate-400 font-black text-2xl">RWF</span>
                                     <input
@@ -959,7 +1127,7 @@ const BudgetPlannerComponent = () => {
                     <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-t-[2.5rem] p-6 pb-28 shadow-2xl animate-slide-up transition-colors border-t border-white/10 relative z-10 max-h-[calc(100vh-7rem)] overflow-y-auto">
                         <div className="drag-handle mb-6"></div>
                         <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Intego Nshya yo Kuzigama</h3>
+                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{editingGoalId ? 'Hindura Intego' : 'Intego Nshya'}</h3>
                             <button onClick={() => setShowSavingsModal(false)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                                 <Icons.Close className="w-6 h-6" />
                             </button>
@@ -973,8 +1141,49 @@ const BudgetPlannerComponent = () => {
                                 placeholder="Hitamo itariki"
                             />
                         </div>
-                        <button onClick={handleAddGoal} className="w-full mt-8 py-4 bg-indigo-600 text-white rounded-3xl font-bold text-sm shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 active:scale-95 transition-transform">
-                            Shiraho Intego
+                        <button onClick={handleSaveGoal} className="w-full mt-8 py-4 bg-indigo-600 text-white rounded-3xl font-bold text-sm shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 active:scale-95 transition-transform">
+                            {editingGoalId ? 'Bika Intego' : 'Shiraho Intego'}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Contribution Modal */}
+            {showContributionModal && activeGoal && (
+                <div className="fixed inset-0 z-[75] flex items-end justify-center">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowContributionModal(false)}></div>
+                    <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-t-[2.5rem] p-6 pb-12 shadow-2xl animate-slide-up relative z-10 border-t border-white/10">
+                        <div className="drag-handle mb-6"></div>
+                        <div className="flex justify-between items-start mb-6">
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400">{contributionType === 'add' ? 'Ongeraho' : 'Kuramo'}</p>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{activeGoal.name}</h3>
+                            </div>
+                            <button onClick={() => setShowContributionModal(false)} className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                                <Icons.Close className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl mb-6">
+                            <button onClick={() => setContributionType('add')} className={`py-3 rounded-xl text-sm font-bold ${contributionType === 'add' ? 'bg-white dark:bg-slate-700 text-teal-600' : 'text-slate-500'}`}>Shyiramo</button>
+                            <button onClick={() => setContributionType('withdraw')} className={`py-3 rounded-xl text-sm font-bold ${contributionType === 'withdraw' ? 'bg-white dark:bg-slate-700 text-amber-600' : 'text-slate-500'}`}>Sohora</button>
+                        </div>
+
+                        <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1 mb-2 block">Amafaranga</label>
+                            <div className="relative">
+                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm tracking-widest">RWF</span>
+                                <input type="number" value={contributionAmount} onChange={e => setContributionAmount(e.target.value)} placeholder="0" className="w-full bg-slate-50 dark:bg-slate-900 rounded-3xl py-5 pl-16 pr-6 text-3xl font-black text-slate-900 dark:text-white border border-slate-100 dark:border-slate-800" />
+                            </div>
+                        </div>
+
+                        <div className="mt-6 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/40 text-sm text-slate-600 dark:text-slate-300">
+                            <p className="font-bold mb-1">Aho wigeze</p>
+                            <p>{formatCurrency(activeGoal.current)} / {formatCurrency(activeGoal.target)}</p>
+                        </div>
+
+                        <button onClick={handleSaveContribution} className="w-full mt-8 py-4 bg-slate-900 dark:bg-teal-600 text-white rounded-3xl font-bold text-sm shadow-xl active:scale-95 transition-transform">
+                            {contributionType === 'add' ? 'Ongeraho Amafaranga' : 'Kuraho Amafaranga'}
                         </button>
                     </div>
                 </div>

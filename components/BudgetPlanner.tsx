@@ -865,6 +865,35 @@ const BudgetPlannerComponent = () => {
                 </div>
             )}
 
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[80] flex items-center justify-center px-6">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowDeleteConfirm(false)}></div>
+                    <div className="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-100 dark:border-slate-800 animate-slide-up">
+                        <div className="flex justify-between items-start mb-6">
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Kwemeza</p>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Uremeza gusiba iri ryinjijwe?</h3>
+                            </div>
+                            <button onClick={() => setShowDeleteConfirm(false)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
+                                <Icons.Close className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-8">
+                            Niba usibye iri ryinjijwe, ntirizongera kuboneka mu mateka yawe cyangwa mu mibare y'ingengo y'imari y'uku kwezi.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 rounded-2xl border border-slate-200 dark:border-slate-800 py-3 font-bold text-sm text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                Kureka
+                            </button>
+                            <button onClick={confirmDeleteTransaction} className="flex-1 rounded-2xl bg-red-500 text-white py-3 font-bold text-sm shadow-sm hover:bg-red-600 transition-colors">
+                                Siba burundu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Edit Budget Modal */}
             {showEditBudgetModal && editingBudgetCategory && (
                 <div className="fixed inset-0 z-[80] flex items-end justify-center">

@@ -306,7 +306,7 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                         </div>
                         <h2 className="text-xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Wiyumva ute?</h2>
                         <p className="text-slate-500 dark:text-slate-400 text-xs max-w-[280px] mb-5 leading-relaxed">
-                            Aha ni ahantu hizewe kandi h'ibanga. Hitamo ingingo hepfo cyangwa wandike icyo utekereza.
+                            Aha ni ahantu hizewe kandi h'ibanga. Hitamo ingingo muziri hasi gato y'iyi nteruro cyangwa wandike icyo utekereza
                         </p>
                         <div className="grid grid-cols-2 gap-2 w-full max-w-[280px]">
                             {[

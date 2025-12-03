@@ -285,8 +285,8 @@ const SexualHealth: React.FC = () => {
   // --- Data ---
   const methods: ContraceptiveMethod[] = [
     {
-      id: '1', name: 'Ibinini', efficacy: '99%', efficacyValue: 95, type: 'Imiti ngendanubuzima',
-      desc: 'Imiti yo kumira buri munsi.',
+      id: '1', name: 'Ibinini', efficacy: '99%', efficacyValue: 95, type: 'Imiti irinda gusama',
+      desc: 'Ibinini byo kunywa buri munsi.',
       pros: ['Itunganya imihango', 'Igabanya udusebe', 'Igaruka vuba'],
       cons: ['Gusaba kwibuka buri munsi', 'Impinduka z\'imyumvire'],
       tags: ['Buri munsi', 'Imiti ngendanubuzima'],
@@ -328,7 +328,7 @@ const SexualHealth: React.FC = () => {
 
   const sideEffects = [
     { id: 'nausea', label: 'Isesemi', guidance: 'Ibi bishobora guterwa n’imihindagurike ya hormone. Akenshi biragenda mu minsi 2–3.', tip: 'Fungura utuntu duto duto kenshi, wirinde kurya ibiremereye nijoro.', alert: 'Niba kuribwa mu nda gukomeje cyangwa bikiyongera, saba ubufasha kwa muganga.' },
-    { id: 'spotting', label: 'Kutakaza amaraso', guidance: 'Ibi bishobora kubaho mu minsi 3–6 ya mbere yo gukoresha LARC cyangwa ibinini byo kuboneza urubyaro.', tip: 'Jya wibuka kwandika ibihe bibaye buri munsi kugira ngo ubyiteho neza.', alert: 'Niba utakaza amaraso menshi cyangwa bimara iminsi myinshi, saba ubufasha kwa muganga.' },
+    { id: 'spotting', label: 'Gutakaza amaraso', guidance: 'Ibi bishobora kubaho mu minsi 3–6 ya mbere yo gukoresha LARC cyangwa ibinini byo kuboneza urubyaro.', tip: 'Jya wibuka kwandika ibihe bibaye buri munsi kugira ngo ubyiteho neza.', alert: 'Niba utakaza amaraso menshi cyangwa bimara iminsi myinshi, saba ubufasha kwa muganga.' },
   ];
 
   const dashboardCards = [
@@ -614,7 +614,7 @@ const SexualHealth: React.FC = () => {
             <div className="space-y-6 animate-slide-up">
               <div className="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-slate-900 dark:text-white text-lg">Kwibutsa ibinini bya buri munsi</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-lg">Kwibutsa gufata ibinini </h3>
                   <button onClick={() => setPillReminder(!pillReminder)} className={`w-12 h-7 rounded-full p-1 transition-colors duration-300 ${pillReminder ? 'bg-teal-500' : 'bg-slate-200 dark:bg-slate-700'}`}>
                     <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${pillReminder ? 'translate-x-5' : 'translate-x-0'}`}></div>
                   </button>

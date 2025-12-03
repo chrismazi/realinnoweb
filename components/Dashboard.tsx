@@ -313,7 +313,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
     results.push({
       id: 'savings',
-      title: 'Ibizigamwe byose',
+      title: 'Ubwizigame',
       message: totalSavings > 0 ? `${formatCurrency(totalSavings)} byazigamwe ku ntego zose.` : 'Tangira intego yo kubaka ubuzima bwawe.',
       tone: totalSavings > 0 ? 'positive' : 'info'
     });
@@ -436,7 +436,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">Uku kwezi</p>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Incamake y'imari</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Reba incamake</h3>
               </div>
               <button
                 onClick={() => onNavigate(Tab.BUDGET)}
@@ -456,7 +456,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   <p className="text-[10px] text-slate-400 font-bold truncate">Ayasohotse {formatCurrency(monthlyExpenses)}</p>
                 </div>
                 <div className="w-20 h-20 shrink-0 rounded-full border-4 border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-bold text-slate-400">Ibizigamwe</span>
+                  <span className="text-[10px] font-bold text-slate-400">Ubwizigamwe</span>
                   <strong className="text-sm text-slate-900 dark:text-white truncate max-w-[70px]">{formatCurrency(totalSavings)}</strong>
                 </div>
               </div>

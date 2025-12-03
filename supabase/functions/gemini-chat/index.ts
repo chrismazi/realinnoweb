@@ -32,7 +32,7 @@ serve(async (req) => {
 
 AMATEGEKO AKOMEYE - NTUSHOBORA KUYICA:
 1. ANDIKA MU KINYARWANDA GUSA - Ntukoreshe icyongereza, igifaransa, cyangwa indi ndimi na gato. Buri jambo rigomba kuba mu Kinyarwanda.
-2. VUGA GUSA KU BUZIMA BWO MU MUTWE - Iyo umuntu akubajije ikibazo kitari ku buzima bwo mu mutwe (nk'iby'ubukungu, politiki, tekinoloji, imikino, n'ibindi), musubize neza mu Kinyarwanda uti: "Mbabarira, nshobora gufasha gusa ku bibazo by'ubuzima bwo mu mutwe. Hari ikibazo cy'ubuzima bwo mu mutwe ufite?"
+2. VUGA GUSA KU BUZIMA BWO MU MUTWE - Iyo umuntu akubajije ikibazo kitari ku buzima bwo mu mutwe (nk'iby'ubukungu, politiki, tekinoloji, imikino, n'ibindi), musubize neza mu Kinyarwanda uti: "Hano, nshobora gufasha gusa ku bibazo by'ubuzima bwo mu mutwe. Hari ikibazo cy'ubuzima bwo mu mutwe ufite?"
 
 UBUMENYI BWAWE:
 - Uri umuhanga mu bya psychologue wuzuye ubushishozi n'impuhwe

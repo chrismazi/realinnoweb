@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AuthState } from '../types';
 import supabaseAuthService from '../services/supabaseAuth';
 import { useTranslation } from '../hooks/useTranslation';
+import { getLegalDocument } from '../utils/legalContent';
+import type { LegalDocumentType } from '../utils/legalContent';
 
 interface AuthProps {
   onLogin: (userData?: { name: string; email: string; id: string }) => void;
@@ -23,12 +26,35 @@ const calculatePasswordStrength = (password: string): { score: number; label: st
   return { score, label: 'Very Strong', color: 'bg-emerald-500' };
 };
 
+const containerVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } }
+};
+
+const messageVariants = {
+  hidden: { opacity: 0, y: -8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.2 } }
+};
+
+const formVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+  exit: { opacity: 0, y: -12, transition: { duration: 0.25, ease: 'easeIn' } }
+};
+
+const footerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { delay: 0.2, duration: 0.3 } }
+};
+
 const Auth: React.FC<AuthProps> = ({ onLogin }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [view, setView] = useState<AuthState>(AuthState.LOGIN);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [activeLegal, setActiveLegal] = useState<LegalDocumentType | null>(null);
 
   // Form state
   const [name, setName] = useState('');
@@ -92,7 +118,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       } else if (view === AuthState.SIGNUP) {
         // Validate terms acceptance
         if (!acceptedTerms) {
-          setError('Please accept the Terms of Service and Privacy Policy to continue.');
+          setError(t('auth.acceptTermsError'));
           setIsLoading(false);
           return;
         }
@@ -198,10 +224,17 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     </label>
   );
 
+  const legalDocument = activeLegal ? getLegalDocument(activeLegal, (language as 'en' | 'rw')) : null;
+
   return (
     <div className="h-full w-full bg-white dark:bg-slate-950 overflow-y-auto transition-colors duration-500">
       <div className="min-h-[100dvh] flex flex-col items-center px-6 py-12 sm:py-16">
-        <div className="w-full max-w-md flex-1 flex flex-col gap-8">
+        <motion.div
+          className="w-full max-w-md flex-1 flex flex-col gap-8"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <div className="flex flex-col items-center text-center gap-4">
             <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 text-brand">
               <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="6" />
@@ -233,30 +266,57 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           </div>
 
           {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 animate-shake">
-              <p className="text-red-600 dark:text-red-400 text-sm font-medium flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {error}
-              </p>
-            </div>
-          )}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                key="auth-error"
+                variants={messageVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4"
+              >
+                <p className="text-red-600 dark:text-red-400 text-sm font-medium flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {error}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Success Message */}
-          {successMessage && (
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 animate-slide-up">
-              <p className="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {successMessage}
-              </p>
-            </div>
-          )}
+          <AnimatePresence>
+            {successMessage && (
+              <motion.div
+                key="auth-success"
+                variants={messageVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4"
+              >
+                <p className="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {successMessage}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <form onSubmit={handleAuthAction} className="space-y-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+          <AnimatePresence mode="wait">
+            <motion.form
+              key={view}
+              onSubmit={handleAuthAction}
+              variants={formVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="space-y-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm"
+            >
             {view === AuthState.SIGNUP && renderInput('text', t('auth.name'), <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>, name, setName)}
             {renderInput('email', t('auth.email'), <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>, email, setEmail)}
 
@@ -354,13 +414,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                   </div>
                 </div>
                 <span className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  I agree to the{' '}
-                  <button type="button" className="text-brand font-semibold hover:underline">
-                    Terms of Service
+                  {t('auth.termsPrompt')}{' '}
+                  <button type="button" onClick={() => setActiveLegal('terms')} className="text-brand font-semibold hover:underline">
+                    {t('auth.termsLink')}
                   </button>
-                  {' '}and{' '}
-                  <button type="button" className="text-brand font-semibold hover:underline">
-                    Privacy Policy
+                  {' '}<span className="text-slate-400">&amp;</span>{' '}
+                  <button type="button" onClick={() => setActiveLegal('privacy')} className="text-brand font-semibold hover:underline">
+                    {t('auth.privacyLink')}
                   </button>
                 </span>
               </label>
@@ -388,17 +448,72 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 </>
               )}
             </button>
-          </form>
+            </motion.form>
+          </AnimatePresence>
 
-        <div className="mt-8 text-center">
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
-            {view === AuthState.LOGIN ? t('auth.noAccount') + " " : view === AuthState.SIGNUP ? t('auth.haveAccount') + " " : t('auth.remembered') + " "}
-            <button onClick={() => setView(view === AuthState.LOGIN ? AuthState.SIGNUP : AuthState.LOGIN)} className="text-brand font-bold hover:underline transition-all ml-1">{view === AuthState.LOGIN ? t('auth.signupButton') : t('auth.loginButton')}</button>
-          </p>
-        </div>
+          <motion.div
+            variants={footerVariants}
+            initial="hidden"
+            animate="visible"
+            className="mt-8 text-center"
+          >
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+              {view === AuthState.LOGIN ? t('auth.noAccount') + " " : view === AuthState.SIGNUP ? t('auth.haveAccount') + " " : t('auth.remembered') + " "}
+              <button onClick={() => setView(view === AuthState.LOGIN ? AuthState.SIGNUP : AuthState.LOGIN)} className="text-brand font-bold hover:underline transition-all ml-1">{view === AuthState.LOGIN ? t('auth.signupButton') : t('auth.loginButton')}</button>
+            </p>
+          </motion.div>
+        </motion.div>
       </div>
+
+      <AnimatePresence>
+        {activeLegal && legalDocument && (
+          <motion.div
+            key="legal-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-6"
+          >
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setActiveLegal(null)}></div>
+            <motion.div
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-100 dark:border-slate-800 max-h-[85vh] flex flex-col"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{t('profile.legalTag')}</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">{legalDocument.title}</h3>
+                </div>
+                <button onClick={() => setActiveLegal(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+              <div className="text-[12px] text-slate-500 dark:text-slate-400 mb-5 border-b border-slate-200 dark:border-slate-800 pb-4">
+                {legalDocument.updatedOn}
+              </div>
+              <div className="space-y-6 overflow-y-auto pr-1 text-sm text-slate-600 dark:text-slate-300 leading-relaxed no-scrollbar">
+                {legalDocument.sections.map((section, index) => (
+                  <section key={`${section.title}-${index}`}>
+                    <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">{section.title}</h4>
+                    {section.body && <p>{section.body}</p>}
+                    {section.bullets && (
+                      <ul className="list-disc list-inside space-y-1">
+                        {section.bullets.map((bullet, idx) => (
+                          <li key={idx}>{bullet}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </section>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
-  </div>
   );
 };
 

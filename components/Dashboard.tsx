@@ -360,20 +360,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand/20 rounded-full blur-[80px] pointer-events-none"></div>
           <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-900/40 rounded-full blur-[80px] pointer-events-none"></div>
 
-          {/* Chart Background - Updated gradient to use brand color */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 opacity-40 pointer-events-none translate-y-4 transition-transform duration-700 group-hover:scale-105 group-hover:translate-y-2 mix-blend-screen">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={balanceHistory}>
-                <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#F97316" stopOpacity={0.6} />
-                    <stop offset="100%" stopColor="#F97316" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <Area type="monotone" dataKey="val" stroke="#F97316" strokeWidth={3} fill="url(#chartGradient)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          {/* Horizontal Accent Glow */}
+          <div className="absolute inset-x-8 bottom-14 h-[2px] bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70"></div>
+          <div className="absolute inset-x-10 bottom-8 h-16 bg-gradient-to-b from-white/15 via-brand/10 to-transparent blur-xl opacity-40 transition-transform duration-500 group-hover:opacity-60"></div>
 
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-8">

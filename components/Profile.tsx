@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import useAppStore, { useUser, useTransactions, useSavingsGoals, useChatHistory, useHealthData } from '../store/useAppStore';
 import { useTranslation } from '../hooks/useTranslation';
@@ -6,6 +5,8 @@ import exportService from '../services/exportService';
 import { notificationService } from '../services/notificationService';
 import supabaseAuthService from '../services/supabaseAuth';
 import { supabase } from '../lib/supabase';
+import { getLegalDocument } from '../utils/legalContent';
+import type { LegalDocumentType } from '../utils/legalContent';
 
 interface ProfileProps {
     onBack: () => void;
@@ -85,6 +86,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
     const [activeModal, setActiveModal] = useState<ModalType>('NONE');
     const [isUploading, setIsUploading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [activeLegalDoc, setActiveLegalDoc] = useState<LegalDocumentType | null>(null);
 
     // Profile Data State - Initialize from store user data
     const [profile, setProfile] = useState<UserProfile>({
@@ -450,17 +452,17 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
             ]
         },
         {
-            section: 'Data & Privacy', items: [
-                { id: 'security', label: 'Privacy & Security', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.858.571-4.189" /></svg>, action: openSecurityModal },
-                { id: 'export', label: 'Export Transactions', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>, action: handleExportTransactions },
-                { id: 'backup', label: 'Backup All Data', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>, action: handleExportData },
+            section: t('profile.dataPrivacy'), items: [
+                { id: 'security', label: t('profile.privacySecurity'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.858.571-4.189" /></svg>, action: openSecurityModal },
+                { id: 'export', label: t('profile.exportTransactions'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>, action: handleExportTransactions },
+                { id: 'backup', label: t('profile.backupAllData'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>, action: handleExportData },
             ]
         },
         {
-            section: 'Support & Legal', items: [
-                { id: 'help', label: 'Help Center', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>, action: () => setActiveModal('HELP') },
-                { id: 'terms', label: 'Terms & Conditions', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>, action: () => setActiveModal('TERMS') },
-                { id: 'privacy', label: 'Privacy Policy', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>, action: () => setActiveModal('PRIVACY') },
+            section: t('profile.supportLegal'), items: [
+                { id: 'help', label: t('profile.helpCenter'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>, action: () => setActiveModal('HELP') },
+                { id: 'terms', label: t('profile.terms'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>, action: () => setActiveLegalDoc('terms') },
+                { id: 'privacy', label: t('profile.privacy'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>, action: () => setActiveLegalDoc('privacy') },
             ]
         },
     ];
@@ -573,25 +575,25 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={() => setActiveModal('NONE')}></div>
             <div className="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-100 dark:border-slate-800 animate-slide-up flex flex-col max-h-[85vh]">
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify_between items-start mb-4">
                     <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Support</p>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Help Center</h3>
+                        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{t('profile.supportLegal')}</p>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('profile.helpCenter')}</h3>
                     </div>
                     <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
                         <Icons.Close className="w-5 h-5" />
                     </button>
                 </div>
                 <div className="text-[12px] text-slate-500 dark:text-slate-400 mb-5 border-b border-slate-200 dark:border-slate-800 pb-4">
-                    Browse common questions or chat with us anytime.
+                    Soma ibibazo bikunze kubazwa cyangwa uganire natwe igihe icyo ari cyo cyose.
                 </div>
 
                 <div className="space-y-4 overflow-y-auto pr-1 no-scrollbar">
-                    {[
-                        { q: 'How is my data secured?', a: 'We use 256-bit encryption, secure storage, and anonymized chat logs. Only you control exports.' },
-                        { q: 'Can I connect my bank account?', a: 'Manual entry is available today. Secure bank syncing is scheduled for RealWorks v3.0.' },
-                        { q: 'How does the cycle tracker work?', a: 'Track your periods and symptoms; the predictions become smarter the more you log.' },
-                        { q: 'Is Vestie giving medical advice?', a: 'Vestie offers supportive coaching, not diagnoses. Always consult licensed professionals for care.' }
+                    {[ 
+                        { q: 'Amakuru yanjye ararindwa ate?', a: 'Dukoresha uburinzi bwa 256-bit, tubika amakuru mu buryo bwizewe kandi tugakuraho imyirondoro mu biganiro. Ni wowe wenyine ugenga kohereza cyangwa gukuramo amakuru yawe.' },
+                        { q: 'Nshobora guhuza konti ya banki?', a: 'Kwandika intoki biraboneka ubu. Guhuza banki mu buryo bwikora bizaboneka muri RealWorks v3.0.' },
+                        { q: 'Uko gukurikirana imihango gukorwaho?', a: 'Andika imihango n’ibimenyetso byawe; uko wiyandikisha kenshi ni ko ubuhanuzi bwiyongera neza.' },
+                        { q: 'Vestie itanga inama z’ivuriro?', a: 'Vestie itanga ubujyanama bugufasha, si ugupima indwara. Buri gihe gisha inama abaganga babifitiye uruhushya.' }
                     ].map((faq, i) => (
                         <div key={i} className="p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900">
                             <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">{faq.q}</h4>
@@ -607,15 +609,18 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                                 </svg>
                             </span>
                             <div>
-                                <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Need more help?</p>
-                                <p className="text-base font-semibold text-slate-900 dark:text-white">Our team replies in under 24h.</p>
+                                <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Ukeneye ubundi bufasha?</p>
+                                <p className="text-base font-semibold text-slate-900 dark:text-white">Itsinda ryacu rigusubiza mu masaha atarenze 24.</p>
                             </div>
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-                            Send us a quick note and we’ll reach out by email or chat as soon as possible.
+                            Twoherereze ubutumwa bugufi natwe tuguhamagare cyangwa tugusubize kuri email vuba bishoboka.
                         </p>
-                        <button className="w-full py-2.5 text-sm font-semibold rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">
-                            Contact Support
+                        <button
+                            onClick={() => window.location.href = 'tel:0788201992'}
+                            className="w-full py-2.5 text-sm font-semibold rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+                        >
+                            Hamagara Ubufasha
                         </button>
                     </div>
                 </div>
@@ -750,7 +755,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 case 'LOGOUT':
                     return 'Log out Everywhere';
                 default:
-                    return 'Privacy & Security';
+                    return t('profile.privacySecurity');
             }
         };
 
@@ -816,95 +821,47 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
         );
     };
 
-    const renderTermsModal = () => (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={() => setActiveModal('NONE')}></div>
-            <div className="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-100 dark:border-slate-800 animate-slide-up flex flex-col max-h-[85vh]">
-                <div className="flex justify-between items-start mb-4">
-                    <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Legal</p>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Terms & Conditions</h3>
-                    </div>
-                    <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
-                        <Icons.Close className="w-5 h-5" />
-                    </button>
-                </div>
-                <div className="text-[12px] text-slate-500 dark:text-slate-400 mb-5 border-b border-slate-200 dark:border-slate-800 pb-4">
-                    Last updated on <span className="font-semibold text-slate-700 dark:text-slate-200">12 March 2025</span>
-                </div>
+    const renderLegalModal = () => {
+        if (!activeLegalDoc) return null;
 
-                <div className="space-y-6 overflow-y-auto pr-1 text-sm text-slate-600 dark:text-slate-300 leading-relaxed no-scrollbar">
-                    <section>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Eligibility</h4>
-                        <ul className="list-decimal list-inside space-y-1">
-                            <li>You are at least 18 years old or meet your country’s legal age.</li>
-                            <li>You can enter a binding agreement with RealWorks.</li>
-                            <li>You will use the app for lawful personal finance and wellness tracking.</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Acceptable use</h4>
-                        <p>Do not misuse the platform, attempt unauthorized access, or upload harmful content. We may suspend accounts that violate these rules.</p>
-                    </section>
-                    <section>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Subscriptions</h4>
-                        <p>Paid tiers renew monthly and can be cancelled anytime inside the app. Fees are non-refundable for the current billing cycle.</p>
-                    </section>
-                    <section>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Contact</h4>
-                        <p>Email legal@realworks.africa for questions regarding these terms.</p>
-                    </section>
+        const document = getLegalDocument(activeLegalDoc, (language as 'en' | 'rw'));
+
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={() => setActiveLegalDoc(null)}></div>
+                <div className="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-100 dark:border-slate-800 animate-slide-up flex flex-col max-h-[85vh]">
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{t('profile.legalTag')}</p>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{document.title}</h3>
+                        </div>
+                        <button onClick={() => setActiveLegalDoc(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
+                            <Icons.Close className="w-5 h-5" />
+                        </button>
+                    </div>
+                    <div className="text-[12px] text-slate-500 dark:text-slate-400 mb-5 border-b border-slate-200 dark:border-slate-800 pb-4">
+                        {document.updatedOn}
+                    </div>
+
+                    <div className="space-y-6 overflow-y-auto pr-1 text-sm text-slate-600 dark:text-slate-300 leading-relaxed no-scrollbar">
+                        {document.sections.map((section, idx) => (
+                            <section key={`${section.title}-${idx}`}>
+                                <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">{section.title}</h4>
+                                {section.body && <p>{section.body}</p>}
+                                {section.bullets && (
+                                    <ul className="list-disc list-inside space-y-1 text-sm">
+                                        {section.bullets.map((bullet, bulletIdx) => (
+                                            <li key={bulletIdx}>{bullet}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </section>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
-    );
-
-    const renderPrivacyModal = () => (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={() => setActiveModal('NONE')}></div>
-            <div className="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-100 dark:border-slate-800 animate-slide-up flex flex-col max-h-[85vh]">
-                <div className="flex justify-between items-start mb-4">
-                    <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Legal</p>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Privacy Policy</h3>
-                    </div>
-                    <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
-                        <Icons.Close className="w-5 h-5" />
-                    </button>
-                </div>
-                <div className="text-[12px] text-slate-500 dark:text-slate-400 mb-5 border-b border-slate-200 dark:border-slate-800 pb-4">
-                    Last updated on <span className="font-semibold text-slate-700 dark:text-slate-200">06 March 2025</span>
-                </div>
-
-                <div className="space-y-6 overflow-y-auto pr-1 text-sm text-slate-600 dark:text-slate-300 leading-relaxed no-scrollbar">
-                    <section>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">How we handle your data</h4>
-                        <p>
-                            We collect the details you provide (name, email, phone, health logs) to personalize RealWorks and power the AI companion. This data is encrypted in transit and at rest and is never sold to third parties.
-                        </p>
-                    </section>
-                    <section>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Information we collect</h4>
-                        <ul className="list-decimal list-inside space-y-1 text-sm">
-                            <li>Personal details you share when creating an account.</li>
-                            <li>Financial activity you enter or import for budgeting.</li>
-                            <li>Wellness logs (cycle data, check-ins) you choose to store.</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Your control</h4>
-                        <p>
-                            You can download, update, or delete your information at any time from the Account screen. Contact support@realworks.africa for additional privacy requests.
-                        </p>
-                    </section>
-                    <section>
-                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Questions?</h4>
-                        <p>Read the full policy at realworks.africa/privacy or chat with support for clarifications.</p>
-                    </section>
-                </div>
-            </div>
-        </div>
-    );
+        );
+    };
 
     const renderUpgradeModal = () => (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
@@ -986,8 +943,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
             {activeModal === 'PERSONAL_INFO' && renderPersonalInfoModal()}
             {activeModal === 'HELP' && renderHelpModal()}
             {activeModal === 'SECURITY' && renderSecurityModal()}
-            {activeModal === 'TERMS' && renderTermsModal()}
-            {activeModal === 'PRIVACY' && renderPrivacyModal()}
+            {renderLegalModal()}
             {activeModal === 'UPGRADE' && renderUpgradeModal()}
             {activeModal === 'CONFIRM_LOGOUT' && renderLogoutConfirmModal()}
 
@@ -996,11 +952,11 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
 
             {/* Navbar Area */}
             <div className="pt-14 px-6 pb-4 relative z-20 flex justify-between items-center text-slate-900 dark:text-white">
-                <button onClick={onBack} className="w-10 h-10 rounded-full bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-900 transition-all active:scale-95">
+                <button onClick={onBack} className="w-10 h-10 rounded-full bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-900 transition-all active:scale-95 flex items-center justify-center">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 </button>
                 <h1 className="text-lg font-bold tracking-wide">Profile</h1>
-                <button onClick={openEditModal} className="w-10 h-10 rounded-full bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-900 transition-all active:scale-95">
+                <button onClick={openEditModal} className="w-10 h-10 rounded-full bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-900 transition-all active:scale-95 flex items-center justify-center">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </button>
             </div>
@@ -1082,7 +1038,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     {t('profile.logout')}
                 </button>
 
-                <p className="text-center text-[10px] text-gray-400 dark:text-slate-600 font-bold tracking-widest uppercase mb-4 opacity-50">RealWorks v2.4.0 • Built with ❤️</p>
+                <p className="text-center text-[10px] text-gray-400 dark:text-slate-600 font-bold tracking-widest uppercase mb-4 opacity-50">RealWorks v2.4.0 </p>
             </div>
         </div>
     );

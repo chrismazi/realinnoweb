@@ -44,7 +44,13 @@ export const translations = {
             subtitleSignup: "Create an account to start tracking your wealth and wellness.",
             subtitleRecovery: "Don't worry, we'll help you get back in.",
             sendReset: "Send Reset Link",
-            remembered: "Remembered?"
+            remembered: "Remembered?",
+            termsPrompt: "I agree to the",
+            termsLink: "Terms of Service",
+            privacyLink: "Privacy Policy",
+            acceptTermsError: "Please accept the Terms of Service and Privacy Policy to continue.",
+            viewTerms: "Read Terms",
+            viewPrivacy: "Read Privacy Policy"
         },
         dashboard: {
             welcome: "Hello",
@@ -117,7 +123,15 @@ export const translations = {
             personalInfo: "Personal Information",
             exportData: "Export Data",
             help: "Help & Support",
-            privacy: "Privacy Policy"
+            privacy: "Privacy Policy",
+            terms: "Terms & Conditions",
+            supportLegal: "Support & Legal",
+            dataPrivacy: "Data & Privacy",
+            privacySecurity: "Privacy & Security",
+            helpCenter: "Help Center",
+            exportTransactions: "Export Transactions",
+            backupAllData: "Backup All Data",
+            legalTag: "Legal"
         }
     },
     rw: {
@@ -165,7 +179,13 @@ export const translations = {
             subtitleSignup: "Fungura konti utangire gukurikirana ubukire n'ubuzima bwawe.",
             subtitleRecovery: "Humura, turagufasha kugarura konti yawe.",
             sendReset: "Ohereza Ihuza ryo guhindura",
-            remembered: "Wibutse?"
+            remembered: "Wibutse?",
+            termsPrompt: "Nemeye",
+            termsLink: "Amategeko y'Imikoreshereze",
+            privacyLink: "Politiki y'Ibanga",
+            acceptTermsError: "Mbega! banza wemere Amategeko y'Imikoreshereze na Politiki y'Ibanga mbere yo gukomeza.",
+            viewTerms: "Soma Amategeko",
+            viewPrivacy: "Soma Politiki y'Ibanga"
         },
         dashboard: {
             welcome: "Muraho",
@@ -238,7 +258,15 @@ export const translations = {
             personalInfo: "Umwirondoro wanjye",
             exportData: "Bika amakuru",
             help: "Ubufasha",
-            privacy: "Amategeko y'ibanga"
+            privacy: "Politiki y'Ibanga",
+            terms: "Amategeko n'Amabwiriza",
+            supportLegal: "Ubufasha n'Amategeko",
+            dataPrivacy: "Amakuru n'Ibanga",
+            privacySecurity: "Amabanga n'Umutekano",
+            helpCenter: "Ubufasha",
+            exportTransactions: "Ohereza Ibyakozwe",
+            backupAllData: "Bika amakuru yose",
+            legalTag: "Amategeko"
         }
     }
 };

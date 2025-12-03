@@ -815,8 +815,8 @@ const BudgetPlannerComponent = () => {
                             <div>
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1 mb-2 block">Amafaranga</label>
                                 <div className="relative group">
-                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xl">$</span>
-                                    <input type="number" value={txAmount} onChange={e => setTxAmount(e.target.value)} placeholder="0.00" className="w-full bg-slate-50 dark:bg-slate-900 rounded-3xl py-5 pl-10 pr-6 text-3xl font-black text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-teal-500 transition-all border border-slate-100 dark:border-slate-800" />
+                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm tracking-widest">RWF</span>
+                                    <input type="number" value={txAmount} onChange={e => setTxAmount(e.target.value)} placeholder="0.00" className="w-full bg-slate-50 dark:bg-slate-900 rounded-3xl py-5 pl-16 pr-6 text-3xl font-black text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-teal-500 transition-all border border-slate-100 dark:border-slate-800" />
                                 </div>
                             </div>
                             <div>
@@ -989,7 +989,7 @@ const BudgetPlannerComponent = () => {
                                     </p>
 
                                     <div className="grid grid-cols-2 gap-3">
-                                        {[{ label: 'Impano ya Leta', value: '+33%' }, { label: 'Tangirira kuri', value: 'RWF 1K' }].map((item) => (
+                                        {[{ label: 'Serivisi igenzurwa na', value: 'RSSB' }, { label: 'Tangirira kuri', value: 'RWF 1K' }].map((item) => (
                                             <div key={item.label} className="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm dark:bg-slate-900 dark:border-slate-700">
                                                 <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-2">{item.label}</p>
                                                 <p className="text-2xl font-black text-slate-900 dark:text-white">{item.value}</p>

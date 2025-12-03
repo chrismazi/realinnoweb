@@ -1038,7 +1038,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                     {t('profile.logout')}
                 </button>
 
-                <p className="text-center text-[10px] text-gray-400 dark:text-slate-600 font-bold tracking-widest uppercase mb-4 opacity-50">RealWorks v2.4.0 </p>
+                <p className="text-center text-[10px] text-gray-400 dark:text-slate-600 font-bold tracking-widest uppercase mb-4 opacity-50">RealWorks</p>
             </div>
         </div>
     );

@@ -159,7 +159,10 @@ const BudgetPlannerComponent = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showEjoHezaModal, setShowEjoHezaModal] = useState(false);
     const [ejoHezaTab, setEjoHezaTab] = useState<'about' | 'calculator' | 'howto'>('about');
-    const [ejoHezaContribution, setEjoHezaContribution] = useState(15000);
+    const [ejoHezaContribution, setEjoHezaContribution] = useState(1000);
+    const [ejoHezaCurrentAge, setEjoHezaCurrentAge] = useState(25);
+    const [ejoHezaTargetAge, setEjoHezaTargetAge] = useState(60);
+    const [ejoHezaFrequency, setEjoHezaFrequency] = useState<'Munsi' | 'Cyumweru' | 'Kwezi' | 'Mwaka'>('Kwezi');
 
     // Transaction Form State
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -467,15 +470,39 @@ const BudgetPlannerComponent = () => {
         setNewGoalDeadline(null);
     };
 
-    const ejoHezaMatchRate = 0.33;
-    const ejoHezaMaxMatch = 20000;
-
-    const ejoHezaProjectedMatch = useMemo(() => {
-        return Math.min(Math.round(ejoHezaContribution * ejoHezaMatchRate), ejoHezaMaxMatch);
-    }, [ejoHezaContribution]);
-
-    const ejoHezaProjectedTotal = useMemo(() => ejoHezaContribution + ejoHezaProjectedMatch, [ejoHezaContribution, ejoHezaProjectedMatch]);
-    const ejoHezaFiveYearTotal = useMemo(() => ejoHezaProjectedTotal * 12 * 5, [ejoHezaProjectedTotal]);
+    const ejoHezaCalculation = useMemo(() => {
+        const yearsToSave = Math.max(0, ejoHezaTargetAge - ejoHezaCurrentAge);
+        
+        // Convert contribution to yearly amount based on frequency
+        let yearlyContribution = ejoHezaContribution;
+        switch (ejoHezaFrequency) {
+            case 'Munsi': yearlyContribution = ejoHezaContribution * 365; break;
+            case 'Cyumweru': yearlyContribution = ejoHezaContribution * 52; break;
+            case 'Kwezi': yearlyContribution = ejoHezaContribution * 12; break;
+            case 'Mwaka': yearlyContribution = ejoHezaContribution; break;
+        }
+        
+        // Total contributions over the years
+        const totalContributions = yearlyContribution * yearsToSave;
+        
+        // EjoHeza uses compound interest - approximate 8% annual return
+        const annualRate = 0.08;
+        let projectedTotal = 0;
+        
+        for (let year = 0; year < yearsToSave; year++) {
+            projectedTotal = (projectedTotal + yearlyContribution) * (1 + annualRate);
+        }
+        
+        return {
+            yearsToSave,
+            yearlyContribution,
+            totalContributions,
+            projectedTotal: Math.round(projectedTotal),
+            frequencyLabel: ejoHezaFrequency === 'Munsi' ? 'ku munsi' : 
+                           ejoHezaFrequency === 'Cyumweru' ? 'ku cyumweru' : 
+                           ejoHezaFrequency === 'Kwezi' ? 'ku kwezi' : 'ku mwaka'
+        };
+    }, [ejoHezaContribution, ejoHezaCurrentAge, ejoHezaTargetAge, ejoHezaFrequency]);
 
     const getSavingsAnalysis = (goal: SavingsGoal) => {
         if (!goal.deadline) return null;
@@ -693,7 +720,7 @@ const BudgetPlannerComponent = () => {
                                 </div>
                                 <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-emerald-400 dark:text-teal-400 mb-3">Gahunda yo kuzigamira ejo hazaza</p>
                                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    Hari aho wakoresha. Uracyafite {formatCurrency(60000)} mu ngengo y'uyu munsi — shyira mu EjoHeza kugira ngo wungukire kuri +33% y'impano ya Leta.
+                                    EjoHeza, ni gahunda y'ubwizigame bw'igihe kirekire yatangijwe na Leta y'u Rwanda. Iyi gahunda igamije guha buri munyarwanda wese amahirwe angana yo kuzigama no guteganyiriza amasaziro meza.
                                 </p>
                             </div>
 
@@ -958,7 +985,7 @@ const BudgetPlannerComponent = () => {
                             {ejoHezaTab === 'about' && (
                                 <div className="space-y-5 animate-fade-in">
                                     <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm">
-                                        EjoHeza ni gahunda ya Leta y'u Rwanda ifasha buri munyarwanda kwizigamira no kubona impano ya Leta ku byo atekereza ejo hazaza.
+                                        EjoHeza, ni gahunda y'ubwizigame bw'igihe kirekire yatangijwe na Leta y'u Rwanda. Iyi gahunda igamije guha buri munyarwanda wese amahirwe angana yo kuzigama no guteganyiriza amasaziro meza.
                                     </p>
 
                                     <div className="grid grid-cols-2 gap-3">
@@ -991,58 +1018,86 @@ const BudgetPlannerComponent = () => {
 
                             {ejoHezaTab === 'calculator' && (
                                 <div className="space-y-6 animate-fade-in">
-                                    <div className="rounded-[1.8rem] border border-slate-100 bg-white p-5 shadow-sm dark:bg-slate-900 dark:border-slate-800">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div>
-                                                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Shyiramo Ku kwezi</p>
-                                                <h3 className="text-2xl font-black text-slate-900 dark:text-white">{formatCurrency(ejoHezaContribution, { maximumFractionDigits: 0 })}</h3>
-                                            </div>
-                                            <span className="text-[11px] font-bold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Kubara</span>
-
+                                    {/* Input Fields - Matching EjoHeza Official */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {/* Mfite imyaka (Current Age) */}
+                                        <div className="rounded-[1.2rem] border border-slate-200 bg-white p-4 dark:bg-slate-900 dark:border-slate-700">
+                                            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">Mfite imyaka</label>
+                                            <input
+                                                type="number"
+                                                min={16}
+                                                max={59}
+                                                value={ejoHezaCurrentAge}
+                                                onChange={(e) => setEjoHezaCurrentAge(Math.min(59, Math.max(16, Number(e.target.value))))}
+                                                className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-brand"
+                                            />
                                         </div>
-                                        <input
-                                            type="range"
-                                            min={1000}
-                                            max={100000}
-                                            step={1000}
-                                            value={ejoHezaContribution}
-                                            onChange={(e) => setEjoHezaContribution(Number(e.target.value))}
-                                            className="w-full accent-brand"
 
-                                        />
-                                        <div className="flex justify-between text-[11px] font-semibold text-slate-400 mt-2">
-                                            <span>RWF 1K</span>
-                                            <span>RWF 100K</span>
+                                        {/* Amafaranga y'ubwizigame (Savings Amount) */}
+                                        <div className="rounded-[1.2rem] border border-slate-200 bg-white p-4 dark:bg-slate-900 dark:border-slate-700">
+                                            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">Amafaranga y'ubwizigame</label>
+                                            <input
+                                                type="number"
+                                                min={1000}
+                                                step={1000}
+                                                value={ejoHezaContribution}
+                                                onChange={(e) => setEjoHezaContribution(Math.max(1000, Number(e.target.value)))}
+                                                className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-brand"
+                                            />
+                                        </div>
+
+                                        {/* Buri (Frequency) */}
+                                        <div className="rounded-[1.2rem] border border-slate-200 bg-white p-4 dark:bg-slate-900 dark:border-slate-700">
+                                            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">Buri</label>
+                                            <select
+                                                value={ejoHezaFrequency}
+                                                onChange={(e) => setEjoHezaFrequency(e.target.value as 'Munsi' | 'Cyumweru' | 'Kwezi' | 'Mwaka')}
+                                                className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-brand appearance-none cursor-pointer"
+                                            >
+                                                <option value="Munsi">Munsi</option>
+                                                <option value="Cyumweru">Cyumweru</option>
+                                                <option value="Kwezi">Kwezi</option>
+                                                <option value="Mwaka">Mwaka</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Kugeza mfite (Target Age) */}
+                                        <div className="rounded-[1.2rem] border border-slate-200 bg-white p-4 dark:bg-slate-900 dark:border-slate-700">
+                                            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 block">Kugeza mfite</label>
+                                            <input
+                                                type="number"
+                                                min={ejoHezaCurrentAge + 1}
+                                                max={100}
+                                                value={ejoHezaTargetAge}
+                                                onChange={(e) => setEjoHezaTargetAge(Math.max(ejoHezaCurrentAge + 1, Number(e.target.value)))}
+                                                className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-brand"
+                                            />
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                        {[{
-                                            label: 'Ufatiweho',
-                                            value: formatCurrency(ejoHezaContribution, { maximumFractionDigits: 0 })
-                                        }, {
-                                            label: "Impano ya Leta (+33%)",
-                                            value: formatCurrency(ejoHezaProjectedMatch, { maximumFractionDigits: 0 })
-                                        }, {
-                                            label: 'Utahana buri kwezi',
-                                            value: formatCurrency(ejoHezaProjectedTotal, { maximumFractionDigits: 0 })
-                                        }].map((item) => (
-                                            <div key={item.label} className="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm dark:bg-slate-900 dark:border-slate-700">
-                                                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-2">{item.label}</p>
-                                                <p className="text-xl font-black text-slate-900 dark:text-white">{item.value}</p>
-                                            </div>
-                                        ))}
+                                    {/* Projected Total - Big Display */}
+                                    <div className="rounded-[1.8rem] border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm dark:from-emerald-900/20 dark:to-slate-900 dark:border-emerald-800/30 text-center">
+                                        <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-wider">Amafaranga Wungukira Muri Gahunda Ngejeje</p>
+                                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white">
+                                            RWF <span className="text-emerald-600 dark:text-emerald-400">{ejoHezaCalculation.projectedTotal.toLocaleString()}</span>
+                                        </h2>
                                     </div>
 
-                                    <div className="rounded-[1.8rem] border border-slate-100 bg-white p-5 shadow-sm dark:bg-slate-900 dark:border-slate-800">
-                                        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-2">Mu myaka 5</p>
-                                        <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">{formatCurrency(ejoHezaFiveYearTotal, { maximumFractionDigits: 0 })}</h3>
-
-                                        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                            Ushyira kuri konti ya EjoHeza amafaranga angana n'aya buri kwezi, ukoresheje impano ya Leta ya +33%,
-                                            ushobora kugira iyi nyongeragaciro mu myaka 5, utabariyemo inyungu y'isoko.
-                                        </p>
+                                    {/* Summary Info */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="rounded-[1.2rem] border border-slate-200 bg-white p-4 dark:bg-slate-900 dark:border-slate-700">
+                                            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Imyaka yo kuzigama</p>
+                                            <p className="text-xl font-black text-slate-900 dark:text-white">{ejoHezaCalculation.yearsToSave} imyaka</p>
+                                        </div>
+                                        <div className="rounded-[1.2rem] border border-slate-200 bg-white p-4 dark:bg-slate-900 dark:border-slate-700">
+                                            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Uzigama {ejoHezaCalculation.frequencyLabel}</p>
+                                            <p className="text-xl font-black text-slate-900 dark:text-white">{formatCurrency(ejoHezaContribution)}</p>
+                                        </div>
                                     </div>
+
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 text-center leading-relaxed">
+                                        Iyi ni estimate gusa. Amafaranga nyayo ashobora gutandukana hashingiwe ku nyungu z'isoko.
+                                    </p>
                                 </div>
                             )}
 

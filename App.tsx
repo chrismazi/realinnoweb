@@ -27,6 +27,12 @@ const App: React.FC = () => {
   // Get store actions
   const { loadFromStorage, syncWithSupabase, setUser } = useAppStore();
 
+  // State for password reset flow
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+
   // Handle auth callback (email verification, password reset, etc.)
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -34,13 +40,14 @@ const App: React.FC = () => {
       const code = url.searchParams.get('code');
       const error = url.searchParams.get('error');
       const errorDescription = url.searchParams.get('error_description');
+      const isPasswordReset = url.pathname.includes('/auth/reset-password');
+      const isEmailVerification = url.pathname.includes('/auth/callback');
       
       // Check if this is an auth callback
-      if (url.pathname.includes('/auth/callback') || code || error) {
+      if (isEmailVerification || isPasswordReset || code || error) {
         if (error) {
           console.error('Auth callback error:', error, errorDescription);
           setAuthMessage({ type: 'error', text: errorDescription || 'Authentication failed. Please try again.' });
-          // Clear URL params
           window.history.replaceState({}, '', '/');
           return;
         }
@@ -54,24 +61,69 @@ const App: React.FC = () => {
             if (exchangeError) {
               console.error('Code exchange error:', exchangeError);
               setAuthMessage({ type: 'error', text: 'Verification failed. The link may have expired.' });
+              window.history.replaceState({}, '', '/');
             } else if (data.session) {
-              console.log('Email verified successfully!');
-              setAuthMessage({ type: 'success', text: 'Email verified successfully! You can now sign in.' });
-              setIsAuthenticated(true);
+              // Check if this is a password reset flow
+              if (isPasswordReset) {
+                console.log('Password reset session established');
+                setShowPasswordReset(true);
+                // Keep the session but show password reset UI
+                window.history.replaceState({}, '', '/');
+              } else {
+                // Email verification flow
+                console.log('Email verified successfully!');
+                setAuthMessage({ type: 'success', text: 'Email verified successfully! You can now sign in.' });
+                setIsAuthenticated(true);
+                window.history.replaceState({}, '', '/');
+              }
             }
           } catch (err) {
             console.error('Auth callback processing error:', err);
             setAuthMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+            window.history.replaceState({}, '', '/');
           }
-          
-          // Clear URL params
-          window.history.replaceState({}, '', '/');
         }
       }
     };
     
     handleAuthCallback();
   }, []);
+
+  // Handle password update
+  const handlePasswordUpdate = async () => {
+    if (newPassword !== confirmPassword) {
+      setAuthMessage({ type: 'error', text: 'Passwords do not match.' });
+      return;
+    }
+    
+    if (newPassword.length < 8) {
+      setAuthMessage({ type: 'error', text: 'Password must be at least 8 characters long.' });
+      return;
+    }
+
+    setIsResettingPassword(true);
+    try {
+      const { supabase } = await import('./lib/supabase');
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      
+      if (error) {
+        console.error('Password update error:', error);
+        setAuthMessage({ type: 'error', text: error.message || 'Failed to update password.' });
+      } else {
+        setAuthMessage({ type: 'success', text: 'Password updated successfully! You can now sign in.' });
+        setShowPasswordReset(false);
+        setNewPassword('');
+        setConfirmPassword('');
+        // Sign out so user can log in with new password
+        await supabase.auth.signOut();
+      }
+    } catch (err: any) {
+      console.error('Password update exception:', err);
+      setAuthMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
 
   // Initialize app on mount
   useEffect(() => {
@@ -238,6 +290,84 @@ const App: React.FC = () => {
     if (showSplash) return <SplashScreen onFinish={handleSplashFinish} />;
 
     if (showOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
+
+    // Password Reset UI
+    if (showPasswordReset) return (
+      <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-950">
+        {/* Auth Message Toast */}
+        {authMessage && (
+          <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl shadow-xl z-[100] animate-slide-up ${
+            authMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white text-sm font-medium`}>
+            {authMessage.text}
+            <button onClick={() => setAuthMessage(null)} className="ml-3 text-white/80 hover:text-white">✕</button>
+          </div>
+        )}
+        
+        <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl">
+          {/* Logo */}
+          <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
+          </div>
+          
+          <h2 className="text-2xl font-bold text-center text-slate-900 dark:text-white mb-2">Reset Password</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-center text-sm mb-6">Enter your new password below</p>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirm Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm new password"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+              />
+            </div>
+            
+            <button
+              onClick={handlePasswordUpdate}
+              disabled={isResettingPassword || !newPassword || !confirmPassword}
+              className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isResettingPassword ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Updating...
+                </>
+              ) : 'Update Password'}
+            </button>
+            
+            <button
+              onClick={() => {
+                setShowPasswordReset(false);
+                setNewPassword('');
+                setConfirmPassword('');
+              }}
+              className="w-full py-3 text-slate-600 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
 
     if (!isAuthenticated) return (
       <>

@@ -1185,7 +1185,7 @@ const SexualHealth: React.FC = () => {
         name: 'Imibereho', tasks: [
           { id: 'habits', label: 'Gabanya ikawa', desc: 'Munsi ya 200mg ku munsi (ikombe 1).' },
           { id: 'smoke', label: 'Reka kunywa itabi', desc: 'Ni ngombwa ku migi myiza.' },
-          { id: 'sleep', label: 'Ibitotsi byiza', desc: 'Amasaha 7-8 kugira ngo hormone zitunganye.' }
+          { id: 'sleep', label: 'Kuruhuka neza', desc: 'Amasaha 7-8 kugira ngo hormone zitunganye.' }
         ]
       },
       {

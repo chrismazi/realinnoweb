@@ -11,19 +11,19 @@ const slides = [
   {
     id: 1,
     title: "Genzura Amafaranga Yawe",
-    desc: "Kurikirana uko utunze, wubake ingengo y'imari, kandi ugenze neza ukoresheje RealWorks.",
+    desc: "Kurikirana kandi ugenzure umutungo wawe, wishyirireho intego ukoresheje urubuga rwa RealWorks.",
     image: real1,
   },
   {
     id: 2,
     title: "Inshuti y'Ubuzima",
-    desc: "Ahantu hizewe ho kuganira, kwibuka, no kubona amahoro mu mutwe hamwe n'ubufasha bwa AI.",
+    desc: "Urubuga rwizewe rwo kuganiriraho, kwiyubaka, no kubonera ubufashe hamwe hifashishijwe AI.",
     image: real2,
   },
   {
     id: 3,
     title: "Ubuzima Ni Bwo Bwa Mbere",
-    desc: "Kukugezaho ubumenyi bwizewe ku buzima bw'imyororokere no kwita ku mubiri.",
+    desc: "Tukugezaho ubumenyi bwizewe ku buzima bw'imyororokere n'inama zo kwita ku mubiri wawe.",
     image: real3,
   }
 ];

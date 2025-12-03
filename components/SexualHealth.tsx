@@ -1492,7 +1492,7 @@ const SexualHealth: React.FC = () => {
 
       {view === 'DASHBOARD' && (
         <div className="p-6 grid grid-cols-1 gap-8 animate-slide-up">
-          {dashboardCards.map(card => (
+          {dashboardCards.filter(card => card.id !== 'mens' && card.id !== 'womens').map(card => (
               <div
                 key={card.id}
                 role="button"

@@ -540,22 +540,22 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
             <div className="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-100 dark:border-slate-800 animate-slide-up">
                 <div className="flex justify-between items-start mb-6">
                     <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Session</p>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Are you sure you want to log out?</h3>
+                        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Sesiyo</p>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Urumva ushaka gusohoka?</h3>
                     </div>
                     <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
                         <Icons.Close className="w-5 h-5" />
                     </button>
                 </div>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-8">
-                    Logging out will end your current session on this device. You can always log back in with your email and password.
+                    Gusohoka birarangiza sesiyo iri muri iyi Telefoni. Ushobora kongera kwinjira ukoresheje imeyili na pasiwode igihe icyo ari cyo cyose.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
                     <button
                         onClick={() => setActiveModal('NONE')}
                         className="flex-1 rounded-2xl border border-slate-200 dark:border-slate-800 py-3 font-bold text-sm text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        Stay logged in
+                        Guma muri konti
                     </button>
                     <button
                         onClick={() => {
@@ -564,7 +564,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                         }}
                         className="flex-1 rounded-2xl bg-red-500 text-white py-3 font-bold text-sm shadow-sm hover:bg-red-600 transition-colors"
                     >
-                        Log me out
+                        Sohoka
                     </button>
                 </div>
             </div>

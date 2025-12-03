@@ -1151,7 +1151,7 @@ const SexualHealth: React.FC = () => {
         color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
         icon: <Icons.Sparkles className="w-6 h-6" />,
         description: 'Tekereza nkaho utegura ubutaka mbere yo gutera. Shira umwete ku guhindura imyitwarire no kubika intungamubiri.',
-        tips: ['Tangira imiti yinda ifite 400mcg ya Folic Acid.', 'Gabanya ikawa kugira ngo wirinde kubabara umutwe nyuma.', 'Gena igihe cyo gusuzumwa mbere yo gusama.']
+        tips: ['Tangira imiti yinda ifite 400mcg ya Folic Acid.', 'Gabanya ikawa kugira ngo wirinde kubabara umutwe.', 'Gena igihe cyo gusuzumwa mbere yo gusama.']
       },
       {
         id: 'TRACK',
@@ -1159,8 +1159,8 @@ const SexualHealth: React.FC = () => {
         timeline: 'Amezi 1-3 mbere',
         color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
         icon: <Icons.ChartBar className="w-6 h-6" />,
-        description: 'Umubiri wawe uguha ibimenyetso buri kwezi. Ubu ni igihe cyo kwiga ururimi rwimihango yawe.',
-        tips: ['Gusohora igi ntabwo buri gihe biba ku munsi wa 14. Kurikirana ubushyuhe bwumubiri.', 'Shakisha umwanda winkondo usa nubugi bwigi.', 'Gabanya stress; cortisol nyinshi ishobora gutinda gusohora igi.']
+        description: 'Umubiri wawe uguha ibimenyetso buri kwezi. Iki ni igihe cyo kwiga no gusobanukirwa imihindagurike y’imihango yawe.',
+        tips: ['Gusohora igi ntibiba ku munsi wa 14 kuri buri mugore.', 'Reba impinduka ku mwanda w’inkondo y’umura', 'Gabanya stress; cortisol nyinshi ishobora gutinza gusohora igi.']
       },
       {
         id: 'TRY',
@@ -1168,8 +1168,8 @@ const SexualHealth: React.FC = () => {
         timeline: 'Igihe cyiza',
         color: 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300',
         icon: <Icons.Heart className="w-6 h-6" />,
-        description: 'Igikorwa nyamukuru. Tegura neza igihe utabuze urukundo.',
-        tips: ['Intanga zumugabo zimara kugeza iminsi 5; amagi amara amasaha 12-24 gusa.', 'Gerageza guhuza ku minsi O-2 na O-1.', 'Bikorwe mu bishimishije—stress ibuza uburumbuke.']
+        description: 'Igikorwa nyamukuru. Tegura neza uwo mubana.',
+        tips: ['Intanga zumugabo zimara kugeza iminsi 5; amagi amara amasaha 12-24 gusa.', 'Gerageza gukora imibonano ku minsi O–2 na O–1 kugira ngo wongere amahirwe yo gusama.', 'Ibi bikorwa mubyinjiyemo mu munezero; stress nyinshi igabanya amahirwe y’uburumbuke.']
       }
     ];
 

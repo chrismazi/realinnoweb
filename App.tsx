@@ -22,9 +22,56 @@ const App: React.FC = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>(Tab.DASHBOARD);
   const [userName, setUserName] = useState<string>('');
+  const [authMessage, setAuthMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Get store actions
-  const { loadFromStorage, syncWithSupabase } = useAppStore();
+  const { loadFromStorage, syncWithSupabase, setUser } = useAppStore();
+
+  // Handle auth callback (email verification, password reset, etc.)
+  useEffect(() => {
+    const handleAuthCallback = async () => {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('code');
+      const error = url.searchParams.get('error');
+      const errorDescription = url.searchParams.get('error_description');
+      
+      // Check if this is an auth callback
+      if (url.pathname.includes('/auth/callback') || code || error) {
+        if (error) {
+          console.error('Auth callback error:', error, errorDescription);
+          setAuthMessage({ type: 'error', text: errorDescription || 'Authentication failed. Please try again.' });
+          // Clear URL params
+          window.history.replaceState({}, '', '/');
+          return;
+        }
+        
+        if (code) {
+          try {
+            // Exchange code for session using Supabase
+            const { supabase } = await import('./lib/supabase');
+            const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+            
+            if (exchangeError) {
+              console.error('Code exchange error:', exchangeError);
+              setAuthMessage({ type: 'error', text: 'Verification failed. The link may have expired.' });
+            } else if (data.session) {
+              console.log('Email verified successfully!');
+              setAuthMessage({ type: 'success', text: 'Email verified successfully! You can now sign in.' });
+              setIsAuthenticated(true);
+            }
+          } catch (err) {
+            console.error('Auth callback processing error:', err);
+            setAuthMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+          }
+          
+          // Clear URL params
+          window.history.replaceState({}, '', '/');
+        }
+      }
+    };
+    
+    handleAuthCallback();
+  }, []);
 
   // Initialize app on mount
   useEffect(() => {
@@ -46,20 +93,43 @@ const App: React.FC = () => {
         if (response.success && response.data) {
           setIsAuthenticated(true);
           setUserName(response.data.profile.name);
+          // Update store with full user data including ID
+          setUser({
+            id: response.data.user.id,
+            name: response.data.profile.name,
+            email: response.data.profile.email,
+            phone: response.data.profile.phone || '',
+            avatar: response.data.profile.avatar_url || '',
+            isAuthenticated: true
+          });
           // Sync data with Supabase
           syncWithSupabase();
         }
       });
 
       // Subscribe to auth state changes
-      const { data: { subscription } } = supabaseAuthService.onAuthStateChange((session) => {
+      const { data: { subscription } } = supabaseAuthService.onAuthStateChange(async (session) => {
         if (session) {
           setIsAuthenticated(true);
+          // Load user profile when session changes
+          const userResponse = await supabaseAuthService.getCurrentUser();
+          if (userResponse.success && userResponse.data) {
+            setUserName(userResponse.data.profile.name);
+            setUser({
+              id: userResponse.data.user.id,
+              name: userResponse.data.profile.name,
+              email: userResponse.data.profile.email,
+              phone: userResponse.data.profile.phone || '',
+              avatar: userResponse.data.profile.avatar_url || '',
+              isAuthenticated: true
+            });
+          }
           // Sync data when session is established
           syncWithSupabase();
         } else {
           setIsAuthenticated(false);
           setUserName('');
+          setUser({ id: null, name: '', email: '', phone: '', avatar: '', isAuthenticated: false });
         }
       });
 
@@ -74,7 +144,7 @@ const App: React.FC = () => {
       hasSeenOnboarding: localStorage.getItem('hasSeenOnboarding'),
       userName: localStorage.getItem('userName'),
     });
-  }, [loadFromStorage, syncWithSupabase]);
+  }, [loadFromStorage, syncWithSupabase, setUser]);
 
   // Splash Screen Timer
   const handleSplashFinish = () => {
@@ -107,12 +177,19 @@ const App: React.FC = () => {
     setShowOnboarding(false);
   };
 
-  const handleLogin = (userData?: { name: string; email: string }) => {
+  const handleLogin = (userData?: { name: string; email: string; id?: string }) => {
     localStorage.setItem('isAuthenticated', 'true');
     if (userData) {
       localStorage.setItem('userName', userData.name);
       localStorage.setItem('userEmail', userData.email);
       setUserName(userData.name);
+      // Update store with user data
+      setUser({
+        id: userData.id || null,
+        name: userData.name,
+        email: userData.email,
+        isAuthenticated: true
+      });
     }
     setIsAuthenticated(true);
   };
@@ -162,7 +239,25 @@ const App: React.FC = () => {
 
     if (showOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
 
-    if (!isAuthenticated) return <Auth onLogin={handleLogin} />;
+    if (!isAuthenticated) return (
+      <>
+        {/* Auth Message Toast */}
+        {authMessage && (
+          <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl shadow-xl z-[100] animate-slide-up ${
+            authMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white text-sm font-medium`}>
+            {authMessage.text}
+            <button 
+              onClick={() => setAuthMessage(null)} 
+              className="ml-3 text-white/80 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+        <Auth onLogin={handleLogin} />
+      </>
+    );
 
     return (
       <ErrorBoundary>

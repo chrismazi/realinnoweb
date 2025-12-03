@@ -450,7 +450,7 @@ const SexualHealth: React.FC = () => {
         <div className="sticky top-0 z-10 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl mb-6 transition-colors border-b border-slate-200 dark:border-slate-800">
           <div className="flex gap-2 overflow-x-auto no-scrollbar px-6 py-3">
             {(['DASHBOARD', 'JOURNAL', 'LIBRARY', 'TOOLS', 'SUPPORT', 'CHAT'] as MentalTab[]).map(tab => (
-              <button key={tab} onClick={() => { setMentalTab(tab); setReadingArticle(null); setActiveAssessment(null); }} className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-sm border ${mentalTab === tab ? 'bg-slate-900 text-white shadow-slate-300 dark:shadow-slate-900/50 scale-105 border-slate-900' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>{tab === 'DASHBOARD' && 'Ubuzima bwanjye'}{tab === 'JOURNAL' && 'Andika'}{tab === 'LIBRARY' && 'Isomero'}{tab === 'TOOLS' && 'Ibikoresho'}{tab === 'SUPPORT' && 'Ubufasha'}{tab === 'CHAT' && 'Ibiganiro'}</button>
+              <button key={tab} onClick={() => { setMentalTab(tab); setReadingArticle(null); setActiveAssessment(null); }} className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-sm border ${mentalTab === tab ? 'bg-slate-900 text-white shadow-slate-300 dark:shadow-slate-900/50 scale-105 border-slate-900' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>{tab === 'DASHBOARD' && 'Ubuzima bwanjye'}{tab === 'JOURNAL' && 'Andika'}{tab === 'LIBRARY' && 'Inyigisho'}{tab === 'TOOLS' && 'Ibikoresho'}{tab === 'SUPPORT' && 'Ubufasha'}{tab === 'CHAT' && 'Ibiganiro'}</button>
             ))}
           </div>
         </div>
@@ -1008,7 +1008,7 @@ const SexualHealth: React.FC = () => {
               {tab === 'CYCLE' && 'Imihango & Kalendari'}
               {tab === 'INSIGHTS' && "Amakuru y'Umunsi"}
               {tab === 'LOG' && 'Ibimenyetso'}
-              {tab === 'RESOURCES' && "Isomero ry'Ubuzima"}
+              {tab === 'RESOURCES' && "Inyigisho z'Ubuzima"}
             </button>
           ))}
         </div>
@@ -1058,7 +1058,7 @@ const SexualHealth: React.FC = () => {
             {womensResource !== 'NONE' && (
               <button onClick={() => setWomensResource('NONE')} className="mb-6 flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors bg-white dark:bg-slate-900 px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:border-slate-800 w-fit">
                 <Icons.Back className="w-4 h-4" />
-                Subira mu Isomero
+                Subira Inyuma
               </button>
             )}
 

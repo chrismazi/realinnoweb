@@ -664,9 +664,9 @@ const SexualHealth: React.FC = () => {
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-8">
               <div>
-                <p className="text-blue-300 text-xs font-bold uppercase tracking-wider mb-2">Overall Wellness</p>
+                <p className="text-blue-300 text-xs font-bold uppercase tracking-wider mb-2">Ubuzima Bwose</p>
                 <h2 className="text-5xl font-extrabold tracking-tight">85<span className="text-2xl text-blue-300/50">/100</span></h2>
-                <span className="inline-block mt-2 px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/30 rounded-full text-xs font-bold uppercase tracking-wide">Status: Optimal</span>
+                <span className="inline-block mt-2 px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/30 rounded-full text-xs font-bold uppercase tracking-wide">Imiterere: Nziza cyane</span>
               </div>
               {/* Interactive Ring Mockup */}
               <div className="w-20 h-20 rounded-full border-[6px] border-blue-500/30 flex items-center justify-center relative">
@@ -677,9 +677,9 @@ const SexualHealth: React.FC = () => {
 
             <div className="grid grid-cols-3 gap-3">
               {[
-                { label: 'Sleep Quality', val: '7.5h', score: 'bg-green-500', sub: 'Restorative' },
-                { label: 'Stress Lvl', val: 'Low', score: 'bg-green-500', sub: 'Managed' },
-                { label: 'Activity', val: '45m', score: 'bg-blue-500', sub: 'Active' }
+                { label: 'Ibitotsi', val: '7.5h', score: 'bg-green-500', sub: 'Byiza' },
+                { label: 'Stress', val: 'Hasi', score: 'bg-green-500', sub: 'Biragenzuwe' },
+                { label: 'Imyitozo', val: '45m', score: 'bg-blue-500', sub: 'Urakora' }
               ].map((item, i) => (
                 <div key={i} className="bg-white/5 rounded-2xl p-4 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors group/item">
                   <div className={`w-2 h-2 ${item.score} rounded-full mb-2`}></div>
@@ -695,8 +695,8 @@ const SexualHealth: React.FC = () => {
         {/* Nutrient Optimization Section */}
         <div>
           <div className="flex justify-between items-center mb-4 px-1">
-            <h3 className="font-bold text-gray-900 text-lg">Fuel Your Body</h3>
-            <span className="text-xs font-bold text-slate-500">Natural Sources</span>
+            <h3 className="font-bold text-gray-900 text-lg">Tegura Umubiri Wawe</h3>
+            <span className="text-xs font-bold text-slate-500">Inkomoko Kamere</span>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group">
@@ -704,7 +704,7 @@ const SexualHealth: React.FC = () => {
                 <Icons.Activity className="w-32 h-32 text-slate-900" />
               </div>
               <h4 className="font-bold text-slate-900 mb-1 relative z-10">Zinc</h4>
-              <p className="text-xs text-slate-500 mb-4 relative z-10">Immunity & Testosterone</p>
+              <p className="text-xs text-slate-500 mb-4 relative z-10">Ubudahangarwa & Testosterone</p>
               <div className="space-y-2 relative z-10">
                 {[
                   { name: 'Pumpkin Seeds', icon: '🎃' },
@@ -723,7 +723,7 @@ const SexualHealth: React.FC = () => {
                 <Icons.Activity className="w-32 h-32 text-slate-900" />
               </div>
               <h4 className="font-bold text-slate-900 mb-1 relative z-10">Magnesium</h4>
-              <p className="text-xs text-slate-500 mb-4 relative z-10">Recovery & Sleep</p>
+              <p className="text-xs text-slate-500 mb-4 relative z-10">Gusubirana & Ibitotsi</p>
               <div className="space-y-2 relative z-10">
                 {[
                   { name: 'Dark Chocolate', icon: '🍫' },
@@ -743,8 +743,8 @@ const SexualHealth: React.FC = () => {
         {/* Daily Protocol Checklist */}
         <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-gray-900 text-lg">Optimization Protocol</h3>
-            <span className="text-xs font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full">{mensChecklist.length}/4 Complete</span>
+            <h3 className="font-bold text-gray-900 text-lg">Gahunda yo Kunoza</h3>
+            <span className="text-xs font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full">{mensChecklist.length}/4 Byarangiye</span>
           </div>
           <div className="space-y-3">
             {[
@@ -787,8 +787,8 @@ const SexualHealth: React.FC = () => {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-bold text-slate-900 text-lg">Prostate Health</h3>
-                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded-md">Priority</span>
+                <h3 className="font-bold text-slate-900 text-lg">Ubuzima bwa Prostate</h3>
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded-md">Ingenzi</span>
               </div>
               <p className="text-sm text-slate-500 leading-relaxed font-medium">
                 Prostate cancer is the second most common cancer in men. Early screening significantly improves outcomes.
@@ -798,7 +798,7 @@ const SexualHealth: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Key Symptoms</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Ibimenyetso by'ingenzi</p>
               <ul className="text-xs text-slate-600 space-y-2 font-bold">
                 <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>Night Urination</li>
                 <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>Weak Flow</li>
@@ -806,7 +806,7 @@ const SexualHealth: React.FC = () => {
               </ul>
             </div>
             <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
-              <p className="text-[10px] text-blue-400 font-bold uppercase tracking-wider mb-2">Screening Plan</p>
+              <p className="text-[10px] text-blue-400 font-bold uppercase tracking-wider mb-2">Gahunda yo gusuzumwa</p>
               <div className="mb-2">
                 <p className="text-xs text-blue-900 font-bold">PSA Blood Test</p>
                 <p className="text-[10px] text-blue-600">Yearly starting at age 50.</p>
@@ -823,10 +823,10 @@ const SexualHealth: React.FC = () => {
         <div className="bg-white rounded-[2.5rem] p-6 border border-gray-100 shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h3 className="font-bold text-gray-900 text-lg">Testicular Self-Exam</h3>
-              <p className="text-xs text-gray-400 font-medium">Monthly • 3 Minutes • In Shower</p>
+              <h3 className="font-bold text-gray-900 text-lg">Kwisuzuma Amabya</h3>
+              <p className="text-xs text-gray-400 font-medium">Buri kwezi • Iminota 3 • Mu mazi</p>
             </div>
-            <div className="px-3 py-1 bg-teal-50 text-teal-600 text-[10px] font-bold rounded-full uppercase tracking-wide">Step-by-Step</div>
+            <div className="px-3 py-1 bg-teal-50 text-teal-600 text-[10px] font-bold rounded-full uppercase tracking-wide">Intambwe ku ntambwe</div>
           </div>
 
           <div className="relative">
@@ -842,21 +842,21 @@ const SexualHealth: React.FC = () => {
               {examStep === 0 && (
                 <div className="animate-fade-in relative z-10">
                   <span className="text-slate-200 font-black text-6xl absolute -top-6 -left-4 select-none">01</span>
-                  <h4 className="font-bold text-gray-900 mb-3 text-xl relative z-10">Preparation</h4>
+                  <h4 className="font-bold text-gray-900 mb-3 text-xl relative z-10">Kwitegura</h4>
                   <p className="text-sm text-gray-600 leading-relaxed font-medium relative z-10">Best performed during or immediately after a warm shower. The heat relaxes the scrotum, making it easier to detect anything unusual. Check one testicle at a time.</p>
                 </div>
               )}
               {examStep === 1 && (
                 <div className="animate-fade-in relative z-10">
                   <span className="text-slate-200 font-black text-6xl absolute -top-6 -left-4 select-none">02</span>
-                  <h4 className="font-bold text-gray-900 mb-3 text-xl relative z-10">Examination</h4>
+                  <h4 className="font-bold text-gray-900 mb-3 text-xl relative z-10">Isuzuma</h4>
                   <p className="text-sm text-gray-600 leading-relaxed font-medium relative z-10">Hold the testicle between your thumbs and fingers with both hands. Gently roll it between your fingers. Look and feel for any hard lumps or smooth rounded bumps.</p>
                 </div>
               )}
               {examStep === 2 && (
                 <div className="animate-fade-in relative z-10">
                   <span className="text-slate-200 font-black text-6xl absolute -top-6 -left-4 select-none">03</span>
-                  <h4 className="font-bold text-gray-900 mb-3 text-xl relative z-10">Know Anatomy</h4>
+                  <h4 className="font-bold text-gray-900 mb-3 text-xl relative z-10">Menya imiterere</h4>
                   <p className="text-sm text-gray-600 leading-relaxed font-medium relative z-10">Locate the epididymis, a soft, rope-like structure behind the testicle. This is normal. If you find any other lumps, changes in size, or feel pain, consult a urologist.</p>
                 </div>
               )}
@@ -968,15 +968,15 @@ const SexualHealth: React.FC = () => {
 
         {/* Actionable Toolkit Footer */}
         <div className="mt-10 pt-8 border-t border-gray-100">
-          <h3 className="font-bold text-gray-900 mb-4 px-1">Resource Toolkit</h3>
+          <h3 className="font-bold text-gray-900 mb-4 px-1">Ibikoresho by'Ubufasha</h3>
           <div className="flex gap-3 overflow-x-auto no-scrollbar pb-4">
             <button className="flex-shrink-0 w-36 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3 group hover:border-blue-200 transition-colors">
               <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Icons.Search className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <span className="block font-bold text-xs text-gray-900">Find Urologist</span>
-                <span className="text-[10px] text-gray-400">Specialists Nearby</span>
+                <span className="block font-bold text-xs text-gray-900">Shaka Muganga</span>
+                <span className="text-[10px] text-gray-400">Inzobere hafi</span>
               </div>
             </button>
             <button className="flex-shrink-0 w-36 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3 group hover:border-green-200 transition-colors">
@@ -984,8 +984,8 @@ const SexualHealth: React.FC = () => {
                 <Icons.Calendar className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <span className="block font-bold text-xs text-gray-900">Book Exam</span>
-                <span className="text-[10px] text-gray-400">Annual Checkup</span>
+                <span className="block font-bold text-xs text-gray-900">Gahunda Isuzuma</span>
+                <span className="text-[10px] text-gray-400">Isuzuma rya buri mwaka</span>
               </div>
             </button>
           </div>

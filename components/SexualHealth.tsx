@@ -309,8 +309,8 @@ const SexualHealth: React.FC = () => {
       bestFor: 'Imihango yoroheje n\'uburyo bworoshye bw\'igihe kirekire.'
     },
     {
-      id: '4', name: 'Agakingirizo', efficacy: '85-98%', efficacyValue: 88, type: 'Igikingirizo',
-      desc: 'Igikingirizo cy\'indwara zandurira mu mibonano mpuzabitsina n\'inda.',
+      id: '4', name: 'Agakingirizo', efficacy: '85-98%', efficacyValue: 88, type: 'Agakingirizo',
+      desc: 'Agakingirizo k\'indwara zandurira mu mibonano mpuzabitsina n\'inda zitateganyijwe.',
       pros: ['Kurinda indwara zandurira', 'Nta miti ngendanubuzima', 'Igihe icyo ari cyo cyose'],
       cons: ['Bihagarika akanya', 'Bishobora gucika/kwiruka'],
       tags: ['Nta miti ngendanubuzima', 'Igihe icyo ari cyo cyose'],
@@ -327,8 +327,8 @@ const SexualHealth: React.FC = () => {
   ];
 
   const sideEffects = [
-    { id: 'nausea', label: 'Kwongera kurya', guidance: 'Ibi birashobora kubaho kwa estrogen. Bimwe bifasha mu minsi 2-3.', tip: 'Kurya n\'ijoro cyangwa mbere yo kwiba.', alert: 'Kumira cyane mu nda.' },
-    { id: 'spotting', label: 'Kutakaza amaraso', guidance: 'Ibi birashobora kubaho mu minsi 3-6 ya mbere ya LARC cyangwa ibinini.', tip: 'Kwandika buri munsi. Kuba n\'amaraso ahari.', alert: 'Kutakaza amaraso kanke kandi kibisi.' },
+    { id: 'nausea', label: 'Isesemi', guidance: 'Ibi bishobora guterwa n’imihindagurike ya hormone. Akenshi biragenda mu minsi 2–3.', tip: 'Fungura utuntu duto duto kenshi, wirinde kurya ibiremereye nijoro.', alert: 'Niba kuribwa mu nda gukomeje cyangwa bikiyongera, saba ubufasha kwa muganga.' },
+    { id: 'spotting', label: 'Kutakaza amaraso', guidance: 'Ibi bishobora kubaho mu minsi 3–6 ya mbere yo gukoresha LARC cyangwa ibinini byo kuboneza urubyaro.', tip: 'Jya wibuka kwandika ibihe bibaye buri munsi kugira ngo ubyiteho neza.', alert: 'Niba utakaza amaraso menshi cyangwa bimara iminsi myinshi, saba ubufasha kwa muganga.' },
   ];
 
   const dashboardCards = [

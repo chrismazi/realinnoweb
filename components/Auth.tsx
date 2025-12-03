@@ -5,6 +5,7 @@ import supabaseAuthService from '../services/supabaseAuth';
 import { useTranslation } from '../hooks/useTranslation';
 import { getLegalDocument } from '../utils/legalContent';
 import type { LegalDocumentType } from '../utils/legalContent';
+import Logo from './Logo.png';
 
 interface AuthProps {
   onLogin: (userData?: { name: string; email: string; id: string }) => void;
@@ -236,20 +237,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           animate="visible"
         >
           <div className="flex flex-col items-center text-center gap-4">
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 text-brand">
-              <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="6" />
-              <g transform="translate(50 50)">
-                {[0, 60, 120, 180, 240, 300].map((angle, i) => (
-                  <path
-                    key={i}
-                    d="M0 -10 C 10 -25, 10 -35, 0 -40 C -10 -35, -10 -25, 0 -10 Z"
-                    fill="currentColor"
-                    transform={`rotate(${angle}) translate(0, 5)`}
-                  />
-                ))}
-                <circle cx="0" cy="0" r="8" fill="currentColor" />
-              </g>
-            </svg>
+            <img src={Logo} alt="RealWorks Logo" className="w-20 h-20 object-contain drop-shadow-xl" />
 
             <div>
               <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">

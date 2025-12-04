@@ -270,26 +270,26 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3 flex-wrap">
-                        <div className="flex items-center gap-2 px-2 py-2 rounded-full bg-white/85 dark:bg-slate-900/70 border border-white/50 dark:border-slate-800/60 shadow-[0_10px_26px_rgba(15,23,42,0.12)] backdrop-blur">
-                            <button onClick={() => setShowClearConfirm(true)} className="h-10 px-4 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-2 active:scale-95 text-[10px] font-bold">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 px-1.5 py-1.5 rounded-full bg-white/85 dark:bg-slate-900/70 border border-white/50 dark:border-slate-800/60 shadow-[0_10px_26px_rgba(15,23,42,0.12)] backdrop-blur">
+                            <button onClick={() => setShowClearConfirm(true)} className="h-10 px-3.5 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                 Gishya
                             </button>
 
                             {messages.length > 0 && (
-                                <button onClick={() => setShowClearConfirm(true)} className="h-10 px-4 rounded-full bg-white/95 dark:bg-slate-900/55 text-slate-500 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/50 shadow-[0_6px_16px_rgba(15,23,42,0.12)] hover:text-red-500 hover:border-red-200/80 dark:hover:border-red-500/50 transition-all flex items-center gap-2 active:scale-95 text-[10px] font-bold">
+                                <button onClick={() => setShowClearConfirm(true)} className="h-10 px-3.5 rounded-full bg-white/95 dark:bg-slate-900/55 text-slate-500 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/50 shadow-[0_6px_16px_rgba(15,23,42,0.12)] hover:text-red-500 hover:border-red-200/80 dark:hover:border-red-500/50 transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     Siba
                                 </button>
                             )}
 
-                            <button onClick={() => setShowBreathing(true)} className="h-10 px-4 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-2 active:scale-95 text-[10px] font-bold">
+                            <button onClick={() => setShowBreathing(true)} className="h-10 px-3.5 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                                 Humeka
                             </button>
 
-                            <button onClick={() => setShowSOS(true)} className="h-10 px-4 rounded-full bg-gradient-to-br from-[#FF8A3D] via-[#FF6B3D] to-[#FFB347] text-white shadow-[0_14px_30px_rgba(255,107,61,0.38)] hover:shadow-[0_18px_36px_rgba(255,107,61,0.48)] transition-all flex items-center gap-2 active:scale-95 text-[10px] font-bold">
+                            <button onClick={() => setShowSOS(true)} className="h-10 px-3.5 rounded-full bg-gradient-to-br from-[#FF8A3D] via-[#FF6B3D] to-[#FFB347] text-white shadow-[0_14px_30px_rgba(255,107,61,0.38)] hover:shadow-[0_18px_36px_rgba(255,107,61,0.48)] transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 SOS
                             </button>

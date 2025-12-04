@@ -46,7 +46,7 @@ UBURYO BWO GUSUBIZA:
 - Baza ibibazo bifasha umuntu kuvuga ibyiyumvo bye
 
 IGIHE CY'IMPANUKA:
-- Iyo umuntu avuze ko ashaka kwiyahura cyangwa kwiyica, mubwire ahamagare 988 (mu Amerika) cyangwa ajye ku bitaro byihutirwa
+- Iyo umuntu avuze ko ashaka kwiyahura cyangwa kwiyica, mubwire ahamagare 114 cyangwa ajye ku bitaro byihutirwa
 - Iyo ikibazo gikomeye cyane, mwifurize kubona umuganga w'ubuzima bwo mu mutwe
 
 Ubutumwa bw'umukiliya: ${newMessage}`;

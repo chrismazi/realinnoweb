@@ -475,8 +475,8 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
             <div className="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-100 dark:border-slate-800 animate-slide-up">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Profile</p>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Edit Information</h3>
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Umwirondoro</p>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Hindura Amakuru</h3>
                     </div>
                     <button onClick={() => setActiveModal('NONE')} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
                         <Icons.Close className="w-5 h-5" />
@@ -501,7 +501,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 </div>
 
                 <div className="space-y-4">
-                    {[{ label: 'Full name', type: 'text', value: editForm.name, key: 'name' }, { label: 'Email', type: 'email', value: editForm.email, key: 'email' }, { label: 'Phone number', type: 'tel', value: editForm.phone, key: 'phone' }].map(field => (
+                    {[{ label: 'Amazina yose', type: 'text', value: editForm.name, key: 'name' }, { label: 'imeri', type: 'email', value: editForm.email, key: 'email' }, { label: 'Numero ya Telefoni', type: 'tel', value: editForm.phone, key: 'phone' }].map(field => (
                         <div key={field.key}>
                             <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">{field.label}</label>
                             <input
@@ -528,7 +528,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                             </svg>
                             Saving...
                         </>
-                    ) : 'Save changes'}
+                    ) : 'Bika ibyahindutse'}
                 </button>
             </div>
         </div>
@@ -955,7 +955,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                 <button onClick={onBack} className="w-10 h-10 rounded-full bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-900 transition-all active:scale-95 flex items-center justify-center">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 </button>
-                <h1 className="text-lg font-bold tracking-wide">Profile</h1>
+                <h1 className="text-lg font-bold tracking-wide">Umwirondoro</h1>
                 <button onClick={openEditModal} className="w-10 h-10 rounded-full bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-900 transition-all active:scale-95 flex items-center justify-center">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </button>
@@ -977,15 +977,12 @@ const Profile: React.FC<ProfileProps> = ({ onBack, onLogout }) => {
                             </div>
                         </button>
                         <div>
-                            <p className="text-sm text-slate-400 dark:text-slate-500">Account</p>
+                            <p className="text-sm text-slate-400 dark:text-slate-500">Konti</p>
                             <p className="text-lg font-bold text-slate-900 dark:text-white">{profile.name}</p>
                             <p className="text-xs text-slate-400 dark:text-slate-500">{profile.email}</p>
                         </div>
                     </div>
-                    <button onClick={openEditModal} className="text-xs font-semibold text-brand hover:underline flex items-center gap-1">
-                        See personal info
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                    </button>
+                    
                 </div>
 
                 {/* Menu Sections */}

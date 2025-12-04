@@ -24,7 +24,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
         <img src={Logo} alt="RealWorks Logo" className="w-full h-full object-contain drop-shadow-xl" />
       </div>
       
-      <h1 className="text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">RealWorks</h1>
+      <h1 className="text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">Fasha</h1>
       <p className="text-[#F97316] mt-3 font-bold tracking-widest uppercase text-sm">Ubuzima.Imari.Intego</p>
     </div>
   );

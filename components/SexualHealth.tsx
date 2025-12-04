@@ -285,7 +285,7 @@ const SexualHealth: React.FC = () => {
   // --- Data ---
   const methods: ContraceptiveMethod[] = [
     {
-      id: '1', name: 'Ibinini', efficacy: '99%', efficacyValue: 95, type: 'Imiti irinda gusama',
+      id: '1', name: 'Ibinini', efficacy: '99%', efficacyValue: 95, type: 'Uburyo bukoresha imisemburo',
       desc: 'Ibinini byo kunywa buri munsi.',
       pros: ['Itunganya imihango', 'Igabanya udusebe', 'Igaruka vuba'],
       cons: ['Gusaba kwibuka buri munsi', 'Impinduka z\'imyumvire'],
@@ -293,7 +293,7 @@ const SexualHealth: React.FC = () => {
       bestFor: 'Abakunda gahunda bakeneye kugabanya udusebe.'
     },
     {
-      id: '2', name: 'IUD (Umuringa)', efficacy: '>99%', efficacyValue: 99.8, type: 'Nta miti ngendanubuzima',
+      id: '2', name: 'IUD (Umuringa)', efficacy: '>99%', efficacyValue: 99.8, type: 'Uburyo budakoresha imisemburo',
       desc: 'Igikoresho kidafite imiti ngendanubuzima gishyirwa mu mura.',
       pros: ['Imara imyaka 10-12', 'Nta miti ngendanubuzima', 'Ushyira ukirengagiza'],
       cons: ['Imihango irushaho', 'Kubabara igihe bishyirwamo'],
@@ -301,7 +301,7 @@ const SexualHealth: React.FC = () => {
       bestFor: 'Uburyo bwo kwirinda igihe kirekire nta miti ngendanubuzima.'
     },
     {
-      id: '3', name: 'IUD (Imiti ngendanubuzima)', efficacy: '>99%', efficacyValue: 99.5, type: 'Imiti ngendanubuzima',
+      id: '3', name: 'IUD (Ifite imisemburo)', efficacy: '>99%', efficacyValue: 99.5, type: 'Uburyo bukoresha imisemburo',
       desc: 'Igikoresho gifite imiti ngendanubuzima nke.',
       pros: ['Imihango yoroheje', 'Imara imyaka 3-7', 'Ushyira ukirengagiza'],
       cons: ['Kutagira uburuhukiro igihe bishyirwamo', 'Gutakaza amaraso mu ntangiriro'],
@@ -317,7 +317,7 @@ const SexualHealth: React.FC = () => {
       bestFor: 'Kurinda indwara zandurira n\'ubundi buryo.'
     },
     {
-      id: '5', name: 'Implanon', efficacy: '>99%', efficacyValue: 99.9, type: 'Imiti ngendanubuzima',
+      id: '5', name: 'Implanon', efficacy: '>99%', efficacyValue: 99.9, type: 'Uburyo budakoresha umusemburo',
       desc: 'Agati gato kashyirwa munsi y\'uruhu rw\'ukuboko.',
       pros: ['Imara imyaka 3', 'Ntigaragara', 'Irakora neza'],
       cons: ['Gutakaza amaraso bidahoraho', 'Igikorwa gito'],
@@ -530,7 +530,7 @@ const SexualHealth: React.FC = () => {
             </div>
           )}
           {mentalTab === 'JOURNAL' && (<div className="space-y-6 animate-slide-up"><div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">{showJournalSuccess && (<div className="absolute top-0 left-0 w-full bg-green-500 text-white text-xs font-bold py-2 text-center animate-fade-in z-20">Entry Saved Successfully!</div>)}<div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-2xl mb-4 relative"><p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Igitekerezo cyo kwandikaho</p><p className="text-indigo-900 dark:text-indigo-200 font-medium text-sm leading-relaxed pr-8">"{activePrompt}"</p><button onClick={shufflePrompt} className="absolute top-4 right-4 text-indigo-400 hover:text-indigo-600 dark:hover:text-white transition-colors"><Icons.Refresh className="w-4 h-4" /></button></div><textarea value={journalEntry} onChange={(e) => setJournalEntry(e.target.value)} placeholder="Tangirira hano wandika..." className="w-full h-40 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl resize-none outline-none focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900/40 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 transition-all border border-slate-100 dark:border-slate-700" /><div className="flex justify-between mt-4"><span className="text-xs text-slate-400 font-medium">{new Date().toLocaleDateString()}</span><button onClick={handleSaveJournal} className="px-6 py-3 bg-slate-900 dark:bg-purple-600 text-white rounded-xl font-bold text-xs shadow-lg shadow-purple-200 dark:shadow-purple-900/30 active:scale-95 transition-transform flex items-center gap-2"><Icons.Check className="w-4 h-4" /> Bika</button></div></div><div className="space-y-4"><h3 className="font-bold text-slate-400 dark:text-slate-500 text-xs uppercase tracking-widest px-2">Ibiheruka</h3>{journalHistory.length === 0 ? (<div className="text-center py-10 opacity-50 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem]"><p className="text-sm font-medium text-slate-500">Nta na kimwe kirandikwa. Tangira wandike!</p></div>) : (journalHistory.map((entry) => (<div key={entry.id} className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-none relative group"><div className="flex justify-between items-start mb-3"><div className="flex gap-2"><span className="text-[10px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">{entry.date.toLocaleDateString()}</span></div><button onClick={() => deleteJournal(entry.id)} className="text-slate-300 hover:text-red-500 transition-colors"><Icons.Trash className="w-4 h-4" /></button></div><p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium whitespace-pre-wrap">{entry.text}</p></div>)))}</div></div>)}
-          {mentalTab === 'SUPPORT' && (<div className="space-y-6 animate-slide-up"><div className="bg-slate-900 dark:bg-white p-8 rounded-[2.5rem] text-center shadow-xl"><h2 className="text-2xl font-bold text-white dark:text-slate-900 mb-2">Nturi wenyine.</h2><p className="text-slate-300 dark:text-slate-600 text-sm mb-8 leading-relaxed">Gusaba ubufasha ni ikimenyetso cy'imbaraga, si ubugoryi.</p><div className="grid grid-cols-1 gap-3"><a href="tel:114" className="flex items-center justify-center gap-3 py-4 bg-red-500 text-white rounded-2xl font-bold shadow-lg shadow-red-500/30 active:scale-95 transition-transform">Hamagara umurongo w'ubufasha (114)</a></div></div></div>)}
+          {mentalTab === 'SUPPORT' && (<div className="space-y-6 animate-slide-up"><div className="bg-slate-900 dark:bg-white p-8 rounded-[2.5rem] text-center shadow-xl"><h2 className="text-2xl font-bold text-white dark:text-slate-900 mb-2">Nturi wenyine.</h2><p className="text-slate-300 dark:text-slate-600 text-sm mb-8 leading-relaxed">Gusaba ubufasha ni ikimenyetso cy'imbaraga, si ubugwari.</p><div className="grid grid-cols-1 gap-3"><a href="tel:114" className="flex items-center justify-center gap-3 py-4 bg-red-500 text-white rounded-2xl font-bold shadow-lg shadow-red-500/30 active:scale-95 transition-transform">Hamagara umurongo w'ubufasha (114)</a></div></div></div>)}
           {isCheckInOpen && (<div className="fixed inset-0 z-50 flex items-end justify-center"><div className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-fade-in" onClick={() => { if (checkInStep === 0) setIsCheckInOpen(false); }}></div><div className="bg-white dark:bg-slate-900 w-full max-w-lg h-[85vh] rounded-t-[2.5rem] shadow-2xl animate-slide-up relative z-10 flex flex-col overflow-hidden"><div className="p-6 flex justify-between items-center"><button onClick={() => { if (checkInStep > 0) setCheckInStep(checkInStep - 1); else setIsCheckInOpen(false); }}><Icons.Back className="w-6 h-6 text-slate-400" /></button><span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Step {checkInStep + 1} of 4</span><button onClick={() => setIsCheckInOpen(false)}><Icons.Close className="w-6 h-6 text-slate-400" /></button></div><div className="flex-1 p-8 flex flex-col items-center justify-center text-center animate-fade-in">{checkInStep === 0 && (<><h2 className="text-3xl font-black text-slate-900 dark:text-white mb-8">Umunsi wawe wagenze ute?</h2><div className="flex flex-col gap-4 w-full max-w-xs">{[{ lvl: 5, label: 'Byiza cyane', emoji: '🤩' }, { lvl: 4, label: 'Byiza', emoji: '🙂' }, { lvl: 3, label: 'Biraho', emoji: '😐' }, { lvl: 2, label: 'Byari Bigoye', emoji: '😔' }, { lvl: 1, label: 'Birababaje cyane', emoji: '😫' }].map(opt => (<button key={opt.lvl} onClick={() => { setCurrentMood(opt.lvl); setCheckInStep(1); }} className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between hover:scale-105 ${currentMood === opt.lvl ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20' : 'border-slate-100 dark:border-slate-800 hover:border-teal-200'}`}><span className="font-bold text-slate-700 dark:text-slate-200">{opt.label}</span><span className="text-2xl">{opt.emoji}</span></button>))}</div></>)}{checkInStep === 1 && (<><h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Isuzuma ry’umubiri</h2><div className="flex flex-wrap justify-center gap-3">{['Umunaniro', 'Ububabare mu mugongo', 'Ububabare bw’umutwe', 'Ufite imbaraga', 'Utuje', 'Umunaniro ukabije'].map(tag => (<button key={tag} onClick={() => currentPhysical.includes(tag) ? setCurrentPhysical(currentPhysical.filter(t => t !== tag)) : setCurrentPhysical([...currentPhysical, tag])} className={`px-6 py-3 rounded-full text-sm font-bold transition-all border-2 ${currentPhysical.includes(tag) ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900' : 'border-slate-200 dark:border-slate-800 text-slate-500'}`}>{tag}</button>))}</div><button onClick={() => setCheckInStep(2)} className="mt-12 px-8 py-4 bg-teal-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">Komeza</button></>)}{checkInStep === 2 && (<><h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Ni iki kigutera ikibazo cyangwa kukubuza amahoro?</h2><div className="flex flex-wrap justify-center gap-3">{['Akazi', 'Amafaranga', 'Umuryango', 'Ubuzima'].map(tag => (<button key={tag} onClick={() => currentFactors.includes(tag) ? setCurrentFactors(currentFactors.filter(t => t !== tag)) : setCurrentFactors([...currentFactors, tag])} className={`px-6 py-3 rounded-full text-sm font-bold transition-all border-2 ${currentFactors.includes(tag) ? 'bg-indigo-600 text-white border-indigo-600' : 'border-slate-200 dark:border-slate-800 text-slate-500'}`}>{tag}</button>))}</div><button onClick={() => setCheckInStep(3)} className="mt-12 px-8 py-4 bg-teal-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">Komeza</button></>)}{checkInStep === 3 && (<><h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Ibyo utekereza ku musozo</h2><textarea value={currentNote} onChange={e => setCurrentNote(e.target.value)} placeholder="Optional note..." className="w-full h-32 bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 mb-8 resize-none focus:ring-2 focus:ring-teal-500 outline-none" /><button onClick={finishCheckIn} className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold shadow-xl active:scale-95 transition-transform">Nasoje</button></>)}</div></div></div>)}
         </div>
       </div>
@@ -569,7 +569,7 @@ const SexualHealth: React.FC = () => {
                 <p className="text-slate-300 text-sm leading-relaxed relative z-10 max-w-xs mx-auto">Shaka uburyo ukurikije imibereho yawe, ibyo ukunda, n'ibyo ukeneye mu buzima.</p>
 
                 <div className="flex flex-wrap justify-center gap-2 mt-6 relative z-10">
-                  {['Byose', 'Imiti ngendanubuzima', 'Nta miti ngendanubuzima', 'Igihe kirekire', 'Buri munsi'].map(tag => (
+                  {['Byose', 'Uburyo bukoresha imisemburo ', 'Uburyo budakoresha imisemburo', 'Ubryo bwigihe kirekire', 'Ukoresha buri munsi'].map(tag => (
                     <button
                       key={tag}
                       onClick={() => setMethodFilter(tag)}
@@ -1145,8 +1145,8 @@ const SexualHealth: React.FC = () => {
         timeline: 'Amezi 3-6 mbere',
         color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
         icon: <Icons.Sparkles className="w-6 h-6" />,
-        description: 'Tekereza nkaho utegura ubutaka mbere yo gutera. Shira umwete ku guhindura imyitwarire no kubika intungamubiri.',
-        tips: ['Tangira imiti yinda ifite 400mcg ya Folic Acid.', 'Gabanya ikawa kugira ngo wirinde kubabara umutwe.', 'Gena igihe cyo gusuzumwa mbere yo gusama.']
+        description: 'Tekereza nk’aho uri gutegura ubutaka mbere yo gutera imbuto. Ubu ni igihe cyo guhindura imyitwarire no kongera intungamubiri mu mubiri.',
+        tips: ['Fata ibinini birinda inda bifite 400 mcg ya Folic Acid buri munsi.', 'Gabanya kunywa ikawa kugira ngo wirinde kubabara umutwe no kurakara umubiri.', 'Teganya isuzuma ry’abaganga mbere yo gutangira gutegura gusama.']
       },
       {
         id: 'TRACK',
@@ -1154,8 +1154,8 @@ const SexualHealth: React.FC = () => {
         timeline: 'Amezi 1-3 mbere',
         color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
         icon: <Icons.ChartBar className="w-6 h-6" />,
-        description: 'Umubiri wawe uguha ibimenyetso buri kwezi. Iki ni igihe cyo kwiga no gusobanukirwa imihindagurike y’imihango yawe.',
-        tips: ['Gusohora igi ntibiba ku munsi wa 14 kuri buri mugore.', 'Reba impinduka ku mwanda w’inkondo y’umura', 'Gabanya stress; cortisol nyinshi ishobora gutinza gusohora igi.']
+        description: 'Umubiri wawe uhatse amakuru buri kwezi. Iki ni igihe cyo kwiga no kumenya neza imihindagurikire y’imihango yawe n’igihe ushobora gusama.',
+        tips: ['Gusohora igi ntibiba ku munsi wa 14 kuri buri mugore.', 'Reba impinduka ku mwanda uva ku nkondo y’umura, zishobora kukwereka igihe uri hafi yo gusama.', 'Gabanya stress kuko cortisol nyinshi ishobora gutinza cyangwa guhagarika gusohora igi']
       },
       {
         id: 'TRY',
@@ -1164,29 +1164,29 @@ const SexualHealth: React.FC = () => {
         color: 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300',
         icon: <Icons.Heart className="w-6 h-6" />,
         description: 'Igikorwa nyamukuru. Tegura neza uwo mubana.',
-        tips: ['Intanga zumugabo zimara kugeza iminsi 5; amagi amara amasaha 12-24 gusa.', 'Gerageza gukora imibonano ku minsi O–2 na O–1 kugira ngo wongere amahirwe yo gusama.', 'Ibi bikorwa mubyinjiyemo mu munezero; stress nyinshi igabanya amahirwe y’uburumbuke.']
+        tips: ['Intanga z’umugabo zishobora kumara iminsi 5 mu mubiri w’umugore.; Igi ry’umugore rimara amasaha 12–24 gusa rishobora gusamwa.', 'Kugira imibonano ku minsi iri hafi yo gusohora igi (O–2 na O–1) byongera amahirwe yo gusama.', 'Mubikore mu munezero, mu bwumvikane. Stress nyinshi ishobora kugabanya amahirwe yo gusama.']
       }
     ];
 
     const checklistCategories = [
       {
         name: 'Ubuvuzi', tasks: [
-          { id: 'folic', label: 'Folic Acid ya buri munsi', desc: 'Irinda ibibazo byuruti rwumwana.' },
-          { id: 'checkup', label: 'Gusura muganga', desc: 'Gusuzuma imiti ninkingo.' },
-          { id: 'dentist', label: 'Gusukura amenyo', desc: 'Ubuzima bwamenyo bugira ingaruka ku nda.' }
+          { id: 'folic', label: 'Folic Acid ya buri munsi', desc: 'Ifasha kurinda ibibazo bishobora kuba ku rutirigogo rw’umwana.' },
+          { id: 'checkup', label: 'Gusura muganga', desc: 'Reba imiti ukoresha n’inkingo ukeneye mbere yo gutangira gutegura gusama.' },
+          { id: 'dentist', label: 'Gusukura amenyo', desc: 'Ubuzima bw’amenyo bushobora kugira ingaruka ku buzima bw’inda.' }
         ]
       },
       {
         name: 'Imibereho', tasks: [
-          { id: 'habits', label: 'Gabanya ikawa', desc: 'Munsi ya 200mg ku munsi (ikombe 1).' },
-          { id: 'smoke', label: 'Reka kunywa itabi', desc: 'Ni ngombwa ku migi myiza.' },
+          { id: 'habits', label: 'Gabanya ikawa', desc: 'Munsi ya 200mg ku munsi (igikombe 1).' },
+          { id: 'smoke', label: 'Reka kunywa itabi', desc: 'Ni ingenzi ku buzima bwiza bw’umubyeyi n’umwana.' },
           { id: 'sleep', label: 'Kuruhuka neza', desc: 'Amasaha 7-8 kugira ngo hormone zitunganye.' }
         ]
       },
       {
         name: 'Amafaranga', tasks: [
-          { id: 'insurance', label: 'Suzuma ubwishingizi', desc: 'Reba niba bufite ubuvuzi bwabagore batwite.' },
-          { id: 'fund', label: 'Amafaranga yibihutirwa', desc: 'Tegura amafaranga yamezi 3.' }
+          { id: 'insurance', label: 'Suzuma ubwishingizi', desc: 'Reba niba butanga ubuvuzi ku bagore batwite n’abana.' },
+          { id: 'fund', label: 'Amafaranga yibikenewe byihutirwa', desc: 'Tegura amafaranga byibura yamezi atatu yo kugufasha mu gihe cy’inzibacyuho.' }
         ]
       }
     ];
@@ -1246,7 +1246,7 @@ const SexualHealth: React.FC = () => {
             <div className="space-y-6 animate-slide-up">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Inzira yo kuba umubyeyi</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Hitamo icyiciro uri kuri cyo kugira ngo ubone inama.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Hitamo icyiciro urimo kugira ngo ubone inama ikubereye.</p>
               </div>
 
               <div className="flex justify-between relative mb-8 px-2">
@@ -1296,7 +1296,7 @@ const SexualHealth: React.FC = () => {
               <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-[2.5rem] p-8 border border-indigo-100 dark:border-indigo-900/30 flex items-center justify-between shadow-sm">
                 <div>
                   <h2 className="text-xl font-bold text-indigo-900 dark:text-indigo-300">Amanota yo Kwitegura</h2>
-                  <p className="text-xs text-indigo-700 dark:text-indigo-400 font-medium mt-1">Rangiza ibikorwa kugira ngo uzamuke.</p>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-400 font-medium mt-1">Rangiza ibi bikorwa kugira ngo uzamure amahirwe yo gusama neza.</p>
                 </div>
                 <div className="w-16 h-16 relative flex items-center justify-center">
                   <svg className="w-full h-full transform -rotate-90">
@@ -1475,11 +1475,11 @@ const SexualHealth: React.FC = () => {
         )}
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-none">
-            {view === 'DASHBOARD' && 'Health'}
+            {view === 'DASHBOARD' && 'Ubuzima'}
             {view === 'CONTRACEPTION_GUIDE' && 'Uburyo bwo kwirinda gusama'}
             {view === 'MENS_HEALTH_VIEW' && 'Men\'s Health'}
             {view === 'WOMENS_HEALTH' && 'Women\'s Wellness'}
-            {view === 'ARTICLE_VIEW' && 'Family Planning'}
+            {view === 'ARTICLE_VIEW' && 'Umuryango'}
             {view === 'MENTAL_HEALTH_VIEW' && 'Ubuzima bwo mu mutwe'}
           </h1>
         </div>

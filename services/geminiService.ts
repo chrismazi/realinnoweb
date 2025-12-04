@@ -94,7 +94,7 @@ export const sendMessageToGemini = async (
       return "Sinshobora gusubiza ubwo butumwa. Nyamuneka dukomeze ikiganiro cyacu mu buryo bwiza.";
     }
 
-    return "Mfite ikibazo cyo guhuza ubu. Nyamuneka gerageza nyuma y'akanya.";
+    return "Mfite ikibazo cya konegisiyo ubu. Nyamuneka gerageza nyuma y'akanya.";
   }
 };
 

@@ -92,7 +92,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const SECTION_LABELS: Record<'OVERVIEW' | 'TRANSACTIONS' | 'SAVINGS', string> = {
     OVERVIEW: 'Incamake',
-    TRANSACTIONS: 'Amateka',
+    TRANSACTIONS: 'Ibyakozwe',
     SAVINGS: 'Kuzigama'
 };
 
@@ -700,7 +700,7 @@ const BudgetPlannerComponent = () => {
                 <div className="flex p-1 bg-white dark:bg-slate-900 rounded-2xl relative mb-2 shadow-sm border border-slate-100 dark:border-slate-800">
                     <div className={`absolute top-1 bottom-1 w-[32.5%] bg-slate-100 dark:bg-slate-800 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]`} style={{ left: activeSection === 'OVERVIEW' ? '0.25rem' : activeSection === 'TRANSACTIONS' ? '33.75%' : '67%' }}></div>
                     <button onClick={() => setActiveSection('OVERVIEW')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider relative z-10 transition-colors ${activeSection === 'OVERVIEW' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>Incamake</button>
-                    <button onClick={() => setActiveSection('TRANSACTIONS')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider relative z-10 transition-colors ${activeSection === 'TRANSACTIONS' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>Amateka</button>
+                    <button onClick={() => setActiveSection('TRANSACTIONS')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider relative z-10 transition-colors ${activeSection === 'TRANSACTIONS' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>Ibyakozwe</button>
                     <button onClick={() => setActiveSection('SAVINGS')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider relative z-10 transition-colors ${activeSection === 'SAVINGS' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>Kuzigama</button>
                 </div>
             </div>
@@ -752,14 +752,17 @@ const BudgetPlannerComponent = () => {
                                         </PieChart>
                                     </ResponsiveContainer>
                                 ) : (
-                                    <div className="h-full flex items-center justify-center">
-                                        <p className="text-slate-400 text-sm">Nta makuru y'ibyakoreshejwe muri uku kwezi</p>
+                                    <div className="h-full flex flex-col items-center justify-center gap-2">
+                                        <p className="text-slate-400 text-sm text-center">Nta makuru y'ibyakoreshejwe muri uku kwezi</p>
+                                        <p className="text-base font-bold text-slate-500">{formatCurrency(0)}</p>
                                     </div>
                                 )}
-                                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                                    <p className="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Igiteranyo</p>
-                                    <p className="text-xl font-bold text-slate-900 dark:text-white">{formatCurrency(totalSpent)}</p>
-                                </div>
+                                {pieChartData.length > 0 && (
+                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                                        <p className="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Igiteranyo</p>
+                                        <p className="text-xl font-bold text-slate-900 dark:text-white">{formatCurrency(totalSpent)}</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="space-y-4 pb-10">

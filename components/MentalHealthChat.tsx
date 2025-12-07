@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { ChatMessage } from '../types';
+import { ChatMessage, ChatSession } from '../types';
 import { sendMessageToGemini } from '../services/geminiService';
-import useAppStore, { useChatHistory, useSettings } from '../store/useAppStore';
+import useAppStore, { useChatHistory, useSettings, useChatSessions } from '../store/useAppStore';
 
 // Rwanda emergency numbers (Kinyarwanda)
 const RWANDA_EMERGENCY = {
@@ -111,13 +111,17 @@ interface MentalHealthChatProps {
 
 const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
     const messages = useChatHistory();
-    const { addChatMessage, clearChatHistory } = useAppStore();
+    const chatSessions = useChatSessions();
+    const { addChatMessage, clearChatHistory, restoreChatSession, deleteChatSession } = useAppStore();
     const settings = useSettings();
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showBreathing, setShowBreathing] = useState(false);
     const [showSOS, setShowSOS] = useState(false);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
+    const [showHistoryPanel, setShowHistoryPanel] = useState(false);
+    const [historySearch, setHistorySearch] = useState('');
+    const [restoringId, setRestoringId] = useState<string | null>(null);
     const [typingAnimation, setTypingAnimation] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -138,6 +142,7 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
         let lastDate = '';
         messages.forEach((msg) => {
             const msgDate = new Date(msg.timestamp).toDateString();
+
             if (msgDate !== lastDate) {
                 result.push({ type: 'date', date: msgDate });
                 lastDate = msgDate;
@@ -146,6 +151,35 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
         });
         return result;
     }, [messages]);
+
+    const filteredSessions = useMemo(() => {
+        const query = historySearch.trim().toLowerCase();
+        if (!query) return chatSessions;
+        return chatSessions.filter((session) =>
+            session.title.toLowerCase().includes(query) ||
+            session.messages.some((msg) => msg.text.toLowerCase().includes(query))
+        );
+    }, [chatSessions, historySearch]);
+
+    const formatSessionMeta = (session: ChatSession) => {
+        const updated = new Date(session.updatedAt);
+        return `${updated.toLocaleDateString()} • ${session.messages.length} ubutumwa`;
+    };
+
+    const handleRestoreSession = async (sessionId: string) => {
+        setRestoringId(sessionId);
+        const success = await restoreChatSession(sessionId);
+        setRestoringId(null);
+        if (success) {
+            setShowHistoryPanel(false);
+            setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+        }
+    };
+
+    const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        deleteChatSession(sessionId);
+    };
 
     const formatDateSeparator = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -173,19 +207,20 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
             timestamp: new Date()
         };
 
-        addChatMessage(userMsg);
+        const historyForAI = [...messages, userMsg];
+
+        await addChatMessage(userMsg);
         setInput('');
         setIsLoading(true);
 
         try {
-            const history = messages;
             let responseText: string;
             let attempts = 0;
             const maxAttempts = 3;
 
             while (attempts < maxAttempts) {
                 try {
-                    responseText = await sendMessageToGemini(history, userMsg.text);
+                    responseText = await sendMessageToGemini(historyForAI, userMsg.text);
                     if (responseText && responseText.trim().length > 0) {
                         const botMsg: ChatMessage = {
                             id: (Date.now() + 1).toString(),
@@ -193,10 +228,11 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                             text: responseText,
                             timestamp: new Date()
                         };
-                        addChatMessage(botMsg);
+                        await addChatMessage(botMsg);
                         setIsLoading(false);
                         return;
                     }
+
                     break;
                 } catch (apiError: any) {
                     attempts++;
@@ -256,6 +292,66 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                 </div>
             )}
 
+            {showHistoryPanel && (
+                <div className="absolute inset-0 z-[65] bg-slate-900/70 dark:bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={() => setShowHistoryPanel(false)}>
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] p-6 shadow-2xl animate-slide-up relative" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Ibiganiro byawe</p>
+                                <h3 className="text-2xl font-black text-slate-900 dark:text-white">Ibiganiro Byarangiye</h3>
+                            </div>
+                            <button onClick={() => setShowHistoryPanel(false)} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+
+                        {chatSessions.length > 0 && (
+                            <div className="mb-4">
+                                <div className="relative">
+                                    <input value={historySearch} onChange={(e) => setHistorySearch(e.target.value)} placeholder="Shakisha mu mateka..." className="w-full rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-teal-500 outline-none" />
+                                    <svg className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" /></svg>
+                                </div>
+                            </div>
+                        )}
+
+                        {chatSessions.length === 0 ? (
+                            <div className="text-center py-10 px-6 border border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem]">
+                                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Ntureba ibyahise kuko utarabika ikiganiro na Vestie.</p>
+                                <p className="text-xs text-slate-400 mt-2">Tangira ikiganiro gishya, hanyuma usibe cyangwa utangire bundi bushya kugira ngo kibikwe hano.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                                {filteredSessions.length === 0 && (
+                                    <p className="text-xs text-center text-slate-400 font-medium">Nta kiganiro gihuye n'ibyo washakishije.</p>
+                                )}
+                                {filteredSessions.map((session) => (
+                                    <button key={session.id} onClick={() => handleRestoreSession(session.id)} className="w-full text-left bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-4 shadow-sm hover:border-teal-200 dark:hover:border-teal-700 transition-all group">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{session.title || 'Ikiganiro kidafite izina'}</p>
+                                                <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400 mt-1">{formatSessionMeta(session)}</p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <button onClick={(e) => handleDeleteSession(session.id, e)} className="p-2 rounded-full text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                </button>
+                                                <div className="p-2 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-300">
+                                                    {restoringId === session.id ? (
+                                                        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v4m0 8v4m8-8h-4M8 12H4" /></svg>
+                                                    ) : (
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             <div className="pt-14 px-6 pb-4 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-30 sticky top-0 transition-colors duration-300">
                 <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-3">
@@ -270,26 +366,35 @@ const MentalHealthChat: React.FC<MentalHealthChatProps> = ({ onBack }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <div className="flex items-center gap-1.5 px-1.5 py-1.5 rounded-full bg-white/85 dark:bg-slate-900/70 border border-white/50 dark:border-slate-800/60 shadow-[0_10px_26px_rgba(15,23,42,0.12)] backdrop-blur">
-                            <button onClick={() => setShowClearConfirm(true)} className="h-10 px-3.5 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                        <div className="flex items-center gap-1.5 px-1.5 py-1.5 rounded-full bg-white/85 dark:bg-slate-900/70 border border-white/50 dark:border-slate-800/60 shadow-[0_10px_26px_rgba(15,23,42,0.12)] backdrop-blur flex-nowrap min-w-max">
+                            <button onClick={() => setShowClearConfirm(true)} className="h-10 px-3.5 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold whitespace-nowrap">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                 Gishya
                             </button>
 
                             {messages.length > 0 && (
-                                <button onClick={() => setShowClearConfirm(true)} className="h-10 px-3.5 rounded-full bg-white/95 dark:bg-slate-900/55 text-slate-500 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/50 shadow-[0_6px_16px_rgba(15,23,42,0.12)] hover:text-red-500 hover:border-red-200/80 dark:hover:border-red-500/50 transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold">
+                                <button onClick={() => setShowClearConfirm(true)} className="h-10 px-3.5 rounded-full bg-white/95 dark:bg-slate-900/55 text-slate-500 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/50 shadow-[0_6px_16px_rgba(15,23,42,0.12)] hover:text-red-500 hover:border-red-200/80 dark:hover:border-red-500/50 transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold whitespace-nowrap">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     Siba
                                 </button>
                             )}
 
-                            <button onClick={() => setShowBreathing(true)} className="h-10 px-3.5 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold">
+                            <button onClick={() => setShowHistoryPanel(true)} className="h-10 px-3.5 rounded-full bg-white/90 dark:bg-slate-900/60 text-slate-600 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700/60 shadow-[0_6px_18px_rgba(15,23,42,0.12)] hover:text-teal-600 hover:border-teal-200/80 dark:hover:border-teal-500/60 transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold whitespace-nowrap">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h10m-10 5h16" /></svg>
+                                Ibyahise
+                                {chatSessions.length > 0 && (
+                                    <span className="w-5 h-5 rounded-full bg-teal-500 text-white text-[9px] font-black flex items-center justify-center">{chatSessions.length}
+                                    </span>
+                                )}
+                            </button>
+
+                            <button onClick={() => setShowBreathing(true)} className="h-10 px-3.5 rounded-full bg-gradient-to-r from-slate-900 via-[#0f172a] to-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.22)] hover:shadow-[0_10px_26px_rgba(15,23,42,0.26)] transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold whitespace-nowrap">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                                 Humeka
                             </button>
 
-                            <button onClick={() => setShowSOS(true)} className="h-10 px-3.5 rounded-full bg-gradient-to-br from-[#FF8A3D] via-[#FF6B3D] to-[#FFB347] text-white shadow-[0_14px_30px_rgba(255,107,61,0.38)] hover:shadow-[0_18px_36px_rgba(255,107,61,0.48)] transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold">
+                            <button onClick={() => setShowSOS(true)} className="h-10 px-3.5 rounded-full bg-gradient-to-br from-[#FF8A3D] via-[#FF6B3D] to-[#FFB347] text-white shadow-[0_14px_30px_rgba(255,107,61,0.38)] hover:shadow-[0_18px_36px_rgba(255,107,61,0.48)] transition-all flex items-center gap-1.5 active:scale-95 text-[10px] font-bold whitespace-nowrap">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 SOS
                             </button>

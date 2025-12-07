@@ -3,7 +3,7 @@
  * This provides data persistence across sessions
  */
 
-import { SavingsGoal, Transaction, ChatMessage } from '../types';
+import { SavingsGoal, Transaction, ChatMessage, ChatSession } from '../types';
 
 // Encryption key (in production, this should be derived from user password)
 const STORAGE_KEY_PREFIX = 'realworks_';
@@ -15,6 +15,7 @@ const STORAGE_KEYS = {
   TRANSACTIONS: `${STORAGE_KEY_PREFIX}transactions`,
   SAVINGS_GOALS: `${STORAGE_KEY_PREFIX}savings_goals`,
   CHAT_HISTORY: `${STORAGE_KEY_PREFIX}chat_history`,
+  CHAT_SESSIONS: `${STORAGE_KEY_PREFIX}chat_sessions`,
   HEALTH_DATA: `${STORAGE_KEY_PREFIX}health_data`,
   MENTAL_HEALTH: `${STORAGE_KEY_PREFIX}mental_health`,
   SETTINGS: `${STORAGE_KEY_PREFIX}settings`,
@@ -172,6 +173,51 @@ export const chatHistoryService = {
     return chatHistoryService.save(trimmed);
   },
   clear: () => storageService.remove(STORAGE_KEYS.CHAT_HISTORY)
+};
+
+type StoredChatSession = Omit<ChatSession, 'messages'> & {
+  messages: (Omit<ChatMessage, 'timestamp'> & { timestamp: string })[];
+};
+
+const serializeSession = (session: ChatSession): StoredChatSession => ({
+  ...session,
+  messages: session.messages.map((msg) => ({
+    ...msg,
+    timestamp: msg.timestamp instanceof Date ? msg.timestamp.toISOString() : new Date(msg.timestamp).toISOString()
+  }))
+});
+
+const deserializeSession = (stored: StoredChatSession): ChatSession => ({
+  ...stored,
+  messages: stored.messages.map((msg) => ({
+    ...msg,
+    timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date()
+  }))
+});
+
+const MAX_STORED_SESSIONS = 50;
+
+export const chatSessionsService = {
+  load: (): ChatSession[] => {
+    const stored = storageService.load<StoredChatSession[]>(STORAGE_KEYS.CHAT_SESSIONS, true) || [];
+    return stored.map(deserializeSession);
+  },
+  save: (sessions: ChatSession[]): boolean => {
+    const payload = sessions.map(serializeSession);
+    return storageService.save(STORAGE_KEYS.CHAT_SESSIONS, payload, true);
+  },
+  add: (session: ChatSession): boolean => {
+    const sessions = chatSessionsService.load();
+    sessions.push(session);
+    const trimmed = sessions.slice(-MAX_STORED_SESSIONS);
+    return chatSessionsService.save(trimmed);
+  },
+  remove: (sessionId: string): boolean => {
+    const sessions = chatSessionsService.load();
+    const filtered = sessions.filter((session) => session.id !== sessionId);
+    return chatSessionsService.save(filtered);
+  },
+  clear: (): boolean => storageService.remove(STORAGE_KEYS.CHAT_SESSIONS)
 };
 
 export const healthDataService = {

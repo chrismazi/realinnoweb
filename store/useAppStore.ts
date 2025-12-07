@@ -6,8 +6,8 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { Transaction, SavingsGoal, ChatMessage } from '../types';
-import { settingsService } from '../services/storageService';
+import { Transaction, SavingsGoal, ChatMessage, ChatSession } from '../types';
+import { settingsService, chatSessionsService } from '../services/storageService';
 import supabaseTransactionsService from '../services/supabaseTransactions';
 import supabaseSavingsService from '../services/supabaseSavings';
 import supabaseHealthService from '../services/supabaseHealth';
@@ -41,6 +41,10 @@ interface AppState {
 
   // Chat data
   chatHistory: ChatMessage[];
+  chatSessions: ChatSession[];
+  activeSessionId: string | null;
+  activeSessionTitle: string;
+  activeSessionCreatedAt: string | null;
 
   // Settings
   settings: {
@@ -76,6 +80,10 @@ interface AppState {
   // Chat actions
   addChatMessage: (message: ChatMessage) => Promise<void>;
   clearChatHistory: () => Promise<void>;
+  archiveCurrentChat: (title?: string) => Promise<string | null>;
+  restoreChatSession: (sessionId: string) => Promise<boolean>;
+  deleteChatSession: (sessionId: string) => void;
+  renameChatSession: (sessionId: string, title: string) => void;
 
   // Settings actions
   updateSettings: (settings: Partial<AppState['settings']>) => void;
@@ -119,6 +127,10 @@ const useAppStore = create<AppState>()(
         },
 
         chatHistory: [],
+        chatSessions: [],
+        activeSessionId: null,
+        activeSessionTitle: '',
+        activeSessionCreatedAt: null,
 
         settings: {
           darkMode: false,
@@ -385,8 +397,13 @@ const useAppStore = create<AppState>()(
         },
 
         clearChatHistory: async () => {
+          await get().archiveCurrentChat();
+
           set((state) => {
             state.chatHistory = [];
+            state.activeSessionId = null;
+            state.activeSessionTitle = '';
+            state.activeSessionCreatedAt = null;
           });
 
           try {
@@ -394,6 +411,91 @@ const useAppStore = create<AppState>()(
           } catch (error) {
             console.error('Error clearing chat history:', error);
           }
+        },
+
+        archiveCurrentChat: async (title) => {
+          const { chatHistory, activeSessionId, activeSessionCreatedAt } = get();
+          if (!chatHistory.length) return null;
+
+          const now = new Date();
+          const firstUserMessage = chatHistory.find((msg) => msg.role === 'user');
+          const computedTitle = title?.trim() && title.trim().length > 0
+            ? title.trim()
+            : firstUserMessage
+              ? firstUserMessage.text.slice(0, 60)
+              : `Ikiganiro ${now.toLocaleString()}`;
+
+          const sessionId = activeSessionId || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+          const createdAt = activeSessionCreatedAt || now.toISOString();
+
+          const session: ChatSession = {
+            id: sessionId,
+            title: computedTitle,
+            createdAt,
+            updatedAt: now.toISOString(),
+            messages: chatHistory.map((msg) => ({
+              ...msg,
+              timestamp: msg.timestamp instanceof Date ? msg.timestamp : new Date(msg.timestamp)
+            }))
+          };
+
+          set((state) => {
+            const existingIndex = state.chatSessions.findIndex((s) => s.id === sessionId);
+            if (existingIndex !== -1) {
+              state.chatSessions[existingIndex] = session;
+            } else {
+              state.chatSessions.push(session);
+            }
+            state.chatSessions.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+            state.activeSessionId = null;
+            state.activeSessionTitle = '';
+            state.activeSessionCreatedAt = null;
+          });
+
+          chatSessionsService.save(get().chatSessions);
+          return sessionId;
+        },
+
+        restoreChatSession: async (sessionId) => {
+          const session = get().chatSessions.find((s) => s.id === sessionId);
+          if (!session) return false;
+
+          set((state) => {
+            state.chatHistory = session.messages.map((msg) => ({
+              ...msg,
+              timestamp: msg.timestamp instanceof Date ? msg.timestamp : new Date(msg.timestamp)
+            }));
+            state.activeSessionId = session.id;
+            state.activeSessionTitle = session.title;
+            state.activeSessionCreatedAt = session.createdAt;
+            state.chatSessions = state.chatSessions.filter((s) => s.id !== sessionId);
+          });
+
+          chatSessionsService.save(get().chatSessions);
+          try {
+            await supabaseChatService.clearAll();
+          } catch (error) {
+            console.error('Error clearing remote chat history before restoring session:', error);
+          }
+
+          return true;
+        },
+
+        deleteChatSession: (sessionId) => {
+          set((state) => {
+            state.chatSessions = state.chatSessions.filter((session) => session.id !== sessionId);
+          });
+          chatSessionsService.save(get().chatSessions);
+        },
+
+        renameChatSession: (sessionId, title) => {
+          set((state) => {
+            const session = state.chatSessions.find((s) => s.id === sessionId);
+            if (session) {
+              session.title = title;
+            }
+          });
+          chatSessionsService.save(get().chatSessions);
         },
 
         // Settings actions
@@ -498,6 +600,11 @@ const useAppStore = create<AppState>()(
                 state.chatHistory = chat.data;
               }
 
+              const storedSessions = chatSessionsService.load();
+              if (storedSessions.length > 0) {
+                state.chatSessions = storedSessions;
+              }
+
               if (userResult.success && userResult.data && userResult.data.profile.settings) {
                 const remoteSettings = userResult.data.profile.settings;
                 // Merge remote settings, prioritizing remote if not empty
@@ -563,6 +670,10 @@ const useAppStore = create<AppState>()(
           state.transactions = [];
           state.savingsGoals = [];
           state.chatHistory = [];
+          state.chatSessions = [];
+          state.activeSessionId = null;
+          state.activeSessionTitle = '';
+          state.activeSessionCreatedAt = null;
           state.healthData = {
             cycleData: {},
             mentalHealth: {},
@@ -571,6 +682,7 @@ const useAppStore = create<AppState>()(
           };
           state.balance = 0;
           localStorage.clear();
+          chatSessionsService.clear();
         })
       })),
       {
@@ -593,6 +705,7 @@ export const useTransactions = () => useAppStore((state) => state.transactions);
 export const useSavingsGoals = () => useAppStore((state) => state.savingsGoals);
 export const useHealthData = () => useAppStore((state) => state.healthData);
 export const useChatHistory = () => useAppStore((state) => state.chatHistory);
+export const useChatSessions = () => useAppStore((state) => state.chatSessions);
 export const useSettings = () => useAppStore((state) => state.settings);
 export const useBalance = () => useAppStore((state) => state.balance);
 

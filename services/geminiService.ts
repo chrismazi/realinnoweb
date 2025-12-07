@@ -45,6 +45,8 @@ const sanitizeMessage = (message: string): string => {
   return sanitized;
 };
 
+const HISTORY_CONTEXT_LIMIT = 30;
+
 export const sendMessageToGemini = async (
   chatHistory: ChatMessage[],
   newMessage: string,
@@ -64,9 +66,11 @@ export const sendMessageToGemini = async (
     const sanitizedMessage = sanitizeMessage(newMessage);
 
     // Call Supabase Edge Function
+    const trimmedHistory = chatHistory.slice(-HISTORY_CONTEXT_LIMIT);
+
     const { data, error } = await supabase.functions.invoke('gemini-chat', {
       body: {
-        history: chatHistory.slice(-10), // Send only last 10 messages context
+        history: trimmedHistory,
         newMessage: sanitizedMessage
       }
     });
